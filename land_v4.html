@@ -1,0 +1,1551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>WorldUnfold v3 — Globe Explorer</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js"></script>
+<style>
+:root {
+  --bg: #020b14;
+  --ocean: #041220;
+  --ocean2: #071c30;
+  --gold: #c9a84c;
+  --gold2: #e8c96a;
+  --gold-glow: rgba(201,168,76,0.3);
+  --glass: rgba(5,18,34,0.92);
+  --glass2: rgba(3,12,24,0.97);
+  --border: rgba(201,168,76,0.2);
+  --border2: rgba(201,168,76,0.12);
+  --text: #eee8d5;
+  --text2: rgba(238,232,213,0.55);
+  --text3: rgba(238,232,213,0.35);
+  /* Continent palette */
+  --asia: #26d9a8;
+  --europe: #7b9ef8;
+  --africa: #f7854a;
+  --n-america: #e879c8;
+  --s-america: #ab69f0;
+  --oceania: #f0c93a;
+  --antarctica: #81e6d9;
+  --no-data: #1a3347;
+  /* Game */
+  --violet: #7c3aed;
+  --violet2: #a78bfa;
+  --green: #10b981;
+  --red: #ef4444;
+  --teal: #14b8a6;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:'Outfit',sans-serif;overflow:hidden;background:var(--bg);color:var(--text)}
+/* ── MAP ── */
+.map-wrap{position:fixed;inset:0;background:radial-gradient(ellipse 120% 100% at 50% 70%,var(--ocean2) 0%,var(--ocean) 40%,var(--bg) 100%);z-index:1;cursor:grab;overflow:hidden}
+.map-wrap:active{cursor:grabbing}
+svg{width:100%;height:100%}
+.country{stroke:rgba(255,255,255,0.6);stroke-width:0.5;stroke-linejoin:round;cursor:pointer;transition:filter .18s,stroke .18s,stroke-width .18s}
+.country.lit{stroke:#ffffff;stroke-width:1.2}
+.country.lit:hover{stroke:var(--gold2);stroke-width:2.2;filter:brightness(1.1) drop-shadow(0 0 9px rgba(0,0,0,0.15))}
+.cap-dot{fill:var(--gold2);stroke:#fff;stroke-width:1;cursor:pointer;opacity:.9;r:4}
+.ctry-label{font-family:'Outfit',sans-serif;font-size:6px;font-weight:700;fill:var(--text);pointer-events:none;opacity:0.4;text-shadow:0 1px 3px rgba(0,0,0,.9), 0 0 5px #000}
+/* ── HEADER ── */
+.header{position:absolute;top:0;left:0;right:0;padding:12px 22px;background:linear-gradient(180deg,var(--glass) 0%,transparent 100%);backdrop-filter:blur(8px);z-index:20;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border2)}
+.logo{font-family:'Cormorant Garamond',serif;font-size:1.22rem;font-weight:700;color:var(--gold2);letter-spacing:3px;display:flex;align-items:center;gap:8px}
+.logo-dot{width:8px;height:8px;border-radius:50%;background:var(--gold2);box-shadow:0 0 8px var(--gold)}
+.header-btns{display:flex;gap:8px}
+.hbtn{border:1px solid var(--border);border-radius:30px;padding:7px 18px;font-family:'Outfit',sans-serif;font-size:.76rem;font-weight:600;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:7px;letter-spacing:.4px}
+.hbtn-game{background:rgba(124,58,237,.12);color:var(--violet);border-color:rgba(124,58,237,.3)}
+.hbtn-game:hover{background:var(--violet);color:#fff;border-color:var(--violet);transform:translateY(-1px);box-shadow:0 6px 18px rgba(124,58,237,.3)}
+.hbtn-info{background:rgba(255,152,0,.15);color:var(--gold2);border-color:var(--border)}
+.hbtn-info:hover{background:var(--gold2);color:#fff;border-color:var(--gold2)}
+/* ── SEARCH ── */
+.search-wrap{position:absolute;top:68px;left:22px;z-index:20}
+.search-box{background:var(--glass);backdrop-filter:blur(14px);border:1px solid var(--border);border-radius:40px;padding:9px 18px 9px 40px;width:232px;color:var(--text);font-family:'Outfit',sans-serif;font-size:.82rem;transition:border .2s;box-shadow:0 4px 12px rgba(0,0,0,0.05)}
+.search-box::placeholder{color:var(--text3)}
+.search-box:focus{outline:none;border-color:var(--gold)}
+.search-ico{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--gold-glow);font-size:.8rem;pointer-events:none;color:rgba(255,152,0,.7)}
+/* ── LEGEND ── */
+.legend{position:absolute;top:68px;right:22px;z-index:20;background:var(--glass);backdrop-filter:blur(14px);padding:13px 17px;border-radius:18px;border:1px solid var(--border);box-shadow:0 4px 12px rgba(0,0,0,0.05)}
+.legend-t{font-size:.57rem;text-transform:uppercase;letter-spacing:2.5px;color:var(--gold2);margin-bottom:9px;font-weight:800}
+.legend-row{display:flex;align-items:center;gap:7px;margin-bottom:5px;font-size:.71rem;color:var(--text2);font-weight:600}
+.leg-sw{width:12px;height:12px;border-radius:4px;flex-shrink:0}
+/* ── FILTERS ── */
+.filters{position:absolute;bottom:88px;left:22px;z-index:20;display:flex;gap:5px;flex-wrap:wrap;background:var(--glass);backdrop-filter:blur(14px);padding:8px 14px;border-radius:40px;border:1px solid var(--border);max-width:94%;box-shadow:0 4px 12px rgba(0,0,0,0.05)}
+.fbtn{background:transparent;border:none;padding:5px 14px;border-radius:30px;color:var(--text2);font-family:'Outfit',sans-serif;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .2s}
+.fbtn:hover{color:var(--text);background:rgba(0,0,0,.04)}
+.fbtn.on{background:var(--gold);color:#fff}
+/* ── CONTROLS ── */
+.ctrl-bar{position:absolute;bottom:24px;left:50%;transform:translateX(-50%);z-index:20;display:flex;gap:7px;background:var(--glass);backdrop-filter:blur(14px);padding:7px 18px;border-radius:50px;border:1px solid var(--border);box-shadow:0 4px 12px rgba(0,0,0,0.05)}
+.cbtn{background:rgba(0,0,0,.04);border:none;padding:6px 16px;border-radius:30px;color:var(--text);font-family:'Outfit',sans-serif;font-size:.76rem;font-weight:700;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:5px}
+.cbtn:hover{background:var(--gold);color:#fff}
+/* ── STATS ── */
+.stats{position:absolute;bottom:24px;right:22px;z-index:20;background:var(--glass);backdrop-filter:blur(14px);padding:7px 18px;border-radius:40px;font-size:.74rem;color:var(--text2);border:1px solid var(--border);display:flex;align-items:center;gap:6px;box-shadow:0 4px 12px rgba(0,0,0,0.05);font-weight:600}
+.stats b{color:var(--gold2);font-weight:800}
+/* ── TOOLTIP ── */
+.tip{position:fixed;pointer-events:none;z-index:999;background:var(--glass2);border:1px solid var(--border);border-radius:12px;padding:6px 14px;font-size:.78rem;color:var(--text);white-space:nowrap;opacity:0;transition:opacity .12s;font-weight:700;box-shadow:0 6px 16px rgba(0,0,0,.1)}
+
+/* ═══════════════════════════════════════
+   COUNTRY MODAL
+═══════════════════════════════════════ */
+.cmodal{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(12px);z-index:200;display:none;align-items:center;justify-content:center;opacity:0;transition:opacity .28s}
+.cmodal.on{display:flex;opacity:1}
+.cm-box{width:96%;max-width:1160px;max-height:93vh;background:var(--glass2);border-radius:34px;border:1px solid var(--border);box-shadow:0 40px 100px rgba(0,0,0,.4);overflow:hidden;display:flex;transform:scale(.86) translateY(24px);transition:transform .42s cubic-bezier(.34,1.5,.64,1)}
+.cmodal.on .cm-box{transform:scale(1) translateY(0)}
+/* LEFT slideshow */
+.cm-photo{flex:1.25;position:relative;min-height:480px;overflow:hidden;background:var(--bg)}
+.ss-wrap{position:relative;width:100%;height:100%;min-height:480px}
+.ss-slide{position:absolute;inset:0;background-size:cover;background-position:center;opacity:0;transition:opacity .7s ease;z-index:1}
+.ss-slide.on{opacity:1}
+.ss-grad{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.65) 0%,rgba(0,0,0,.0) 45%,transparent 100%),linear-gradient(to right,rgba(0,0,0,.2) 0%,transparent 50%);pointer-events:none;z-index:3}
+.ss-cap{position:absolute;bottom:44px;left:0;right:0;padding:22px 18px 14px;color:#fff;font-size:.85rem;font-weight:600;letter-spacing:.4px;z-index:4;pointer-events:none;text-shadow:0 1px 6px rgba(0,0,0,.8)}
+.cont-badge{position:absolute;top:18px;left:18px;padding:6px 16px;border-radius:30px;font-size:.65rem;font-weight:800;letter-spacing:2px;text-transform:uppercase;z-index:5;color:#fff;box-shadow:0 4px 14px rgba(0,0,0,.25)}
+.ss-nav{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,.4);border:none;width:42px;height:42px;border-radius:50%;color:var(--text);font-size:1rem;cursor:pointer;transition:all .2s;z-index:15;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,.3)}
+.ss-nav:hover{background:var(--gold2);color:#fff}
+.ss-prev{left:14px}.ss-next{right:14px}
+.ss-dots{position:absolute;bottom:14px;left:0;right:0;display:flex;justify-content:center;gap:7px;z-index:15}
+.ss-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.5);cursor:pointer;transition:all .22s}
+.ss-dot.on{background:#fff;width:20px;border-radius:10px}
+/* RIGHT info */
+.cm-info{flex:.82;padding:26px 28px;overflow-y:auto;max-height:93vh;position:relative}
+.cm-info::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,var(--gold),transparent);pointer-events:none}
+.cm-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px}
+.cm-title{font-family:'Cormorant Garamond',serif;font-size:2.2rem;font-weight:700;color:var(--text);line-height:1}
+.cm-sub{font-size:.68rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text2);margin-top:4px}
+.cm-close{background:rgba(0,0,0,.04);border:none;width:36px;height:36px;border-radius:50%;color:var(--text2);cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.cm-close:hover{background:#ef4444;color:#fff;transform:rotate(90deg)}
+/* FLAG HERO */
+.flag-card{background:rgba(0,0,0,.2);border:1px solid var(--border2);border-radius:20px;padding:20px;margin-bottom:14px;text-align:center;position:relative;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,.2)}
+.flag-img-wrap{display:flex;justify-content:center;margin-bottom:10px}
+.flag-img{width:140px;height:90px;object-fit:cover;border-radius:8px;border:1px solid var(--border);box-shadow:0 8px 24px rgba(0,0,0,.3);background:var(--bg)}
+.flag-emoji-fallback{font-size:4.5rem;line-height:1;filter:drop-shadow(0 4px 16px rgba(0,0,0,.15))}
+.capital-pill{display:inline-flex;align-items:center;gap:7px;background:rgba(255,152,0,.15);border-radius:30px;padding:5px 16px;font-size:.76rem;color:var(--gold2);font-weight:700;margin-top:4px}
+.population-row{display:flex;justify-content:center;gap:16px;margin-top:10px;flex-wrap:wrap}
+.pop-chip{background:rgba(0,0,0,.04);border-radius:30px;padding:4px 12px;font-size:.68rem;color:var(--text2);font-weight:600}
+.pop-chip b{color:var(--text);font-weight:800}
+/* INFO SECTIONS */
+.info-sec{margin-bottom:9px;background:rgba(0,0,0,.2);border:1px solid var(--border2);border-radius:14px;padding:12px 14px;transition:border-color .2s;box-shadow:0 2px 8px rgba(0,0,0,.1)}
+.info-sec:hover{border-color:var(--gold-glow);background:rgba(0,0,0,.4)}
+.info-lbl{font-size:.56rem;text-transform:uppercase;letter-spacing:2.5px;color:var(--gold2);margin-bottom:5px;font-weight:800;display:flex;align-items:center;gap:6px}
+.info-lbl i{font-size:.65rem;opacity:.9}
+.info-val{font-size:.85rem;line-height:1.65;color:var(--text);font-weight:500}
+.back-btn{background:rgba(255,152,0,.15);border:none;padding:12px 20px;border-radius:40px;color:var(--gold2);font-weight:700;cursor:pointer;transition:all .22s;display:flex;align-items:center;gap:8px;width:100%;justify-content:center;margin-top:10px;font-family:'Outfit',sans-serif;font-size:.85rem}
+.back-btn:hover{background:var(--gold2);color:#fff;box-shadow:0 6px 16px var(--gold-glow)}
+.cm-info::-webkit-scrollbar{width:4px}
+.cm-info::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+
+/* ═══════════════════════════════════════
+   GAME MODAL
+═══════════════════════════════════════ */
+.gmodal{position:fixed;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(16px);z-index:300;display:none;align-items:center;justify-content:center;opacity:0;transition:opacity .28s}
+.gmodal.on{display:flex;opacity:1}
+.gbox{width:96%;max-width:880px;max-height:95vh;background:var(--glass2);border-radius:30px;box-shadow:0 40px 100px rgba(0,0,0,.4);border:1px solid var(--border);overflow:hidden;display:flex;flex-direction:column;position:relative}
+.gbox::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,transparent,var(--violet),transparent);pointer-events:none}
+.g-head{padding:20px 26px 14px;border-bottom:1px solid rgba(0,0,0,.05);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.g-title{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:700;color:var(--violet);display:flex;align-items:center;gap:10px}
+.g-pills{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.g-pill{background:rgba(124,58,237,.1);border-radius:30px;padding:4px 14px;font-size:.74rem;font-weight:700;color:var(--violet);display:flex;align-items:center;gap:5px}
+.g-pill .val{color:var(--violet);font-size:.9rem;font-weight:800}
+.g-close{background:rgba(0,0,0,.04);border:none;width:34px;height:34px;border-radius:50%;color:var(--text2);cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center}
+.g-close:hover{background:#ef4444;color:#fff}
+.g-body{padding:22px 26px;overflow-y:auto;flex:1}
+/* MODE SELECT */
+.mode-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:22px}
+.mode-card{background:rgba(0,0,0,.2);border:1px solid var(--border2);border-radius:18px;padding:18px;cursor:pointer;transition:all .22s;text-align:center;box-shadow:0 4px 12px rgba(0,0,0,.2)}
+.mode-card:hover{border-color:var(--violet);transform:translateY(-2px);box-shadow:0 8px 24px rgba(124,58,237,.15)}
+.mode-card.sel{border-color:var(--violet);background:rgba(124,58,237,.2);box-shadow:0 0 0 2px var(--violet)}
+.mode-ico{font-size:2rem;margin-bottom:8px}
+.mode-nm{font-size:.9rem;font-weight:800;color:var(--text);margin-bottom:3px}
+.mode-dsc{font-size:.75rem;color:var(--text2);font-weight:500}
+.diff-row{display:flex;gap:8px;margin-bottom:22px}
+.diff-btn{flex:1;background:rgba(0,0,0,.2);border:1px solid var(--border2);border-radius:12px;padding:10px;color:var(--text2);font-family:'Outfit',sans-serif;font-size:.78rem;font-weight:700;cursor:pointer;transition:all .2s;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.1)}
+.diff-btn:hover{border-color:var(--violet);color:var(--violet)}
+.diff-btn.sel{background:rgba(124,58,237,.1);border-color:var(--violet);color:var(--violet)}
+.start-btn{background:linear-gradient(135deg,var(--violet),#9333ea);border:none;padding:14px 36px;border-radius:40px;color:#fff;font-family:'Outfit',sans-serif;font-size:.95rem;font-weight:700;cursor:pointer;transition:all .22s;letter-spacing:.5px;display:flex;align-items:center;gap:8px;box-shadow:0 8px 20px rgba(124,58,237,.3)}
+.start-btn:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(124,58,237,.45)}
+/* QUIZ */
+.quiz-area{display:none}
+.quiz-area.on{display:block}
+.prog-wrap{height:6px;background:rgba(0,0,0,.05);border-radius:6px;margin-bottom:20px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--violet),var(--violet2));border-radius:6px;transition:width .5s cubic-bezier(.4,0,.2,1)}
+.streak-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(249,115,22,.15);border-radius:30px;padding:5px 14px;font-size:.75rem;color:#ea580c;font-weight:700;margin-bottom:14px}
+.timer-bar-wrap{height:4px;background:rgba(0,0,0,.05);border-radius:4px;margin-bottom:16px;overflow:hidden}
+.timer-bar{height:100%;border-radius:4px;transition:width .2s linear}
+.q-text{font-family:'Cormorant Garamond',serif;font-size:1.45rem;font-weight:800;color:var(--text);margin-bottom:6px;line-height:1.3}
+.q-sub{font-size:.8rem;color:var(--text2);margin-bottom:18px;font-weight:600}
+/* FLAG display in quiz */
+.quiz-flag-wrap{display:flex;justify-content:center;margin:14px 0 20px}
+.quiz-flag-img{width:200px;height:128px;object-fit:cover;border-radius:10px;border:1px solid var(--border);box-shadow:0 10px 30px rgba(0,0,0,.4);background:var(--bg)}
+.quiz-flag-emoji{font-size:5rem;text-align:center;display:block;filter:drop-shadow(0 4px 18px rgba(0,0,0,.2));margin:14px 0 20px}
+.opts-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:18px}
+.opt-btn{background:rgba(0,0,0,.2);border:1px solid var(--border2);border-radius:14px;padding:14px 16px;color:var(--text);font-family:'Outfit',sans-serif;font-size:.88rem;font-weight:600;cursor:pointer;transition:all .2s;text-align:left;display:flex;align-items:center;gap:10px;box-shadow:0 4px 12px rgba(0,0,0,.1)}
+.opt-btn:hover:not(:disabled){background:rgba(124,58,237,.05);border-color:var(--violet);transform:translateY(-2px);box-shadow:0 6px 16px rgba(124,58,237,.15)}
+.opt-btn.correct{background:rgba(16,185,129,.1)!important;border-color:#10b981!important;color:#059669!important}
+.opt-btn.wrong{background:rgba(239,68,68,.1)!important;border-color:#ef4444!important;color:#dc2626!important}
+.opt-btn:disabled{cursor:default;transform:none!important}
+.opt-letter{width:28px;height:28px;border-radius:8px;background:rgba(124,58,237,.1);display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:800;color:var(--violet);flex-shrink:0}
+.fb-box{border-radius:14px;padding:14px 18px;margin-bottom:14px;font-size:.85rem;font-weight:600;display:none;line-height:1.5}
+.fb-box.ok{background:rgba(16,185,129,.15);border:1px solid rgba(16,185,129,.3);color:#047857}
+.fb-box.bad{background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:#b91c1c}
+.next-btn{background:linear-gradient(135deg,var(--violet),#9333ea);border:none;padding:12px 28px;border-radius:40px;color:#fff;font-family:'Outfit',sans-serif;font-size:.88rem;font-weight:700;cursor:pointer;transition:all .2s;display:none;align-items:center;gap:7px;box-shadow:0 6px 16px rgba(124,58,237,.3)}
+.next-btn:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(124,58,237,.4)}
+/* RESULT */
+.result-area{display:none;text-align:center;padding:28px 0}
+.res-ring{width:140px;height:140px;border-radius:50%;border:4px solid var(--gold);margin:0 auto 18px;display:flex;align-items:center;justify-content:center;flex-direction:column;box-shadow:0 0 40px var(--gold-glow),inset 0 0 30px rgba(255,152,0,.1)}
+.res-pts{font-family:'Cormorant Garamond',serif;font-size:2.8rem;font-weight:800;color:var(--gold2);line-height:1}
+.res-lbl{font-size:.7rem;color:var(--text2);letter-spacing:1px;text-transform:uppercase;font-weight:700}
+.res-msg{font-size:1.1rem;color:var(--text);font-weight:600;margin-bottom:22px}
+.badges-row{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:24px}
+.badge{padding:6px 16px;border-radius:30px;font-size:.75rem;font-weight:700;border:1px solid transparent}
+.res-btns{display:flex;gap:12px;justify-content:center}
+.res-btn{border:none;padding:12px 28px;border-radius:40px;font-family:'Outfit',sans-serif;font-size:.9rem;font-weight:800;cursor:pointer;transition:all .22s}
+.res-btn:hover{transform:translateY(-2px)}
+.rbtn-gold{background:linear-gradient(135deg,var(--gold),var(--gold2));color:#fff;box-shadow:0 6px 16px var(--gold-glow)}
+.rbtn-gold:hover{box-shadow:0 10px 24px var(--gold-glow)}
+.rbtn-violet{background:linear-gradient(135deg,var(--violet),#9333ea);color:#fff;box-shadow:0 6px 16px rgba(124,58,237,.3)}
+.rbtn-violet:hover{box-shadow:0 10px 24px rgba(124,58,237,.4)}
+
+/* ── REGION LABEL OVERLAY ── */
+.region-labels{position:absolute;inset:0;pointer-events:none;z-index:5}
+.r-label{position:absolute;font-family:'Cormorant Garamond',serif;font-size:.78rem;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,.4);pointer-events:none;text-shadow:0 2px 6px rgba(0,0,0,.1)}
+
+/* ── DISCOVER TOAST ── */
+.toast{position:fixed;top:80px;left:50%;transform:translateX(-50%) translateY(-80px);z-index:400;background:var(--glass2);border:1px solid var(--border);border-radius:40px;padding:12px 26px;font-size:.88rem;color:var(--gold2);font-weight:700;display:flex;align-items:center;gap:9px;transition:transform .4s cubic-bezier(.34,1.5,.64,1),opacity .4s;opacity:0;white-space:nowrap;box-shadow:0 8px 24px rgba(0,0,0,.1)}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){
+  .cm-box{flex-direction:column;max-height:90vh}
+  .cm-photo{min-height:230px}
+  .cm-info{max-height:48vh}
+  .legend{display:none}
+  .mode-grid{grid-template-columns:1fr 1fr}
+  .opts-grid{grid-template-columns:1fr}
+}
+@media(max-width:600px){
+  .mode-grid{grid-template-columns:1fr}
+  .cm-title{font-size:1.5rem}
+  .quiz-flag-img{width:160px;height:100px}
+}
+</style>
+</head>
+<body>
+<div class="map-wrap" id="mapWrap"></div>
+<div class="tip" id="tip"></div>
+
+<!-- HEADER -->
+<div class="header">
+  <div>
+    <div class="logo"><div class="logo-dot"></div> WORLDUNFOLD</div>
+    <div style="font-size:.65rem;color:var(--text3);margin-top:2px;letter-spacing:.5px">Click any country to explore</div>
+  </div>
+  <div class="header-btns">
+    <button class="hbtn hbtn-game" id="launchGame"><i class="fas fa-gamepad"></i> GeoMaster Quiz</button>
+    <button class="hbtn hbtn-info" id="launchStats"><i class="fas fa-chart-bar"></i> Progress</button>
+  </div>
+</div>
+
+<!-- SEARCH -->
+<div class="search-wrap">
+  <i class="fas fa-search search-ico"></i>
+  <input class="search-box" id="searchBox" placeholder="Search country…">
+</div>
+
+<!-- LEGEND -->
+<div class="legend">
+  <div class="legend-t">Regions</div>
+  <div class="legend-row"><div class="leg-sw" style="background:var(--asia)"></div>Asia</div>
+  <div class="legend-row"><div class="leg-sw" style="background:var(--europe)"></div>Europe</div>
+  <div class="legend-row"><div class="leg-sw" style="background:var(--africa)"></div>Africa</div>
+  <div class="legend-row"><div class="leg-sw" style="background:var(--n-america)"></div>N. America</div>
+  <div class="legend-row"><div class="leg-sw" style="background:var(--s-america)"></div>S. America</div>
+  <div class="legend-row"><div class="leg-sw" style="background:var(--oceania)"></div>Oceania</div>
+  <div class="legend-row"><div class="leg-sw" style="background:var(--antarctica)"></div>Antarctica</div>
+  <div class="legend-row"><div class="leg-sw" style="background:var(--no-data)"></div>No data</div>
+</div>
+
+<!-- FILTERS -->
+<div class="filters">
+  <button class="fbtn on" data-f="all">All</button>
+  <button class="fbtn" data-f="Asia">Asia</button>
+  <button class="fbtn" data-f="Europe">Europe</button>
+  <button class="fbtn" data-f="Africa">Africa</button>
+  <button class="fbtn" data-f="North America">N.America</button>
+  <button class="fbtn" data-f="South America">S.America</button>
+  <button class="fbtn" data-f="Oceania">Oceania</button>
+  <button class="fbtn" data-f="Antarctica">Antarctica</button>
+</div>
+
+<!-- CONTROLS -->
+<div class="ctrl-bar">
+  <button class="cbtn" id="zIn"><i class="fas fa-plus"></i> Zoom</button>
+  <button class="cbtn" id="zOut"><i class="fas fa-minus"></i> Zoom</button>
+  <button class="cbtn" id="zReset"><i class="fas fa-sync-alt"></i> Reset</button>
+</div>
+
+<!-- STATS -->
+<div class="stats"><i class="fas fa-globe" style="color:var(--gold)"></i> Explored: <b id="discN">0</b> / <b id="totN">0</b></div>
+
+<!-- DISCOVER TOAST -->
+<div class="toast" id="toast">🎉 <span id="toastTxt"></span></div>
+
+<!-- COUNTRY MODAL -->
+<div class="cmodal" id="cmodal">
+  <div class="cm-box">
+    <div class="cm-photo">
+      <div class="ss-wrap" id="ssWrap">
+        <div class="ss-grad" id="ssGrad"></div>
+        <div class="ss-cap" id="ssCap"></div>
+      </div>
+      <div class="cont-badge" id="contBadge"></div>
+      <button class="ss-nav ss-prev" id="ssPrev"><i class="fas fa-chevron-left"></i></button>
+      <button class="ss-nav ss-next" id="ssNext"><i class="fas fa-chevron-right"></i></button>
+      <div class="ss-dots" id="ssDots"></div>
+    </div>
+    <div class="cm-info">
+      <div class="cm-head">
+        <div>
+          <div class="cm-title" id="cmName">—</div>
+          <div class="cm-sub" id="cmSub">—</div>
+        </div>
+        <button class="cm-close" id="cmClose"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="flag-card">
+        <div class="flag-img-wrap" id="flagImgWrap"></div>
+        <div class="capital-pill"><i class="fas fa-map-marker-alt"></i> <span id="cmCap">—</span></div>
+        <div class="population-row" id="cmStats"></div>
+      </div>
+      <div class="info-sec"><div class="info-lbl"><i class="fas fa-palette"></i> CULTURE</div><div class="info-val" id="cmCulture">—</div></div>
+      <div class="info-sec"><div class="info-lbl"><i class="fas fa-calendar-star"></i> TRADITIONS</div><div class="info-val" id="cmTrad">—</div></div>
+      <div class="info-sec"><div class="info-lbl"><i class="fas fa-bolt"></i> AMAZING FACT</div><div class="info-val" id="cmFact">—</div></div>
+      <div class="info-sec"><div class="info-lbl"><i class="fas fa-lightbulb"></i> DID YOU KNOW?</div><div class="info-val" id="cmDyk">—</div></div>
+      <div class="info-sec"><div class="info-lbl"><i class="fas fa-compass"></i> TRAVEL TIP</div><div class="info-val" id="cmTip">—</div></div>
+      <button class="back-btn" id="cmBack"><i class="fas fa-arrow-left"></i> Back to Map</button>
+    </div>
+  </div>
+</div>
+
+<!-- GAME MODAL -->
+<div class="gmodal" id="gmodal">
+  <div class="gbox">
+    <div class="g-head">
+      <div class="g-title"><i class="fas fa-globe-americas"></i> GeoMaster Quiz</div>
+      <div class="g-pills">
+        <div class="g-pill">🏆 <span class="val" id="gScore">0</span></div>
+        <div class="g-pill">🔥 <span class="val" id="gStreak">0</span></div>
+        <div class="g-pill">⏱ <span class="val" id="gQN">0</span>/10</div>
+        <button class="g-close" id="gClose"><i class="fas fa-times"></i></button>
+      </div>
+    </div>
+    <div class="g-body">
+      <!-- Mode selector -->
+      <div id="modeSel">
+        <div style="font-family:'Cormorant Garamond',serif;font-size:1.25rem;font-weight:700;color:var(--text);margin-bottom:5px">Choose your challenge</div>
+        <div style="font-size:.77rem;color:var(--text2);margin-bottom:18px">10 questions · Each streak multiplies your score</div>
+        <div class="mode-grid">
+          <div class="mode-card sel" data-m="flag"><div class="mode-ico">🏳️</div><div class="mode-nm">Flag Quiz</div><div class="mode-dsc">Name the country from its flag</div></div>
+          <div class="mode-card" data-m="capital"><div class="mode-ico">🏙️</div><div class="mode-nm">Capital Cities</div><div class="mode-dsc">Match capital to its country</div></div>
+          <div class="mode-card" data-m="fact"><div class="mode-ico">🔍</div><div class="mode-nm">Mystery Clue</div><div class="mode-dsc">Guess from a fascinating fact</div></div>
+          <div class="mode-card" data-m="continent"><div class="mode-ico">🗺️</div><div class="mode-nm">Continent Sort</div><div class="mode-dsc">Which continent is this country?</div></div>
+          <div class="mode-card" data-m="landmark"><div class="mode-ico">🏛️</div><div class="mode-nm">Landmark Hunt</div><div class="mode-dsc">Name the country from a famous site</div></div>
+          <div class="mode-card" data-m="mix"><div class="mode-ico">🎲</div><div class="mode-nm">Ultimate Mix</div><div class="mode-dsc">All modes shuffled together</div></div>
+        </div>
+        <div style="font-size:.72rem;color:var(--text2);margin-bottom:10px;font-weight:600">DIFFICULTY</div>
+        <div class="diff-row">
+          <button class="diff-btn" data-d="easy">🌱 Easy<br><span style="font-size:.64rem;font-weight:400">4 options · 30s</span></button>
+          <button class="diff-btn sel" data-d="medium">⚡ Medium<br><span style="font-size:.64rem;font-weight:400">4 options · 20s</span></button>
+          <button class="diff-btn" data-d="hard">🔥 Hard<br><span style="font-size:.64rem;font-weight:400">6 options · 12s</span></button>
+        </div>
+        <button class="start-btn" id="startBtn"><i class="fas fa-play"></i> Start Game</button>
+      </div>
+      <!-- Quiz -->
+      <div class="quiz-area" id="quizArea">
+        <div class="prog-wrap"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+        <div class="timer-bar-wrap"><div class="timer-bar" id="timerBar" style="width:100%;background:linear-gradient(90deg,#10b981,#059669)"></div></div>
+        <div class="streak-badge" id="streakBadge" style="display:none"><i class="fas fa-fire"></i> <span id="streakN">0</span>× streak!</div>
+        <div class="q-text" id="qText">—</div>
+        <div class="q-sub" id="qSub">Pick the correct answer</div>
+        <div id="qVisual"></div>
+        <div class="opts-grid" id="optsGrid"></div>
+        <div class="fb-box" id="fbBox"></div>
+        <button class="next-btn" id="nextBtn" style="display:none">Next <i class="fas fa-arrow-right"></i></button>
+      </div>
+      <!-- Result -->
+      <div class="result-area" id="resultArea">
+        <div class="res-ring"><div class="res-pts" id="resPts">0</div><div class="res-lbl">Points</div></div>
+        <div class="res-msg" id="resMsg">—</div>
+        <div class="badges-row" id="resBadges"></div>
+        <div class="res-btns">
+          <button class="res-btn rbtn-gold" id="playAgain">Play Again</button>
+          <button class="res-btn rbtn-violet" id="changeMode">Change Mode</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════
+// COUNTRY DATABASE
+// iso = numeric ISO 3166-1
+// flagCode = ISO 3166-1 alpha-2 (for flagcdn)
+// photos = verified Unsplash permanent IDs via direct URLs
+// ══════════════════════════════════════
+const DB = [
+/* ── ASIA ── */
+{ iso:392, fc:"jp", name:"Japan",        flag:"🇯🇵", capital:"Tokyo",       region:"Asia",         lat:35.68,  lon:139.69,
+  pop:"125.7M", area:"377,915 km²", lang:"Japanese", currency:"Yen (¥)",
+  culture:"The concept of Wa (harmony) defines society. Zen Buddhism and Shinto coexist gracefully.",
+  trad:"Tea ceremonies, Hanami (cherry blossom picnics), bowing as a greeting.",
+  fact:"Japan has over 5.5 million vending machines — one for every 23 people!",
+  dyk:"The world's first novel, The Tale of Genji, was written by a Japanese woman in 1008 CE.",
+  travel:"🌸 Visit in late March–April for cherry blossoms in Ueno or Maruyama Park.",
+  photos:[
+    {url:"https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=900&q=80",cap:"Mount Fuji at Dawn"},
+    {url:"https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=900&q=80",cap:"Tokyo Skyline"},
+    {url:"https://images.unsplash.com/photo-1478436127897-769e1b3f0f36?w=900&q=80",cap:"Kyoto Fushimi Inari"}
+  ]},
+{ iso:356, fc:"in", name:"India",        flag:"🇮🇳", capital:"New Delhi",   region:"Asia",         lat:28.61,  lon:77.21,
+  pop:"1.44B", area:"3,287,263 km²", lang:"Hindi, English + 20 others", currency:"Rupee (₹)",
+  culture:"22 official languages, 6 major religions. A festival happens almost every week.",
+  trad:"Diwali, Holi festival of colours, touching elders' feet as a sign of respect.",
+  fact:"Zero was invented in India, as was chess, Yoga, and the decimal number system.",
+  dyk:"Varanasi is one of the oldest continuously inhabited cities in the world — over 3,000 years old.",
+  travel:"🕌 Visit the Taj Mahal at dawn when the marble blushes pink in morning light.",
+  photos:[
+    {url:"https://images.unsplash.com/photo-1564507592333-c60657eea523?w=900&q=80",cap:"Taj Mahal at Sunrise"},
+    {url:"https://images.unsplash.com/photo-1524492412937-b28074a5d7da?w=900&q=80",cap:"Varanasi Ghats"},
+    {url:"https://images.unsplash.com/photo-1587135941948-670b381f08ce?w=900&q=80",cap:"Hawa Mahal, Jaipur"}
+  ]},
+{ iso:156, fc:"cn", name:"China",        flag:"🇨🇳", capital:"Beijing",     region:"Asia",         lat:39.90,  lon:116.41,
+  pop:"1.41B", area:"9,596,960 km²", lang:"Mandarin", currency:"Yuan (¥)",
+  culture:"5,000 years of civilisation. Confucian values of family, respect and education run deep.",
+  trad:"Chinese New Year, Dragon Boat Festival, Mid-Autumn Moon Festival with mooncakes.",
+  fact:"China produces and consumes more tea than any other country in the world.",
+  dyk:"Ice cream was invented in China around 200 BCE — made with buffalo milk packed in snow.",
+  travel:"🏯 Walk the Great Wall at Mutianyu for stunning valley views with far fewer crowds.",
+  photos:[
+    {url:"https://images.unsplash.com/photo-1508804185872-d7badad00f7d?w=900&q=80",cap:"Great Wall of China"},
+    {url:"https://images.unsplash.com/photo-1547981609-4b6bfe67ca0b?w=900&q=80",cap:"Li River, Guilin"},
+    {url:"https://images.unsplash.com/photo-1537031934223-a4e3c9702eed?w=900&q=80",cap:"Shanghai Bund"}
+  ]},
+{ iso:764, fc:"th", name:"Thailand",     flag:"🇹🇭", capital:"Bangkok",     region:"Asia",         lat:13.76,  lon:100.50,
+  pop:"71.6M", area:"513,120 km²", lang:"Thai", currency:"Baht (฿)",
+  culture:"Land of Smiles — Buddhism shapes every corner of daily life.",
+  trad:"Songkran water festival in April, Loy Krathong floating lanterns in November.",
+  fact:"Thailand has over 40,000 Buddhist temples — more than any other country on Earth.",
+  dyk:"The Thai alphabet has 44 consonants and 32 vowels — one of the world's most complex scripts.",
+  travel:"🛕 Explore Chiang Mai's ancient temples at dawn before the heat and crowds arrive.",
+  photos:[
+    {url:"https://images.unsplash.com/photo-1508009603885-50cf7c579365?w=900&q=80",cap:"Grand Palace, Bangkok"},
+    {url:"https://images.unsplash.com/photo-1483683804023-6ccdb62f86ef?w=900&q=80",cap:"Phi Phi Islands"},
+    {url:"https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?w=900&q=80",cap:"Chiang Mai Temple"}
+  ]},
+{ iso:792, fc:"tr", name:"Turkey",       flag:"🇹🇷", capital:"Ankara",      region:"Asia",         lat:39.93,  lon:32.86,
+  pop:"84.3M", area:"783,562 km²", lang:"Turkish", currency:"Lira (₺)",
+  culture:"Bridge of East and West — Ottoman grandeur, ancient Greek ruins, Byzantine mosaics.",
+  trad:"Turkish tea (çay) culture, hammam bathhouses, Sufi whirling dervish ceremonies.",
+  fact:"Istanbul had coffee houses before London — Turkey introduced café culture to Europe.",
+  dyk:"Noah's Ark is said to have rested on Mount Ararat in eastern Turkey.",
+  travel:"🎈 Take a hot-air balloon over Cappadocia's fairy chimneys at sunrise.",
+  photos:[
+    {url:"https://images.unsplash.com/photo-1541432901042-2d8bd64b4a9b?w=900&q=80",cap:"Hagia Sophia, Istanbul"},
+    {url:"https://images.unsplash.com/photo-1570168007204-dfb528c6958f?w=900&q=80",cap:"Cappadocia Balloons"},
+    {url:"https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?w=900&q=80",cap:"Bosphorus Strait"}
+  ]},
+{ iso:360, fc:"id", name:"Indonesia",   flag:"🇮🇩", capital:"Jakarta",     region:"Asia",         lat:-6.21,  lon:106.85,
+  pop:"273M", area:"1,904,569 km²", lang:"Indonesian", currency:"Rupiah (Rp)",
+  culture:"World's largest archipelago — 17,000 islands, 300 ethnic groups, 700 languages.",
+  trad:"Batik textile art (UNESCO), Wayang shadow puppet theatre, gamelan music.",
+  fact:"Home to the world's largest flower — Rafflesia arnoldii — nearly 1 metre wide.",
+  dyk:"Komodo Dragons, the world's largest lizards, exist only in Indonesia.",
+  travel:"🌋 Hike to Ijen's electric-blue volcanic crater fire at 3am for an otherworldly sight.",
+  photos:[
+    {url:"https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=900&q=80",cap:"Bali Rice Terraces"},
+    {url:"https://images.unsplash.com/photo-1555400038-63f5ba517a47?w=900&q=80",cap:"Borobudur Temple"},
+    {url:"https://images.unsplash.com/photo-1518548419970-58e3b4079ab2?w=900&q=80",cap:"Raja Ampat Islands"}
+  ]},
+{ iso:704, fc:"vn", name:"Vietnam",      flag:"🇻🇳", capital:"Hanoi",       region:"Asia",         lat:21.03,  lon:105.85,
+  pop:"97.3M", area:"331,212 km²", lang:"Vietnamese", currency:"Dong (₫)",
+  culture:"Confucian, Buddhist and French colonial layers over 4,000 years of history.",
+  trad:"Tết Lunar New Year: firecrackers, ancestor worship and red envelopes.",
+  fact:"Vietnam is the world's second largest coffee exporter after Brazil.",
+  dyk:"Ha Long Bay contains nearly 2,000 limestone islands sculpted by 500 million years of geology.",
+  travel:"🛶 Kayak through the caves of Ha Long Bay at sunset when the karsts glow amber.",
+  photos:[
+    {url:"https://images.unsplash.com/photo-1528127269322-539801943592?w=900&q=80",cap:"Ha Long Bay"},
+    {url:"https://images.unsplash.com/photo-1583417319070-4a69db38a482?w=900&q=80",cap:"Hoi An Lanterns"},
+    {url:"https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?w=900&q=80",cap:"Sapa Rice Terraces"}
+  ]},
+{ iso:410, fc:"kr", name:"South Korea", flag:"🇰🇷", capital:"Seoul",       region:"Asia",         lat:37.57,  lon:126.98,
+  pop:"51.7M", area:"100,210 km²", lang:"Korean", currency:"Won (₩)",
+  culture:"K-drama, K-pop and Korean BBQ riding on 5,000 years of Confucian tradition.",
+  trad:"Chuseok harvest festival, Seollal Lunar New Year, elaborate bowing ceremonies.",
+  fact:"South Korea has the world's fastest average internet speed.",
+  dyk:"Koreans count age from conception — every newborn is already 1 year old.",
+  travel:"🏯 Walk Bukchon Hanok Village among 600-year-old traditional houses at dawn.",
+  photos:[
+    {url:"https://images.unsplash.com/photo-1548115184-bc6544d06a58?w=900&q=80",cap:"Seoul Skyline"},
+    {url:"https://images.unsplash.com/photo-1578637387939-43c525550085?w=900&q=80",cap:"Gyeongbokgung Palace"},
+    {url:"https://images.unsplash.com/photo-1596422846543-75c6fc197f07?w=900&q=80",cap:"Jeju Island"}
+  ]},
+{ iso:682, fc:"sa", name:"Saudi Arabia",flag:"🇸🇦", capital:"Riyadh",      region:"Asia",         lat:24.71,  lon:46.68,
+  pop:"34.8M", area:"2,149,690 km²", lang:"Arabic", currency:"Riyal (SR)",
+  culture:"Heart of Islam; home to Mecca and Medina, the two holiest cities in the world.",
+  trad:"Hospitality is sacred — guests always receive coffee and dates before any conversation.",
+  fact:"Saudi Arabia is the world's largest country with absolutely no permanent rivers.",
+  dyk:"Al-Ula's Hegra rock city is Saudi Arabia's Petra — and far less visited.",
+  travel:"🏜️ Sleep under the stars in the Rub' al Khali — the world's largest sand desert.",
+  photos:[
+    {url:"https://images.unsplash.com/photo-1586724237569-f3d0c1dee8c6?w=900&q=80",cap:"Riyadh Skyline"},
+    {url:"https://images.unsplash.com/photo-1553913861-c0fddf2619ee?w=900&q=80",cap:"Rub' al Khali"},
+    {url:"https://images.unsplash.com/photo-1568322445389-f64ac2515020?w=900&q=80",cap:"Al-Ula Ancient Ruins"}
+  ]},
+{ iso:784, fc:"ae", name:"UAE",          flag:"🇦🇪", capital:"Abu Dhabi",   region:"Asia",         lat:24.45,  lon:54.38,
+  pop:"9.9M",  area:"83,600 km²",  lang:"Arabic", currency:"Dirham (AED)",
+  culture:"Desert Bedouin heritage meets hyper-futurism — falconry UNESCO-listed alongside skyscrapers.",
+  trad:"Falconry, camel racing, oud music evenings, and elaborate Arabic coffee rituals.",
+  fact:"The Burj Khalifa is so tall you can watch the sunset twice — from the ground then the top.",
+  dyk:"Dubai's Palm Jumeirah is visible from space, built entirely from sand dredged from the seabed.",
+  travel:"🌆 Visit the Louvre Abu Dhabi — its geometric dome is an architectural marvel.",
+  photos:[
+    {url:"https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=900&q=80",cap:"Burj Khalifa, Dubai"},
+    {url:"https://images.unsplash.com/photo-1518684079-3c830dcef090?w=900&q=80",cap:"Dubai Creek"},
+    {url:"https://images.unsplash.com/photo-1559494007-9f5847c49d94?w=900&q=80",cap:"Desert Safari"}
+  ]},
+{ iso:586, fc:"pk", name:"Pakistan",    flag:"🇵🇰", capital:"Islamabad",   region:"Asia",         lat:33.73,  lon:73.09,
+  pop:"220M", area:"881,913 km²", lang:"Urdu, English", currency:"Rupee (PKR)",
+  culture:"Indus Valley civilisation roots — one of the world's oldest and richest urban cultures.",
+  trad:"Eid celebrations, Sufi qawwali music, polo tournaments in the Gilgit mountains.",
+  fact:"Pakistan has more 8,000m peaks than any other country, including mighty K2.",
+  dyk:"Mohenjo-daro had running water and sewage systems in 2500 BCE — millennia before Rome.",
+  travel:"🏔️ Drive the Karakoram Highway — the world's highest paved international road.",
+  photos:[
+    {url:"https://images.unsplash.com/photo-1608306448197-e83633f1261c?w=900&q=80",cap:"K2 Mountain, Karakoram"},
+    {url:"https://images.unsplash.com/photo-1583159608630-f6fd61e36ca4?w=900&q=80",cap:"Badshahi Mosque, Lahore"},
+    {url:"https://images.unsplash.com/photo-1586952518485-11b180e92764?w=900&q=80",cap:"Karakoram Highway"}
+  ]},
+/* ── EUROPE ── */
+{ iso:380, fc:"it", name:"Italy",        flag:"🇮🇹", capital:"Rome",        region:"Europe",       lat:41.90,  lon:12.50,
+  pop:"60.3M", area:"301,340 km²", lang:"Italian", currency:"Euro (€)",
+  culture:"La Dolce Vita — family first, three-hour lunches, and over 250 distinct hand gestures.",
+  trad:"Carnevale di Venezia, eating lentils at midnight on New Year's Eve for prosperity.",
+  fact:"Italy has more UNESCO World Heritage Sites than any other country.",
+  dyk:"Italy didn't fully unify as a single nation until 1861.",
+  travel:"🏛️ Visit the Colosseum and Roman Forum at dusk when the golden stones glow amber.",
+  photos:[
+    {url:"https://images.unsplash.com/photo-1552832230-c0197dd311b5?w=900&q=80",cap:"Colosseum, Rome"},
+    {url:"https://images.unsplash.com/photo-1534113414509-0eec2bfb493f?w=900&q=80",cap:"Venice Grand Canal"},
+    {url:"https://images.unsplash.com/photo-1516483638261-f4dbaf036963?w=900&q=80",cap:"Amalfi Coast"}
+  ]},
+{ iso:250, fc:"fr", name:"France",       flag:"🇫🇷", capital:"Paris",       region:"Europe",       lat:48.86,  lon:2.35,
+  pop:"67.8M", area:"551,695 km²", lang:"French", currency:"Euro (€)",
+  culture:"Art de vivre — long meals, cheese after dessert, two-cheek kisses as greeting.",
+  trad:"Galette des Rois in January, Bastille Day fireworks on 14 July.",
+  fact:"France is the world's most visited country — nearly 90 million tourists annually.",
+  dyk:"The Eiffel Tower was originally meant to be dismantled after just 20 years.",
+  travel:"🗼 Watch the Eiffel Tower's light show — 20,000 bulbs flash every hour after dark.",
+  photos:[
+    {url:"https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=900&q=80",cap:"Eiffel Tower at Night"},
+    {url:"https://images.unsplash.com/photo-1511739001486-6bfe10ce785f?w=900&q=80",cap:"Louvre Museum"},
+    {url:"https://images.unsplash.com/photo-1431274172761-fca41d930114?w=900&q=80",cap:"Provence Lavender Fields"}
+  ]},
+{ iso:276, fc:"de", name:"Germany",      flag:"🇩🇪", capital:"Berlin",      region:"Europe",       lat:52.52,  lon:13.41,
+  pop:"83.1M", area:"357,114 km²", lang:"German", currency:"Euro (€)",
+  culture:"Engineering precision meets artistic soul — Goethe, Bach, Beethoven, Beethoven, all German.",
+  trad:"Oktoberfest (world's largest beer festival), enchanting Weihnachtsmarkt Christmas markets.",
+  fact:"Germany has 1,300 breweries producing over 1,500 distinct beer varieties.",
+  dyk:"The Gutenberg Bible, the first mass-printed book in the world, was made in Germany in 1455.",
+  travel:"🏰 Visit Neuschwanstein Castle — the fairy-tale that directly inspired Disney's Cinderella Castle.",
+  photos:[
+    {url:"https://images.unsplash.com/photo-1467269204594-9661b134dd2b?w=900&q=80",cap:"Neuschwanstein Castle"},
+    {url:"https://images.unsplash.com/photo-1560969184-10fe8719e047?w=900&q=80",cap:"Brandenburg Gate, Berlin"},
+    {url:"https://images.unsplash.com/photo-1444723121867-7a241cacace9?w=900&q=80",cap:"Rhine Valley"}
+  ]},
+{ iso:724, fc:"es", name:"Spain",        flag:"🇪🇸", capital:"Madrid",      region:"Europe",       lat:40.42,  lon:-3.70,
+  pop:"47.3M", area:"505,990 km²", lang:"Spanish", currency:"Euro (€)",
+  culture:"Passionate flamenco, siesta culture, late dinners at 10pm, and world-class football.",
+  trad:"La Tomatina tomato battle, Running of the Bulls in Pamplona, 12 grapes at New Year.",
+  fact:"Spain is the world's second-largest olive oil producer after Greece.",
+  dyk:"Gaudi's Sagrada Família has been under construction since 1882 and is still unfinished.",
+  travel:"🌊 Explore Gaudí's Barcelona — especially Sagrada Família as the sun streams through its glass.",
+  photos:[
+    {url:"https://images.unsplash.com/photo-1583422409516-2895a77efded?w=900&q=80",cap:"Sagrada Família"},
+    {url:"https://images.unsplash.com/photo-1543783207-ec64e4d95325?w=900&q=80",cap:"Alhambra, Granada"},
+    {url:"https://images.unsplash.com/photo-1555992336-03a23c7b20ee?w=900&q=80",cap:"Ibiza Coastline"}
+  ]},
+{ iso:826, fc:"gb", name:"United Kingdom",flag:"🇬🇧",capital:"London",     region:"Europe",       lat:51.51,  lon:-0.13,
+  pop:"67.2M", area:"243,610 km²", lang:"English", currency:"Pound (£)",
+  culture:"Constitutional monarchy with outsized global influence from Shakespeare to The Beatles.",
+  trad:"Afternoon tea, Guy Fawkes Night bonfires, pub quiz culture on Thursday nights.",
+  fact:"The UK gave the world the World Wide Web, the telephone, the steam engine and penicillin.",
+  dyk:"Big Ben refers to the bell inside — the tower is officially called the Elizabeth Tower.",
+  travel:"🎡 See the Crown Jewels at the Tower of London — one sceptre holds 2,800 diamonds.",
+  photos:[
+    {url:"https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=900&q=80",cap:"Big Ben, London"},
+    {url:"https://images.unsplash.com/photo-1543785734-4b6e564642f8?w=900&q=80",cap:"Tower Bridge at Night"},
+    {url:"https://images.unsplash.com/photo-1586500036706-41963de24d8b?w=900&q=80",cap:"Scottish Highlands"}
+  ]},
+{ iso:300, fc:"gr", name:"Greece",       flag:"🇬🇷", capital:"Athens",      region:"Europe",       lat:37.98,  lon:23.73,
+  pop:"10.4M", area:"131,957 km²", lang:"Greek", currency:"Euro (€)",
+  culture:"Birthplace of democracy, philosophy, the Olympic Games and Western theatre.",
+  trad:"Easter (Pascha) eclipses Christmas — midnight resurrection services fill every church.",
+  fact:"Greece has more archaeological museums than any other country on Earth.",
+  dyk:"The Greek alphabet — still in daily use — is the oldest living alphabet in the world.",
+  travel:"🏛️ Watch the sunset over the Santorini caldera from Oia — the most photographed moment in Europe.",
+  photos:[
+    {url:"https://images.unsplash.com/photo-1533105079780-92b9be482077?w=900&q=80",cap:"Santorini, Oia"},
+    {url:"https://images.unsplash.com/photo-1555993539-1732b0258235?w=900&q=80",cap:"Acropolis, Athens"},
+    {url:"https://images.unsplash.com/photo-1603565816030-6b389eeb23cb?w=900&q=80",cap:"Mykonos Windmills"}
+  ]},
+{ iso:528, fc:"nl", name:"Netherlands", flag:"🇳🇱", capital:"Amsterdam",   region:"Europe",       lat:52.37,  lon:4.90,
+  pop:"17.5M", area:"41,543 km²",  lang:"Dutch", currency:"Euro (€)",
+  culture:"World's cycling capital — art, tulips, and famously liberal, open-minded culture.",
+  trad:"King's Day orange street party, Sinterklaas on Dec 5, stroopwafels over a hot cup.",
+  fact:"The Netherlands produces 80% of the world's entire supply of flower bulbs.",
+  dyk:"Amsterdam has more bicycles (881,000) than residents (820,000).",
+  travel:"🌷 Visit Keukenhof in April when 7 million tulips bloom simultaneously.",
+  photos:[
+    {url:"https://images.unsplash.com/photo-1534351590666-13e3e96b5017?w=900&q=80",cap:"Amsterdam Canals"},
+    {url:"https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=900&q=80",cap:"Tulip Fields"},
+    {url:"https://images.unsplash.com/photo-1572970459143-43e3d32d2a73?w=900&q=80",cap:"Kinderdijk Windmills"}
+  ]},
+{ iso:620, fc:"pt", name:"Portugal",    flag:"🇵🇹", capital:"Lisbon",      region:"Europe",       lat:38.72,  lon:-9.14,
+  pop:"10.3M", area:"92,212 km²",  lang:"Portuguese", currency:"Euro (€)",
+  culture:"Saudade — a poetic melancholy for the past; expressed through haunting fado music.",
+  trad:"Feast of St. Anthony in Lisbon on June 13; sardines grilled on every street corner.",
+  fact:"Portugal is the world's largest cork producer — responsible for 50% of global supply.",
+  dyk:"Lisbon is older than Rome, settled by Phoenicians around 1200 BCE.",
+  travel:"🌉 Ride Tram 28 across Lisbon's seven hills at golden hour — the city is a living postcard.",
+  photos:[
+    {url:"https://images.unsplash.com/photo-1555881400-74d7acaacd8b?w=900&q=80",cap:"Lisbon Tram"},
+    {url:"https://images.unsplash.com/photo-1587347564504-76c28a1a4f7f?w=900&q=80",cap:"Sintra Palace"},
+    {url:"https://images.unsplash.com/photo-1560866350-97bab8fc8de4?w=900&q=80",cap:"Douro Valley Vineyards"}
+  ]},
+{ iso:752, fc:"se", name:"Sweden",       flag:"🇸🇪", capital:"Stockholm",   region:"Europe",       lat:59.33,  lon:18.07,
+  pop:"10.4M", area:"450,295 km²", lang:"Swedish", currency:"Krona (SEK)",
+  culture:"Lagom (everything in moderation), Fika (daily coffee ritual), radically flat workplace culture.",
+  trad:"Midsommar dancing around the maypole, St Lucia with candle crowns in December.",
+  fact:"Sweden has over 220,000 islands — more than any other country.",
+  dyk:"IKEA, Spotify, Skype, Minecraft and Bluetooth were all invented in Sweden.",
+  travel:"🌌 Sleep in ICEHOTEL in Jukkasjärvi and watch the Northern Lights from a glass igloo.",
+  photos:[
+    {url:"https://images.unsplash.com/photo-1509356843151-3e7d96241e11?w=900&q=80",cap:"Stockholm Old Town"},
+    {url:"https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=900&q=80",cap:"Swedish Aurora"},
+    {url:"https://images.unsplash.com/photo-1476610182048-b716b8518aae?w=900&q=80",cap:"Swedish Archipelago"}
+  ]},
+/* ── AFRICA ── */
+{ iso:818, fc:"eg", name:"Egypt",        flag:"🇪🇬", capital:"Cairo",       region:"Africa",       lat:30.04,  lon:31.24,
+  pop:"104M", area:"1,001,450 km²", lang:"Arabic", currency:"Pound (EGP)",
+  culture:"Ancient Pharaonic heritage (5,000+ years), Coptic Christianity, and Islam.",
+  trad:"Sham el-Nessim spring festival since 2700 BCE; bread is treated as sacred.",
+  fact:"Ancient Egyptians invented toothpaste, the 365-day calendar, and the world's first paper.",
+  dyk:"King Tutankhamun's dagger was made from iron harvested from a meteorite.",
+  travel:"🐫 Ride a camel to the Pyramids at sunset for the quintessential Egyptian photograph.",
+  photos:[
+    {url:"https://images.unsplash.com/photo-1539650116574-75c0c6d73f6e?w=900&q=80",cap:"Pyramids of Giza"},
+    {url:"https://images.unsplash.com/photo-1600001756652-4f0e1a06e8d1?w=900&q=80",cap:"Great Sphinx of Giza"},
+    {url:"https://images.unsplash.com/photo-1553530666-ba11a90a0868?w=900&q=80",cap:"Nile at Sunset, Luxor"}
+  ]},
+{ iso:404, fc:"ke", name:"Kenya",        flag:"🇰🇪", capital:"Nairobi",     region:"Africa",       lat:-1.29,  lon:36.82,
+  pop:"55.1M", area:"580,367 km²", lang:"Swahili, English", currency:"Shilling (KES)",
+  culture:"Harambee (pulling together) — community spirit across 40+ tribes including the Maasai.",
+  trad:"Bride price in cattle, nyama choma roast gatherings, vibrant beadwork traditions.",
+  fact:"The Great Wildebeest Migration involves 1.5 million animals in a dramatic river crossing.",
+  dyk:"Lake Turkana contains fossils that fundamentally changed our understanding of human evolution.",
+  travel:"🦁 Witness the Great Migration in Maasai Mara between July and October.",
+  photos:[
+    {url:"https://images.unsplash.com/photo-1547471080-7cc2caa01a7e?w=900&q=80",cap:"Maasai Mara"},
+    {url:"https://images.unsplash.com/photo-1516426122078-c23e76319801?w=900&q=80",cap:"African Elephants"},
+    {url:"https://images.unsplash.com/photo-1590856029826-c7a73142bbf1?w=900&q=80",cap:"Mount Kenya"}
+  ]},
+{ iso:710, fc:"za", name:"South Africa",flag:"🇿🇦", capital:"Pretoria",    region:"Africa",       lat:-25.75, lon:28.19,
+  pop:"60.1M", area:"1,219,090 km²", lang:"11 official languages", currency:"Rand (ZAR)",
+  culture:"Rainbow Nation — Nelson Mandela's Ubuntu philosophy: 'I am because we are.'",
+  trad:"Braai (barbecue) is practically a religion; Heritage Day is nicknamed National Braai Day.",
+  fact:"South Africa uniquely has three capital cities: Pretoria, Cape Town and Bloemfontein.",
+  dyk:"The world's largest diamond (Cullinan, 3,106 carats) was unearthed here in 1905.",
+  travel:"🌿 Drive the Garden Route and spot African penguins waddling at Boulders Beach.",
+  photos:[
+    {url:"https://images.unsplash.com/photo-1516026672322-bc52d61a55d5?w=900&q=80",cap:"Table Mountain, Cape Town"},
+    {url:"https://images.unsplash.com/photo-1577083288073-40892c0860a4?w=900&q=80",cap:"Kruger National Park Safari"},
+    {url:"https://images.unsplash.com/photo-1580060839134-75a5edca2e99?w=900&q=80",cap:"Cape of Good Hope"}
+  ]},
+{ iso:504, fc:"ma", name:"Morocco",     flag:"🇲🇦", capital:"Rabat",       region:"Africa",       lat:33.97,  lon:-6.85,
+  pop:"37.8M", area:"446,550 km²", lang:"Arabic, Berber, French", currency:"Dirham (MAD)",
+  culture:"Gateway between Africa and Europe — Berber, Arab, Andalusian and French cultures fuse.",
+  trad:"Hammam bathing rituals, Gnawa music festivals, mint tea ceremony as sacred hospitality.",
+  fact:"Moroccan leather from Fes is tanned using the exact same techniques as 1,000 years ago.",
+  dyk:"Morocco was the first country in the world to formally recognise US independence in 1777.",
+  travel:"🌅 Sleep in a luxury Sahara tent near Merzouga and stargaze under total darkness.",
+  photos:[
+    {url:"https://images.unsplash.com/photo-1551410224-699683e91516?w=900&q=80",cap:"Sahara Desert"},
+    {url:"https://images.unsplash.com/photo-1548018560-c7cfc394cbba?w=900&q=80",cap:"Chefchaouen Blue City"},
+    {url:"https://images.unsplash.com/photo-1493246507139-91e8fad9978e?w=900&q=80",cap:"Marrakech Souks"}
+  ]},
+{ iso:566, fc:"ng", name:"Nigeria",     flag:"🇳🇬", capital:"Abuja",       region:"Africa",       lat:9.08,   lon:7.40,
+  pop:"218M", area:"923,768 km²", lang:"English + 500 languages", currency:"Naira (NGN)",
+  culture:"Africa's most populous country — Nollywood is the world's second largest film industry.",
+  trad:"Osun-Osogbo UNESCO festival, Durbar horse parade, electric Afrobeats music culture.",
+  fact:"Nigeria produces more films per year than Hollywood (only Bollywood makes more).",
+  dyk:"Nigeria is home to the Benue-Congo language family — ancestor to over 1,000 languages.",
+  travel:"🎵 Experience Lagos nightlife — Afrobeats was born on these streets and never stopped pulsing.",
+  photos:[
+    {url:"https://images.unsplash.com/photo-1612178537253-bccd437b730e?w=900&q=80",cap:"Lagos Skyline, Nigeria"},
+    {url:"https://images.unsplash.com/photo-1594498653385-d5172c532c00?w=900&q=80",cap:"Zuma Rock, Abuja"},
+    {url:"https://images.unsplash.com/photo-1604948501466-4e9c339b9c24?w=900&q=80",cap:"Abuja City Centre"}
+  ]},
+{ iso:231, fc:"et", name:"Ethiopia",    flag:"🇪🇹", capital:"Addis Ababa", region:"Africa",       lat:9.01,   lon:38.76,
+  pop:"123M", area:"1,104,300 km²", lang:"Amharic", currency:"Birr (ETB)",
+  culture:"One of the oldest Christian nations; 80 ethnic groups; the birthplace of coffee itself.",
+  trad:"Timkat Epiphany — priests carry replicas of the Ark of the Covenant through the streets.",
+  fact:"Ethiopia follows its own calendar — it is currently 2016 and has 13 months in the year.",
+  dyk:"Lucy, the 3.2-million-year-old human ancestor skeleton, was discovered in Ethiopia in 1974.",
+  travel:"⛪ Visit Lalibela's rock-hewn churches — each carved downward into the earth from solid rock.",
+  photos:[
+    {url:"https://images.unsplash.com/photo-1609137144813-7d9921338f24?w=900&q=80",cap:"Lalibela Rock Churches"},
+    {url:"https://images.unsplash.com/photo-1596003906949-67221c37965c?w=900&q=80",cap:"Simien Mountains, Ethiopia"},
+    {url:"https://images.unsplash.com/photo-1531206715517-5c0ba140b2b8?w=900&q=80",cap:"Ethiopian Coffee Ceremony"}
+  ]},
+{ iso:12,  fc:"dz", name:"Algeria",     flag:"🇩🇿", capital:"Algiers",     region:"Africa",       lat:36.74,  lon:3.06,
+  pop:"45.4M", area:"2,381,741 km²", lang:"Arabic, Berber", currency:"Dinar (DZD)",
+  culture:"Birthplace of Albert Camus and home to the ancient Berber (Amazigh) civilisation.",
+  trad:"Yennayer Berber New Year, rai music — a rebellious fusion of folk and rock.",
+  fact:"Algeria is Africa's largest country and 85% of it is pure Sahara desert.",
+  dyk:"The ancient Roman ruins of Timgad were buried under the Sahara for 900 years before rediscovery.",
+  travel:"🏜️ Visit the Tassili n'Ajjer plateau — 15,000 prehistoric rock paintings and arches.",
+  photos:[
+    {url:"https://images.unsplash.com/photo-1489749798305-4fea3ae63d43?w=900&q=80",cap:"Sahara Dunes Algeria"},
+    {url:"https://images.unsplash.com/photo-1565017033394-68ec2c8fc5ba?w=900&q=80",cap:"Algiers Casbah"},
+    {url:"https://images.unsplash.com/photo-1581288801896-1a413bef3399?w=900&q=80",cap:"Tassili Rock Art"}
+  ]},
+/* ── NORTH AMERICA ── */
+{ iso:840, fc:"us", name:"United States",flag:"🇺🇸",capital:"Washington D.C.",region:"North America",lat:38.91,lon:-77.04,
+  pop:"335M", area:"9,833,517 km²", lang:"English", currency:"Dollar ($)",
+  culture:"Melting pot of cultures; the world's centre for film, music and technological innovation.",
+  trad:"Thanksgiving, Fourth of July fireworks, tailgate football parties, Super Bowl Sunday.",
+  fact:"The US has the world's largest economy and the highest number of Nobel Prize winners.",
+  dyk:"Alaska has more coastline than all other 49 US states combined.",
+  travel:"🏔️ Stand at the South Rim of the Grand Canyon at sunrise — the rocks span 2 billion years.",
+  photos:[
+    {url:"https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=900&q=80",cap:"Grand Canyon, Arizona"},
+    {url:"https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?w=900&q=80",cap:"New York City"},
+    {url:"https://images.unsplash.com/photo-1533601017-439a914b98b0?w=900&q=80",cap:"Yellowstone National Park"}
+  ]},
+{ iso:124, fc:"ca", name:"Canada",       flag:"🇨🇦", capital:"Ottawa",      region:"North America", lat:45.42,  lon:-75.70,
+  pop:"38.2M", area:"9,984,670 km²", lang:"English, French", currency:"Dollar (CAD)",
+  culture:"Cultural mosaic — deeply multicultural with living Indigenous heritage and traditions.",
+  trad:"Canada Day on July 1, maple syrup season in spring, ice hockey as the national religion.",
+  fact:"Canada has the longest coastline of any country on Earth — 202,080 kilometres.",
+  dyk:"Canada holds more lakes than every other country in the world combined.",
+  travel:"🍁 Visit Banff in autumn when larch trees turn gold against turquoise glacier lakes.",
+  photos:[
+    {url:"https://images.unsplash.com/photo-1517935706615-2717063c2225?w=900&q=80",cap:"Banff National Park"},
+    {url:"https://images.unsplash.com/photo-1507992781348-310259076fe0?w=900&q=80",cap:"Niagara Falls"},
+    {url:"https://images.unsplash.com/photo-1467890947394-8171244e5410?w=900&q=80",cap:"Vancouver Skyline"}
+  ]},
+{ iso:484, fc:"mx", name:"Mexico",       flag:"🇲🇽", capital:"Mexico City", region:"North America", lat:19.43,  lon:-99.13,
+  pop:"128M", area:"1,964,375 km²", lang:"Spanish", currency:"Peso (MXN)",
+  culture:"Mariachi, lucha libre wrestling, and Día de los Muertos — death celebrated, not mourned.",
+  trad:"Día de Muertos marigold altars honouring ancestors, breaking piñatas at Las Posadas.",
+  fact:"Mexico City sinks roughly 10 inches each year — it was built on a drained Aztec lake.",
+  dyk:"The Aztecs invented floating island gardens called chinampas — some still exist today.",
+  travel:"🏛️ Climb Teotihuacan's Pyramid of the Sun at dawn as light sweeps the Avenue of the Dead.",
+  photos:[
+    {url:"https://images.unsplash.com/photo-1518638150340-f706e86654de?w=900&q=80",cap:"Chichen Itza"},
+    {url:"https://images.unsplash.com/photo-1520038410233-7141be7e6f97?w=900&q=80",cap:"Mexico City Cathedral"},
+    {url:"https://images.unsplash.com/photo-1547127796-06bb04e4b315?w=900&q=80",cap:"Cenote Swimming"}
+  ]},
+{ iso:192, fc:"cu", name:"Cuba",         flag:"🇨🇺", capital:"Havana",      region:"North America", lat:23.13,  lon:-82.38,
+  pop:"11.3M", area:"109,884 km²", lang:"Spanish", currency:"Peso (CUP)",
+  culture:"Time capsule of classic cars, colonial architecture and revolutionary murals.",
+  trad:"Son Cubano music, conga street parades, domino games in every plaza.",
+  fact:"Cuba has more doctors per capita than almost any country in the world.",
+  dyk:"Havana's Malecón seawall was built in 1901 and remains the city's living room.",
+  travel:"🎺 Attend a son cubano session in Trinidad's cobblestone streets after dark.",
+  photos:[
+    {url:"https://images.unsplash.com/photo-1519862170344-6cd5e49cb996?w=900&q=80",cap:"Havana Classic Cars"},
+    {url:"https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=900&q=80",cap:"Havana Old City"},
+    {url:"https://images.unsplash.com/photo-1624138784614-87fd1b6528f8?w=900&q=80",cap:"Viñales Valley, Cuba"}
+  ]},
+/* ── SOUTH AMERICA ── */
+{ iso:76,  fc:"br", name:"Brazil",       flag:"🇧🇷", capital:"Brasília",    region:"South America", lat:-15.83, lon:-47.92,
+  pop:"215M", area:"8,515,767 km²", lang:"Portuguese", currency:"Real (BRL)",
+  culture:"Samba, bossa nova, capoeira — Carnival is the planet's largest human celebration.",
+  trad:"Carnival, white clothing at New Year's Eve on Copacabana, feijoada every Saturday.",
+  fact:"Brazil contains over 60% of the entire Amazon rainforest — the Earth's lungs.",
+  dyk:"Brazil has the largest Japanese diaspora outside Japan — over 1.5 million people.",
+  travel:"🏖️ Stand beneath Christ the Redeemer at sunrise before the tour buses arrive.",
+  photos:[
+    {url:"https://images.unsplash.com/photo-1483729558449-99ef09a8c325?w=900&q=80",cap:"Christ the Redeemer, Rio"},
+    {url:"https://images.unsplash.com/photo-1544989164-31a7e0e8c34f?w=900&q=80",cap:"Amazon Rainforest"},
+    {url:"https://images.unsplash.com/photo-1559087867-ce4c91325525?w=900&q=80",cap:"Iguazu Falls"}
+  ]},
+{ iso:32,  fc:"ar", name:"Argentina",   flag:"🇦🇷", capital:"Buenos Aires",region:"South America", lat:-34.60, lon:-58.38,
+  pop:"46.2M", area:"2,780,400 km²", lang:"Spanish", currency:"Peso (ARS)",
+  culture:"Tango born in Buenos Aires; passionate about football and beef-centric asado culture.",
+  trad:"Mate tea shared from a gourd, Sunday asado, late dinner never before 10pm.",
+  fact:"Argentina has won the FIFA World Cup three times — 1978, 1986 and 2022.",
+  dyk:"Patagonia's Perito Moreno glacier is still advancing — unlike most glaciers on Earth.",
+  travel:"💃 Take a tango lesson in a San Telmo milonga and dance until 4am like a true porteño.",
+  photos:[
+    {url:"https://images.unsplash.com/photo-1589802829985-817e51171b92?w=900&q=80",cap:"Torres del Paine, Patagonia"},
+    {url:"https://images.unsplash.com/photo-1568546193726-b2e4e03a0de3?w=900&q=80",cap:"Buenos Aires"},
+    {url:"https://images.unsplash.com/photo-1601484775-8f7e96bdd105?w=900&q=80",cap:"Perito Moreno Glacier"}
+  ]},
+{ iso:170, fc:"co", name:"Colombia",    flag:"🇨🇴", capital:"Bogotá",      region:"South America", lat:4.71,   lon:-74.07,
+  pop:"51.9M", area:"1,141,748 km²", lang:"Spanish", currency:"Peso (COP)",
+  culture:"Homeland of magical realism; Gabriel García Márquez, Shakira, and the world's best coffee.",
+  trad:"Festival de las Flores in Medellín, Carnaval de Barranquilla, cumbia dancing.",
+  fact:"Colombia is the only South American country with coastlines on both the Pacific and Caribbean.",
+  dyk:"Colombia's Coffee Triangle grows beans in volcanic soil at 1,200–1,800m altitude — ideal conditions.",
+  travel:"☕ Pick coffee on a misty Eje Cafetero farm then taste it fresh at the source.",
+  photos:[
+    {url:"https://images.unsplash.com/photo-1576402187878-974f70c890a5?w=900&q=80",cap:"Cartagena Old City"},
+    {url:"https://images.unsplash.com/photo-1533050487297-09b450131914?w=900&q=80",cap:"Coffee Plantation"},
+    {url:"https://images.unsplash.com/photo-1535498730771-e735b998cd64?w=900&q=80",cap:"Medellín, Colombia"}
+  ]},
+{ iso:604, fc:"pe", name:"Peru",         flag:"🇵🇪", capital:"Lima",        region:"South America", lat:-12.05, lon:-77.04,
+  pop:"33.4M", area:"1,285,216 km²", lang:"Spanish, Quechua", currency:"Sol (PEN)",
+  culture:"Inca civilisation at its peak — Quechua language still spoken by 8 million people.",
+  trad:"Inti Raymi (Festival of the Sun), colourful Andean textiles, chicha corn beer ceremonies.",
+  fact:"Machu Picchu sits at 2,430m altitude — built without mortar and without the wheel.",
+  dyk:"Peru's Amazon basin holds 10% of ALL species on Earth.",
+  travel:"🌄 Hike the classic Inca Trail to arrive at the Sun Gate above Machu Picchu at dawn.",
+  photos:[
+    {url:"https://images.unsplash.com/photo-1526392060635-9d6019884377?w=900&q=80",cap:"Machu Picchu"},
+    {url:"https://images.unsplash.com/photo-1580619305218-8423a7ef79b4?w=900&q=80",cap:"Rainbow Mountain"},
+    {url:"https://images.unsplash.com/photo-1596401619237-4ef4a6db8745?w=900&q=80",cap:"Huacachina Oasis"}
+  ]},
+{ iso:152, fc:"cl", name:"Chile",        flag:"🇨🇱", capital:"Santiago",    region:"South America", lat:-33.46, lon:-70.65,
+  pop:"19.5M", area:"756,102 km²", lang:"Spanish", currency:"Peso (CLP)",
+  culture:"The world's longest and thinnest country — 4,300km from the Atacama to Antarctic ice.",
+  trad:"Fiestas Patrias in September, cueca national dance, empanadas on every corner.",
+  fact:"Chile's Atacama Desert is the world's driest place — some areas have never recorded rain.",
+  dyk:"Easter Island (Isla de Pascua) belongs to Chile, 3,700km from the mainland.",
+  travel:"🔭 Stargaze in the Atacama — the world's best sky thanks to zero humidity and zero light.",
+  photos:[
+    {url:"https://images.unsplash.com/photo-1518184879165-7d63a8e6e073?w=900&q=80",cap:"Torres del Paine Chile"},
+    {url:"https://images.unsplash.com/photo-1582379749632-26ae7cefcca6?w=900&q=80",cap:"Atacama Desert"},
+    {url:"https://images.unsplash.com/photo-1562462181-9a68b0e43c4a?w=900&q=80",cap:"Santiago, Chile"}
+  ]},
+/* ── OCEANIA ── */
+{ iso:36,  fc:"au", name:"Australia",   flag:"🇦🇺", capital:"Canberra",    region:"Oceania",      lat:-35.28, lon:149.13,
+  pop:"26.0M", area:"7,741,220 km²", lang:"English", currency:"Dollar (AUD)",
+  culture:"Multicultural nation built on 65,000 years of Aboriginal Dreamtime traditions.",
+  trad:"Australia Day on Jan 26, beach cricket on Christmas, ANZAC Day dawn vigils.",
+  fact:"Australia is wider than the Moon — and is the only continent that is also a country.",
+  dyk:"Wombats produce cube-shaped droppings — the only animal on Earth known to do this.",
+  travel:"🦘 Snorkel the Great Barrier Reef at Lady Musgrave Island — the clearest water on Earth.",
+  photos:[
+    {url:"https://images.unsplash.com/photo-1501167786227-4cba60f6d58f?w=900&q=80",cap:"Sydney Opera House"},
+    {url:"https://images.unsplash.com/photo-1523482580672-f109ba8cb9be?w=900&q=80",cap:"Great Barrier Reef"},
+    {url:"https://images.unsplash.com/photo-1529108190281-9a4f620bc2d8?w=900&q=80",cap:"Uluru at Sunrise"}
+  ]},
+{ iso:554, fc:"nz", name:"New Zealand", flag:"🇳🇿", capital:"Wellington",  region:"Oceania",      lat:-41.29, lon:174.78,
+  pop:"5.1M",  area:"268,021 km²", lang:"English, Māori", currency:"Dollar (NZD)",
+  culture:"Māori culture is central — haka, tā moko tattooing, whakapapa (genealogy).",
+  trad:"Waitangi Day on Feb 6, haka at every major public event, Māori hangi earth oven feasts.",
+  fact:"New Zealand was the first country in the world to give women the right to vote in 1893.",
+  dyk:"New Zealand has 13 of the world's 18 penguin species — more than any other country.",
+  travel:"🏔️ Hike the Tongariro Alpine Crossing — volcanic craters and emerald lakes in a single day.",
+  photos:[
+    {url:"https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=900&q=80",cap:"Milford Sound"},
+    {url:"https://images.unsplash.com/photo-1507699622108-4be3abd695ad?w=900&q=80",cap:"Hobbiton, Matamata"},
+    {url:"https://images.unsplash.com/photo-1570118614556-e73baf2cd5e9?w=900&q=80",cap:"Mount Cook"}
+  ]},
+{ iso:643, fc:"ru", name:"Russia", flag:"🇷🇺", capital:"Moscow", region:"Europe", lat:55.75, lon:37.61,
+  pop:"143M", area:"17,098,242 km²", lang:"Russian", currency:"Ruble (RUB)",
+  culture:"A vast culture spanning 11 time zones, famous for classical ballet and literature.",
+  trad:"Maslenitsa, Orthodox Christmas, drinking tea from a samovar.",
+  fact:"Russia is the largest country in the world, covering one-eighth of Earth's inhabited land.",
+  dyk:"The Trans-Siberian Railway is the longest single railway in the world, spanning 9,289 km.",
+  travel:"🏰 Visit the Red Square and St. Basil's Cathedral in Moscow.",
+  photos:[
+    {url:"", wiki:"Red Square", cap:"Red Square, Moscow"},
+    {url:"", wiki:"Hermitage Museum", cap:"Winter Palace, St. Petersburg"},
+    {url:"", wiki:"Lake Baikal", cap:"Lake Baikal"}
+  ]},
+{ iso:578, fc:"no", name:"Norway", flag:"🇳🇴", capital:"Oslo", region:"Europe", lat:59.91, lon:10.75,
+  pop:"5.4M", area:"385,207 km²", lang:"Norwegian", currency:"Krone (NOK)",
+  culture:"Deeply connected to nature, famous for its fjords, Vikings, and friluftsliv (open-air living).",
+  trad:"Constitution Day on May 17th, skiing, burning a massive bonfire for Midsummer.",
+  fact:"Norway introduced salmon sushi to Japan in the 1980s.",
+  dyk:"Svalbard requires you to carry a rifle outside settlements due to polar bears.",
+  travel:"🌌 See the Northern Lights in Tromsø during the polar night.",
+  photos:[
+    {url:"", wiki:"Geirangerfjord", cap:"Geirangerfjord"},
+    {url:"", wiki:"Trolltunga", cap:"Trolltunga"},
+    {url:"", wiki:"Lofoten", cap:"Lofoten Islands"}
+  ]},
+{ iso:352, fc:"is", name:"Iceland", flag:"🇮🇸", capital:"Reykjavík", region:"Europe", lat:64.14, lon:-21.92,
+  pop:"372K", area:"103,000 km²", lang:"Icelandic", currency:"Krona (ISK)",
+  culture:"Land of Fire and Ice, known for folklore, elves, and stunning geothermal landscapes.",
+  trad:"Bolludagur (Cream Puff Day), knitting lopapeysa sweaters, reading books on Christmas Eve.",
+  fact:"Iceland has no mosquitoes and no standing army.",
+  dyk:"Over 85% of Iceland's energy comes from renewable geothermal and hydroelectric sources.",
+  travel:"🌋 Soak in the Blue Lagoon after hiking to an active volcano.",
+  photos:[
+    {url:"", wiki:"Blue Lagoon (Iceland)", cap:"Blue Lagoon"},
+    {url:"", wiki:"Gullfoss", cap:"Gullfoss Waterfall"},
+    {url:"", wiki:"Aurora", cap:"Aurora Borealis"}
+  ]},
+{ iso:756, fc:"ch", name:"Switzerland", flag:"🇨🇭", capital:"Bern", region:"Europe", lat:46.94, lon:7.44,
+  pop:"8.7M", area:"41,290 km²", lang:"German, French, Italian, Romansh", currency:"Franc (CHF)",
+  culture:"Alpine traditions, precision engineering, and strict neutrality.",
+  trad:"Fête de l'Escalade in Geneva, Alpine cattle descents, making world-class chocolate and cheese.",
+  fact:"Switzerland has enough nuclear fallout shelters to accommodate its entire population.",
+  dyk:"The Gotthard Base Tunnel is the world's longest and deepest railway tunnel.",
+  travel:"🏔️ Take the Glacier Express train through the stunning Swiss Alps.",
+  photos:[
+    {url:"", wiki:"Matterhorn", cap:"The Matterhorn"},
+    {url:"", wiki:"Lake Geneva", cap:"Lake Geneva"},
+    {url:"", wiki:"Jungfraujoch", cap:"Jungfrau"}
+  ]},
+{ iso:450, fc:"mg", name:"Madagascar", flag:"🇲🇬", capital:"Antananarivo", region:"Africa", lat:-18.87, lon:47.5,
+  pop:"29M", area:"587,041 km²", lang:"Malagasy, French", currency:"Ariary (MGA)",
+  culture:"A unique blend of Southeast Asian and East African roots, famous for its incredible biodiversity.",
+  trad:"Famadihana (turning of the bones), wearing lamba garments, and celebrating Alahamady Be (New Year).",
+  fact:"Over 80% of Madagascar's plant and animal species are found nowhere else on Earth.",
+  dyk:"It is the fourth largest island in the world.",
+  travel:"🌳 Walk down the Avenue of the Baobabs at sunset.",
+  photos:[
+    {url:"", wiki:"Avenue of the Baobabs", cap:"Avenue of the Baobabs"},
+    {url:"", wiki:"Tsingy de Bemaraha Strict Nature Reserve", cap:"Tsingy de Bemaraha"},
+    {url:"", wiki:"Lemur", cap:"Ring-tailed Lemur"}
+  ]},
+{ iso:242, fc:"fj", name:"Fiji", flag:"🇫🇯", capital:"Suva", region:"Oceania", lat:-18.14, lon:178.43,
+  pop:"924K", area:"18,274 km²", lang:"Fijian, English, Fiji Hindi", currency:"Dollar (FJD)",
+  culture:"Deeply communal with strong traditions of respect, famous for the 'Bula' spirit and island hospitality.",
+  trad:"Drinking kava (yaqona) in ceremonies, meke dance, walking on fire (beqa).",
+  fact:"Fiji consists of 333 tropical islands, but only about 110 are inhabited.",
+  dyk:"Fiji is situated exactly on the International Date Line.",
+  travel:"🤿 Scuba dive in the Great Astrolabe Reef or visit the Mamanuca Islands.",
+  photos:[
+    {url:"", wiki:"Mamanuca Islands", cap:"Mamanuca Islands"},
+    {url:"", wiki:"Sri Siva Subramaniya temple", cap:"Sri Siva Subramaniya Temple"},
+    {url:"", wiki:"Kava", cap:"Traditional Kava Ceremony"}
+  ]},
+{ iso:496, fc:"mn", name:"Mongolia", flag:"🇲🇳", capital:"Ulaanbaatar", region:"Asia", lat:47.92, lon:106.91,
+  pop:"3.3M", area:"1,564,110 km²", lang:"Mongolian", currency:"Tögrög (MNT)",
+  culture:"Deeply rooted in nomadic traditions, horsemanship, and the legacy of Genghis Khan.",
+  trad:"The Naadam Festival featuring wrestling, horse racing, and archery. Living in traditional yurts (gers).",
+  fact:"Mongolia is the most sparsely populated sovereign state in the world.",
+  dyk:"About one-third of the population still lives a nomadic or semi-nomadic lifestyle.",
+  travel:"🐪 Sleep in a ger camp and ride camels in the Gobi Desert.",
+  photos:[
+    {url:"", wiki:"Gobi Desert", cap:"Gobi Desert"},
+    {url:"", wiki:"Equestrian statue of Genghis Khan", cap:"Genghis Khan Statue"},
+    {url:"", wiki:"Khuvsgul Lake", cap:"Lake Khuvsgul"}
+  ]},
+{ iso:304, fc:"gl", name:"Greenland", flag:"🇬🇱", capital:"Nuuk", region:"North America", lat:64.18, lon:-51.72,
+  pop:"56K", area:"2,166,086 km²", lang:"Greenlandic", currency:"Krone (DKK)",
+  culture:"Inuit heritage combined with Danish influences, defined by survival in the extreme Arctic.",
+  trad:"Dog sledding, hunting seal and whale, intricate beadwork on national costumes.",
+  fact:"Greenland is the world's largest island (Australia is considered a continent).",
+  dyk:"About 80% of Greenland is covered by an ice sheet that can be up to 3 km thick.",
+  travel:"🧊 Sail among massive icebergs in the Ilulissat Icefjord.",
+  photos:[
+    {url:"", wiki:"Ilulissat Icefjord", cap:"Ilulissat Icefjord"},
+    {url:"", wiki:"Nuuk", cap:"Nuuk Cityscape"},
+    {url:"", wiki:"Greenland Dog", cap:"Greenland Sled Dogs"}
+  ]},
+{ iso:834, fc:"tz", name:"Tanzania", flag:"🇹🇿", capital:"Dodoma", region:"Africa", lat:-6.17, lon:35.74,
+  pop:"63M", area:"947,303 km²", lang:"Swahili, English", currency:"Shilling (TZS)",
+  culture:"A peaceful blend of over 120 ethnic groups, famous for the Maasai culture and vibrant coastal Swahili life.",
+  trad:"Tingatinga painting, Maasai jumping dance (adumu), eating Ugali and Nyama Choma.",
+  fact:"Mount Kilimanjaro in Tanzania is the highest single free-standing mountain in the world.",
+  dyk:"Over 2 million animals migrate across the Serengeti plains every year.",
+  travel:"🦁 Witness the Great Migration in the Serengeti National Park.",
+  photos:[
+    {url:"", wiki:"Mount Kilimanjaro", cap:"Mount Kilimanjaro"},
+    {url:"", wiki:"Serengeti National Park", cap:"Serengeti National Park"},
+    {url:"", wiki:"Zanzibar", cap:"Zanzibar Coast"}
+  ]},
+{ iso:818, fc:"eg", name:"Egypt", flag:"🇪🇬", capital:"Cairo", region:"Africa", lat:26.82, lon:30.8,
+  pop:"109M", area:"1,010,408 km²", lang:"Arabic", currency:"Pound (EGP)",
+  culture:"One of the oldest continuous civilizations, renowned for its ancient monuments and Islamic architecture.",
+  trad:"Ramadan lanterns (Fanous), drinking hibiscus tea (Karkadeh), sailing on feluccas.",
+  fact:"The Great Pyramid of Giza is the oldest and only intact wonder of the ancient world.",
+  dyk:"Ancient Egyptians invented a 365-day calendar to predict the annual flooding of the Nile.",
+  travel:"🐪 Explore the Valley of the Kings and temples of Luxor.",
+  photos:[
+    {url:"", wiki:"Great Pyramid of Giza", cap:"Great Pyramid of Giza"},
+    {url:"", wiki:"Luxor Temple", cap:"Luxor Temple"},
+    {url:"", wiki:"Nile", cap:"The River Nile"}
+  ]},
+{ iso:710, fc:"za", name:"South Africa", flag:"🇿🇦", capital:"Pretoria", region:"Africa", lat:-30.55, lon:22.93,
+  pop:"60M", area:"1,221,037 km²", lang:"12 Official Languages (Zulu, Xhosa, English...)", currency:"Rand (ZAR)",
+  culture:"Known as the 'Rainbow Nation', featuring a rich diversity of cultures, languages, and breathtaking landscapes.",
+  trad:"Hosting an outdoor braai (barbecue), singing traditional choral music, playing rugby.",
+  fact:"It is the only country in the world to have three capital cities: Pretoria, Cape Town, and Bloemfontein.",
+  dyk:"South Africa is home to the oldest meteor scar in the world, the Vredefort Dome.",
+  travel:"🚙 Go on a safari in Kruger National Park to see the Big Five.",
+  photos:[
+    {url:"", wiki:"Table Mountain", cap:"Table Mountain"},
+    {url:"", wiki:"Kruger National Park", cap:"Kruger National Park"},
+    {url:"", wiki:"Cape of Good Hope", cap:"Cape Point"}
+  ]},
+{ iso:566, fc:"ng", name:"Nigeria", flag:"🇳🇬", capital:"Abuja", region:"Africa", lat:9.08, lon:8.67,
+  pop:"218M", area:"923,768 km²", lang:"English, Hausa, Yoruba, Igbo", currency:"Naira (NGN)",
+  culture:"The vibrant 'Giant of Africa', famous for Nollywood cinema, Afrobeats music, and colorful fashion.",
+  trad:"Durbar festivals with horsemen, eating Jollof rice, and celebrating the New Yam Festival.",
+  fact:"Nigeria has over 500 indigenous languages, making it one of the most linguistically diverse countries.",
+  dyk:"The city of Lagos is the most populous city in Africa.",
+  travel:"🗿 Visit the Zuma Rock or the ancient city walls of Kano.",
+  photos:[
+    {url:"", wiki:"Zuma Rock", cap:"Zuma Rock"},
+    {url:"", wiki:"Lagos", cap:"Lagos City Skyline"},
+    {url:"", wiki:"Osun-Osogbo", cap:"Osun-Osogbo Sacred Grove"}
+  ]},
+{ iso:504, fc:"ma", name:"Morocco", flag:"🇲🇦", capital:"Rabat", region:"Africa", lat:31.79, lon:-7.09,
+  pop:"37M", area:"446,550 km²", lang:"Arabic, Berber", currency:"Dirham (MAD)",
+  culture:"A blend of Arab, Berber, and European influences, famous for intricately tiled riads and bustling souks.",
+  trad:"Drinking sweet mint tea poured from a height, unwinding in a hammam, weaving distinct rugs.",
+  fact:"Morocco is home to the oldest existing, continually operating university in the world, founded in 859 AD.",
+  dyk:"The city of Chefchaouen is famously painted entirely in shades of blue.",
+  travel:"🐪 Trek through the Sahara Desert on a camel and sleep under the stars.",
+  photos:[
+    {url:"", wiki:"Chefchaouen", cap:"The Blue City of Chefchaouen"},
+    {url:"", wiki:"Jemaa el-Fnaa", cap:"Jemaa el-Fnaa, Marrakech"},
+    {url:"", wiki:"Sahara", cap:"The Sahara Desert"}
+  ]},
+{ iso:10, fc:"aq", name:"Antarctica", flag:"🇦🇶", capital:"None", region:"Antarctica", lat:-82.86, lon:135,
+  pop:"~4000 (Researchers)", area:"14,200,000 km²", lang:"None", currency:"None",
+  culture:"No native population; a cooperative international hub for scientific research in extreme conditions.",
+  trad:"Midwinter Day celebrations, the '300 Club' polar plunge, international science collaboration.",
+  fact:"Antarctica contains about 70% of the planet's fresh water and 90% of its ice.",
+  dyk:"It is actually the largest desert in the world because it receives very little precipitation.",
+  travel:"🐧 Take an expedition cruise to see enormous icebergs and Emperor penguins.",
+  photos:[
+    {url:"", wiki:"Antarctica", cap:"Antarctic Ice Shelf"},
+    {url:"", wiki:"Emperor penguin", cap:"Emperor Penguins"},
+    {url:"", wiki:"Aurora Australis", cap:"Aurora Australis"}
+  ]},
+{ iso:144, fc:"lk", name:"Sri Lanka", flag:"🇱🇰", capital:"Colombo", region:"Asia", lat:7.87, lon:80.77,
+  pop:"22M", area:"65,610 km²", lang:"Sinhala, Tamil", currency:"Rupee (LKR)",
+  culture:"The 'Teardrop of India', rich with ancient Buddhist temples, lush tea gardens, and vibrant wildlife.",
+  trad:"Lighting oil lamps for prosperity, celebrating the Esala Perahera festival with decorated elephants.",
+  fact:"Sri Lanka was the first country in the world to elect a female prime minister, Sirimavo Bandaranaike, in 1960.",
+  dyk:"It is one of the world's largest exporters of tea, originally planted by the British in the 1860s.",
+  travel:"🐘 Take a scenic train ride through the misty tea hills of Ella.",
+  photos:[
+    {url:"", wiki:"Sigiriya", cap:"Sigiriya Rock Fortress"},
+    {url:"", wiki:"Nine Arch Bridge, Demodara", cap:"Nine Arch Bridge"},
+    {url:"", wiki:"Yala National Park", cap:"Yala National Park Safari"}
+  ]},
+{ iso:50, fc:"bd", name:"Bangladesh", flag:"🇧🇩", capital:"Dhaka", region:"Asia", lat:23.68, lon:90.35,
+  pop:"170M", area:"148,460 km²", lang:"Bengali", currency:"Taka (BDT)",
+  culture:"A lush, riverine nation deeply connected to poetry, music, and the fertile Bengal delta.",
+  trad:"Pohela Boishakh (Bengali New Year) colorful parades, eating Hilsa fish, riding rickshaws.",
+  fact:"Bangladesh has the world's longest unbroken natural sea beach, Cox's Bazar.",
+  dyk:"It is home to the Sundarbans, the largest mangrove forest in the world and habitat of the Bengal tiger.",
+  travel:"🐅 Take a boat tour through the Sundarbans mangrove forest.",
+  photos:[
+    {url:"", wiki:"Sundarbans", cap:"The Sundarbans Mangrove"},
+    {url:"", wiki:"Ahsan Manzil", cap:"Ahsan Manzil Pink Palace"},
+    {url:"", wiki:"Cox's Bazar", cap:"Cox's Bazar Beach"}
+  ]}
+];
+
+// ══════════════════════════════════════
+// SETUP
+// ══════════════════════════════════════
+const isoMap = {};
+DB.forEach(c => { isoMap[String(c.iso)] = c; });
+
+// World-atlas TopoJSON uses UN M49 numeric codes (= ISO 3166-1 numeric for most countries).
+// Add known alternate IDs so every DB country lights up correctly:
+const altIds = {
+  // Australia territories sometimes appear under 10 (Antarctica) or 36; 36 is correct ✓
+  // France: TopoJSON may use 250 (metro) — already in DB ✓
+  // Some builds encode Kosovo=383, Western Sahara=732, etc. — not in DB so ignored.
+  // Add extras only when TopoJSON ID differs from ISO numeric:
+  "826": "826"  // UK placeholder (already correct)
+};
+
+function getCountry(id){
+  return isoMap[String(id)] || null;
+}
+
+// Name-based fallback map for TopoJSON features that include a name property
+const nameMap = {};
+DB.forEach(c => { nameMap[c.name.toLowerCase()] = c; });
+// Common TopoJSON name variants
+const nameAliases = {
+  "united states of america": "United States",
+  "usa": "United States",
+  "uk": "United Kingdom",
+  "great britain": "United Kingdom",
+  "south korea": "South Korea",
+  "democratic republic of the congo": null,
+  "republic of the congo": null,
+  "côte d'ivoire": null,
+  "new zealand": "New Zealand",
+  "saudi arabia": "Saudi Arabia",
+  "south africa": "South Africa",
+  "united arab emirates": "UAE"
+};
+Object.entries(nameAliases).forEach(([alias, canonical]) => {
+  if (canonical) nameMap[alias] = nameMap[canonical.toLowerCase()] || null;
+});
+
+function getCountryByFeature(d) {
+  let c = isoMap[String(d.id)];
+  if (!c && d.properties && d.properties.name) {
+    c = nameMap[d.properties.name.toLowerCase()] || null;
+  }
+  return c || null;
+}
+
+const regionColor = {
+  "Asia":"#26d9a8","Europe":"#7b9ef8","Africa":"#f7854a",
+  "North America":"#e879c8","South America":"#ab69f0","Oceania":"#f0c93a"
+};
+
+let discovered = new Set();
+document.getElementById('totN').textContent = DB.length;
+document.getElementById('discN').textContent = 0;
+
+// ══════════════════════════════════════
+// MAP
+// ══════════════════════════════════════
+const W = window.innerWidth, H = window.innerHeight;
+const svg = d3.select("#mapWrap").append("svg").attr("width",W).attr("height",H);
+const g = svg.append("g");
+const proj = d3.geoMercator().scale(W*1.18/(2*Math.PI)).translate([W/2, H/1.82]);
+const path = d3.geoPath().projection(proj);
+let ct={k:1,x:0,y:0}, animating=false;
+function applyT(){ g.attr("transform",`translate(${ct.x},${ct.y}) scale(${ct.k})`); }
+function zoomTo(lat,lon){
+  if(animating)return; animating=true;
+  const c=proj([lon,lat]); if(!c){animating=false;return;}
+  const tz=3, tx=W/2-c[0]*tz, ty=H/2-c[1]*tz;
+  gsap.to(ct,{k:tz,x:tx,y:ty,duration:.8,ease:"power3.inOut",onUpdate:applyT,onComplete:()=>animating=false});
+}
+function resetZ(){
+  if(animating)return; animating=true;
+  gsap.to(ct,{k:1,x:0,y:0,duration:.65,ease:"power2.inOut",onUpdate:applyT,onComplete:()=>animating=false});
+}
+// Drag
+let drag=false,sx,sy,stx,sty;
+svg.on("mousedown",e=>{if(animating)return;drag=true;sx=e.clientX;sy=e.clientY;stx=ct.x;sty=ct.y;svg.style("cursor","grabbing");e.preventDefault();});
+svg.on("mousemove",e=>{if(!drag||animating)return;ct.x=stx+(e.clientX-sx);ct.y=sty+(e.clientY-sy);applyT();});
+svg.on("mouseup",()=>{drag=false;svg.style("cursor","grab");});
+svg.on("mouseleave",()=>{drag=false;svg.style("cursor","grab");});
+svg.on("touchstart",e=>{if(animating||e.touches.length!==1)return;drag=true;sx=e.touches[0].clientX;sy=e.touches[0].clientY;stx=ct.x;sty=ct.y;e.preventDefault();},{passive:false});
+svg.on("touchmove",e=>{if(!drag||animating||e.touches.length!==1)return;ct.x=stx+(e.touches[0].clientX-sx);ct.y=sty+(e.touches[0].clientY-sy);applyT();e.preventDefault();},{passive:false});
+svg.on("touchend",()=>{drag=false;});
+document.getElementById('zIn').onclick=()=>{ if(!animating){ct.k=Math.min(ct.k*1.3,8);applyT();}};
+document.getElementById('zOut').onclick=()=>{ if(!animating){ct.k=Math.max(ct.k*.77,.4);applyT();}};
+document.getElementById('zReset').onclick=resetZ;
+
+// Tooltip
+const tip=document.getElementById('tip');
+function showTip(e,t){tip.textContent=t;tip.style.opacity=1;moveTip(e);}
+function moveTip(e){tip.style.left=(e.clientX+14)+'px';tip.style.top=(e.clientY-28)+'px';}
+function hideTip(){tip.style.opacity=0;}
+
+// Load map
+d3.json("https://cdn.jsdelivr.net/npm/world-atlas@2.0.2/countries-110m.json").then(world=>{
+  const features=topojson.feature(world,world.objects.countries).features;
+  g.selectAll(".country").data(features).enter().append("path")
+    .attr("d",path)
+    .attr("class",d=>{ const c=getCountryByFeature(d); return c?"country lit":"country"; })
+    .attr("fill",d=>{ const c=getCountryByFeature(d); return c?(regionColor[c.region]||"#26d9a8"):"#1a3347"; })
+    .attr("data-id",d=>d.id)
+    .attr("data-region",d=>{ const c=getCountryByFeature(d); return c?c.region:""; })
+    .on("mouseover",function(e,d){ const c=getCountryByFeature(d); if(c) showTip(e,c.flag+" "+c.name); })
+    .on("mousemove",moveTip)
+    .on("mouseout",hideTip)
+    .on("click",function(e,d){ const c=getCountryByFeature(d); if(c) openCountry(c); });
+
+  DB.forEach(c=>{
+    const xy=proj([c.lon,c.lat]); if(!xy)return;
+    g.append("circle").attr("cx",xy[0]).attr("cy",xy[1]).attr("r",3.5).attr("class","cap-dot").on("click",()=>openCountry(c));
+    g.append("text").attr("x",xy[0]+6).attr("y",xy[1]-4).attr("class","ctry-label").text(c.flag+" "+c.name).on("click",()=>openCountry(c));
+  });
+});
+
+// ══════════════════════════════════════
+// SLIDESHOW
+// ══════════════════════════════════════
+let curSlide=0, ssTimer, ssPhotos=[];
+function buildSlides(photos, countryName){
+  clearInterval(ssTimer); curSlide=0; ssPhotos=photos;
+  const wrap=document.getElementById('ssWrap'), dots=document.getElementById('ssDots');
+  // Remove old slides (but keep ss-grad and ss-cap)
+  Array.from(wrap.querySelectorAll('.ss-slide')).forEach(s=>s.remove());
+  dots.innerHTML='';
+  photos.forEach((p,i)=>{
+    const s=document.createElement('div'); s.className='ss-slide'+(i===0?' on':'');
+    
+    // Fetch from Wikipedia API using search to find the most relevant page for the caption
+    const searchTerm = p.wiki ? p.wiki : (countryName + ' ' + p.cap.replace(/at Dawn|at Sunrise|at Night|Skyline|Sunset|Sunrise/ig, '').trim());
+    fetch(`https://en.wikipedia.org/w/api.php?action=query&generator=search&gsrsearch=${encodeURIComponent(searchTerm)}&gsrlimit=1&prop=pageimages&format=json&pithumbsize=1000&origin=*`)
+      .then(res=>res.json())
+      .then(data=>{
+         let src = '';
+         if(data.query && data.query.pages){
+            const pid = Object.keys(data.query.pages)[0];
+            if(pid !== "-1" && data.query.pages[pid].thumbnail) {
+               src = data.query.pages[pid].thumbnail.source;
+            }
+         }
+         if(src) {
+             s.style.backgroundImage = `url('${src}')`;
+         } else {
+             // Fallback to the direct country page if search fails
+             fetch(`https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(countryName)}&prop=pageimages&format=json&pithumbsize=1000&origin=*`)
+             .then(r=>r.json()).then(d=>{
+                if(d.query && d.query.pages){
+                   const ppid = Object.keys(d.query.pages)[0];
+                   if(ppid !== "-1" && d.query.pages[ppid].thumbnail) {
+                      s.style.backgroundImage = `url('${d.query.pages[ppid].thumbnail.source}')`;
+                   }
+                }
+             });
+         }
+      })
+      .catch(() => {
+          if (p.url) s.style.backgroundImage = `url('${p.url}')`;
+      });
+
+    // Insert before ss-grad so gradient stays on top
+    const grad=document.getElementById('ssGrad');
+    wrap.insertBefore(s, grad);
+    const dot=document.createElement('div'); dot.className='ss-dot'+(i===0?' on':'');
+    dot.onclick=()=>goSlide(i); dots.appendChild(dot);
+  });
+  // Set caption for first slide
+  const cap=document.getElementById('ssCap');
+  if(cap && photos[0]) cap.textContent=photos[0].cap;
+  ssTimer=setInterval(()=>goSlide(curSlide+1),5000);
+}
+function goSlide(i){
+  const sl=document.querySelectorAll('.ss-slide'), dt=document.querySelectorAll('.ss-dot');
+  if(i<0) i=sl.length-1; if(i>=sl.length) i=0;
+  sl.forEach((s,j)=>s.classList.toggle('on',j===i));
+  dt.forEach((d,j)=>d.classList.toggle('on',j===i));
+  curSlide=i;
+  // Update shared caption
+  const cap=document.getElementById('ssCap');
+  if(cap && ssPhotos[i]) cap.textContent=ssPhotos[i].cap;
+}
+document.getElementById('ssPrev').onclick=()=>goSlide(curSlide-1);
+document.getElementById('ssNext').onclick=()=>goSlide(curSlide+1);
+
+// ══════════════════════════════════════
+// FLAG via flagcdn
+// ══════════════════════════════════════
+function buildFlag(country, containerId){
+  const wrap=document.getElementById(containerId);
+  wrap.innerHTML='';
+  // Try image from flagcdn
+  const img=document.createElement('img');
+  img.className='flag-img';
+  img.src=`https://flagcdn.com/w320/${country.fc}.png`;
+  img.alt=country.name+' flag';
+  img.onerror=function(){
+    // Fallback to emoji if image fails
+    const em=document.createElement('div');
+    em.className='flag-emoji-fallback';
+    em.textContent=country.flag;
+    wrap.replaceChild(em,img);
+  };
+  wrap.appendChild(img);
+}
+
+// ══════════════════════════════════════
+// TOAST
+// ══════════════════════════════════════
+function showToast(msg){
+  const t=document.getElementById('toast'); t.querySelector('#toastTxt').textContent=msg;
+  t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3200);
+}
+
+// ══════════════════════════════════════
+// COUNTRY MODAL
+// ══════════════════════════════════════
+const cmodal=document.getElementById('cmodal');
+function openCountry(c){
+  if(!discovered.has(c.name)){ discovered.add(c.name); document.getElementById('discN').textContent=discovered.size; showToast("Discovered "+c.name+"!"); }
+  zoomTo(c.lat,c.lon);
+  document.getElementById('cmName').textContent=c.name;
+  document.getElementById('cmSub').textContent=c.region+" · "+c.lang;
+  buildFlag(c,'flagImgWrap');
+  document.getElementById('cmCap').textContent=c.capital;
+  document.getElementById('cmStats').innerHTML=
+    `<div class="pop-chip">👥 <b>${c.pop}</b> people</div>`+
+    `<div class="pop-chip">📐 <b>${c.area}</b></div>`+
+    `<div class="pop-chip">💱 <b>${c.currency}</b></div>`;
+  document.getElementById('cmCulture').textContent=c.culture;
+  document.getElementById('cmTrad').textContent=c.trad;
+  document.getElementById('cmFact').textContent=c.fact;
+  document.getElementById('cmDyk').textContent=c.dyk;
+  document.getElementById('cmTip').textContent=c.travel;
+  const badge=document.getElementById('contBadge');
+  badge.textContent=c.region; 
+  const cssVarMap = {"Asia":"var(--asia)", "Europe":"var(--europe)", "Africa":"var(--africa)", "North America":"var(--n-america)", "South America":"var(--s-america)", "Oceania":"var(--oceania)", "Antarctica":"var(--antarctica)"};
+  badge.style.background=cssVarMap[c.region]||'var(--no-data)';
+  buildSlides(c.photos, c.name);
+  cmodal.classList.add('on');
+}
+function closeCountry(){ clearInterval(ssTimer); cmodal.classList.remove('on'); resetZ(); }
+document.getElementById('cmClose').onclick=closeCountry;
+document.getElementById('cmBack').onclick=closeCountry;
+cmodal.onclick=e=>{ if(e.target===cmodal) closeCountry(); };
+
+// ══════════════════════════════════════
+// SEARCH & FILTER
+// ══════════════════════════════════════
+document.getElementById('searchBox').addEventListener('input',e=>{
+  const q=e.target.value.toLowerCase().trim();
+  g.selectAll(".country").attr("opacity",function(){
+    if(!q) return 1;
+    const c=getCountry(d3.select(this).attr("data-id"));
+    return (c&&c.name.toLowerCase().includes(q))?1:.1;
+  });
+  g.selectAll(".ctry-label").attr("opacity",function(){
+    if(!q) return 1;
+    return d3.select(this).text().toLowerCase().includes(q)?1:.06;
+  });
+  if(q.length>=2){
+    const found=DB.find(c=>c.name.toLowerCase().startsWith(q));
+    if(found) openCountry(found);
+  }
+});
+document.querySelectorAll('.fbtn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.fbtn').forEach(b=>b.classList.remove('on'));
+    btn.classList.add('on');
+    const f=btn.dataset.f;
+    g.selectAll(".country").attr("opacity",function(){
+      if(f==='all')return 1;
+      return d3.select(this).attr("data-region")===f?1:.07;
+    });
+    g.selectAll(".ctry-label").attr("opacity",function(){
+      if(f==='all')return 1;
+      const t=d3.select(this).text();
+      const m=DB.find(c=>t.includes(c.name));
+      return(m&&m.region===f)?1:.04;
+    });
+  });
+});
+svg.style("cursor","grab");
+
+// ══════════════════════════════════════
+// GAME ENGINE
+// ══════════════════════════════════════
+const gmodal=document.getElementById('gmodal');
+let gMode='flag', gDiff='medium', gQN=0, gScore=0, gStreak=0, gMaxStreak=0;
+let gQuestions=[], gAnswered=false, timerInterval;
+const TOTAL=10;
+const DIFF_TIME={easy:30,medium:20,hard:12};
+const DIFF_OPTS={easy:4,medium:4,hard:6};
+
+document.getElementById('launchGame').onclick=()=>{ gmodal.classList.add('on'); showModeSelect(); };
+document.getElementById('gClose').onclick=()=>{ clearInterval(timerInterval); gmodal.classList.remove('on'); };
+gmodal.onclick=e=>{ if(e.target===gmodal){ clearInterval(timerInterval); gmodal.classList.remove('on'); }};
+
+document.querySelectorAll('.mode-card').forEach(c=>{
+  c.onclick=()=>{ document.querySelectorAll('.mode-card').forEach(x=>x.classList.remove('sel')); c.classList.add('sel'); gMode=c.dataset.m; };
+});
+document.querySelectorAll('.diff-btn').forEach(b=>{
+  b.onclick=()=>{ document.querySelectorAll('.diff-btn').forEach(x=>x.classList.remove('sel')); b.classList.add('sel'); gDiff=b.dataset.d; };
+});
+document.getElementById('startBtn').onclick=startGame;
+document.getElementById('nextBtn').onclick=nextQ;
+document.getElementById('playAgain').onclick=startGame;
+document.getElementById('changeMode').onclick=showModeSelect;
+
+function showModeSelect(){
+  document.getElementById('modeSel').style.display='block';
+  document.getElementById('quizArea').classList.remove('on');
+  document.getElementById('resultArea').style.display='none';
+  gScore=0; gStreak=0; gQN=0; updatePills();
+}
+function updatePills(){
+  document.getElementById('gScore').textContent=gScore;
+  document.getElementById('gStreak').textContent=gStreak;
+  document.getElementById('gQN').textContent=gQN;
+}
+function shuffle(a){ return [...a].sort(()=>Math.random()-.5); }
+
+function startGame(){
+  document.getElementById('modeSel').style.display='none';
+  document.getElementById('resultArea').style.display='none';
+  document.getElementById('quizArea').classList.add('on');
+  gScore=0; gStreak=0; gQN=0; gMaxStreak=0;
+  gQuestions=shuffle(DB).slice(0,TOTAL);
+  updatePills(); showQ();
+}
+
+function showQ(){
+  if(gQN>=TOTAL){ endGame(); return; }
+  clearInterval(timerInterval);
+  gAnswered=false;
+  const q=gQuestions[gQN];
+  const mode=gMode==='mix'?['flag','capital','fact','continent','landmark'][Math.floor(Math.random()*5)]:gMode;
+  document.getElementById('progFill').style.width=((gQN/TOTAL)*100)+'%';
+  document.getElementById('fbBox').style.display='none';
+  document.getElementById('nextBtn').style.display='none';
+  const sb=document.getElementById('streakBadge');
+  if(gStreak>=2){ sb.style.display='inline-flex'; document.getElementById('streakN').textContent=gStreak+'×'; }
+  else sb.style.display='none';
+
+  const numOpts=DIFF_OPTS[gDiff];
+  const wrongPool=DB.filter(c=>c.name!==q.name);
+  const wrongs=shuffle(wrongPool).slice(0,numOpts-1);
+  const allOpts=shuffle([q,...wrongs]);
+  const letters='ABCDEF'.split('');
+
+  const qText=document.getElementById('qText');
+  const qSub=document.getElementById('qSub');
+  const qVis=document.getElementById('qVisual');
+  const opts=document.getElementById('optsGrid');
+  qVis.innerHTML=''; opts.innerHTML='';
+
+  // Set grid cols
+  opts.style.gridTemplateColumns=numOpts>4?'1fr 1fr 1fr':'1fr 1fr';
+
+  if(mode==='flag'){
+    qText.textContent='Which country does this flag belong to?';
+    qSub.textContent='Identify the country from its flag';
+    // Show ACTUAL flag image
+    const fw=document.createElement('div'); fw.className='quiz-flag-wrap';
+    const fi=document.createElement('img'); fi.className='quiz-flag-img';
+    fi.src=`https://flagcdn.com/w320/${q.fc}.png`;
+    fi.alt=q.name; fi.onerror=function(){ this.style.display='none'; const em=document.createElement('div'); em.className='quiz-flag-emoji'; em.textContent=q.flag; fw.appendChild(em); };
+    fw.appendChild(fi); qVis.appendChild(fw);
+    allOpts.forEach((o,i)=>{ const btn=makeOptBtn(letters[i],o.flag+' '+o.name,()=>checkAns(btn,o.name===q.name,q)); opts.appendChild(btn); });
+
+  } else if(mode==='capital'){
+    qText.textContent=`${q.flag} ${q.name}`;
+    qSub.textContent='What is the capital city of this country?';
+    allOpts.forEach((o,i)=>{ const btn=makeOptBtn(letters[i],'🏙️ '+o.capital,()=>checkAns(btn,o.capital===q.capital,q)); opts.appendChild(btn); });
+
+  } else if(mode==='fact'){
+    const clues=[q.fact,q.dyk,q.culture];
+    const clue=clues[Math.floor(Math.random()*clues.length)];
+    qText.textContent='"'+clue+'"';
+    qSub.textContent='Which country does this describe?';
+    allOpts.forEach((o,i)=>{ const btn=makeOptBtn(letters[i],o.flag+' '+o.name,()=>checkAns(btn,o.name===q.name,q)); opts.appendChild(btn); });
+
+  } else if(mode==='continent'){
+    qText.textContent=q.flag+' '+q.name;
+    qSub.textContent='Which region/continent is this country in?';
+    const regions=['Asia','Europe','Africa','North America','South America','Oceania'];
+    const correctReg=q.region;
+    const wrongRegs=shuffle(regions.filter(r=>r!==correctReg)).slice(0,numOpts-1);
+    const allRegs=shuffle([correctReg,...wrongRegs]);
+    allRegs.forEach((r,i)=>{ const btn=makeOptBtn(letters[i],r,()=>checkAns(btn,r===correctReg,q,correctReg)); opts.appendChild(btn); });
+
+  } else if(mode==='landmark'){
+    // Show a photo and guess country
+    const photo=q.photos[0];
+    const pw=document.createElement('div'); pw.className='quiz-flag-wrap';
+    const pi=document.createElement('img'); pi.className='quiz-flag-img';
+    pi.style.cssText='width:280px;height:170px;border-radius:14px;object-fit:cover;border:2px solid var(--border);box-shadow:0 10px 30px rgba(0,0,0,.6)';
+    pi.src=photo.url; pi.alt='Landmark';
+    pw.appendChild(pi); qVis.appendChild(pw);
+    qText.textContent='🏛️ '+photo.cap;
+    qSub.textContent='Which country is this landmark in?';
+    allOpts.forEach((o,i)=>{ const btn=makeOptBtn(letters[i],o.flag+' '+o.name,()=>checkAns(btn,o.name===q.name,q)); opts.appendChild(btn); });
+  }
+
+  // Timer
+  let timeLeft=DIFF_TIME[gDiff];
+  const bar=document.getElementById('timerBar');
+  bar.style.width='100%';
+  bar.style.background='linear-gradient(90deg,#10b981,#059669)';
+  timerInterval=setInterval(()=>{
+    timeLeft--;
+    const pct=(timeLeft/DIFF_TIME[gDiff])*100;
+    bar.style.width=pct+'%';
+    if(pct<50) bar.style.background='linear-gradient(90deg,#f59e0b,#d97706)';
+    if(pct<25) bar.style.background='linear-gradient(90deg,#ef4444,#dc2626)';
+    if(timeLeft<=0){ clearInterval(timerInterval); if(!gAnswered) timeUp(q); }
+  },1000);
+}
+
+function makeOptBtn(letter,label,onClick){
+  const btn=document.createElement('button'); btn.className='opt-btn';
+  btn.innerHTML=`<span class="opt-letter">${letter}</span>${label}`;
+  btn.onclick=onClick; return btn;
+}
+
+function checkAns(btn,correct,q,correctLabel){
+  if(gAnswered)return; gAnswered=true;
+  clearInterval(timerInterval);
+  document.querySelectorAll('.opt-btn').forEach(b=>b.disabled=true);
+  const fb=document.getElementById('fbBox');
+  if(correct){
+    btn.classList.add('correct');
+    gStreak++; gMaxStreak=Math.max(gMaxStreak,gStreak);
+    const pts=10+(gStreak>1?(gStreak-1)*5:0);
+    gScore+=pts;
+    fb.className='fb-box ok'; fb.style.display='block';
+    fb.innerHTML=`✅ Correct! <strong>${q.flag} ${q.name}</strong> +${pts} pts — ${q.fact}`;
+  } else {
+    btn.classList.add('wrong');
+    gStreak=0;
+    // Highlight correct
+    document.querySelectorAll('.opt-btn').forEach(b=>{ if(b.textContent.includes(q.name)||b.textContent.includes(q.capital)||(correctLabel&&b.textContent.includes(correctLabel))) b.classList.add('correct'); });
+    fb.className='fb-box bad'; fb.style.display='block';
+    fb.innerHTML=`❌ Not quite! Correct: <strong>${q.flag} ${q.name}</strong> (${q.capital}, ${q.region})`;
+  }
+  gQN++; updatePills();
+  document.getElementById('nextBtn').style.display='inline-flex';
+  document.getElementById('timerBar').style.width='0%';
+}
+
+function timeUp(q){
+  if(gAnswered)return; gAnswered=true;
+  document.querySelectorAll('.opt-btn').forEach(b=>b.disabled=true);
+  gStreak=0;
+  document.querySelectorAll('.opt-btn').forEach(b=>{ if(b.textContent.includes(q.name)||b.textContent.includes(q.capital)) b.classList.add('correct'); });
+  const fb=document.getElementById('fbBox');
+  fb.className='fb-box bad'; fb.style.display='block';
+  fb.innerHTML=`⏱ Time's up! It was <strong>${q.flag} ${q.name}</strong> — ${q.capital}`;
+  gQN++; updatePills();
+  document.getElementById('nextBtn').style.display='inline-flex';
+}
+
+function nextQ(){ showQ(); }
+
+function endGame(){
+  clearInterval(timerInterval);
+  document.getElementById('quizArea').classList.remove('on');
+  const ra=document.getElementById('resultArea'); ra.style.display='block';
+  const pct=Math.round((gScore/(TOTAL*10))*100);
+  document.getElementById('resPts').textContent=gScore;
+  let msg=''; 
+  if(pct>=90) msg='🏆 GeoMaster! Extraordinary knowledge!';
+  else if(pct>=70) msg='🌟 Impressive! You really know your world.';
+  else if(pct>=50) msg='🌍 Solid effort! Keep exploring.';
+  else msg='🗺️ Keep travelling the map — you\'ll get there!';
+  document.getElementById('resMsg').textContent=msg;
+  const bd=document.getElementById('resBadges'); bd.innerHTML='';
+  const badges=[];
+  if(gMaxStreak>=3) badges.push({t:'🔥 '+gMaxStreak+'× Streak',bg:'rgba(249,115,22,.15)',c:'#fdba74'});
+  if(gScore===TOTAL*10+TOTAL*5) badges.push({t:'💯 Lightning Perfect',bg:'rgba(201,168,76,.15)',c:var_css('--gold2')});
+  else if(pct===100) badges.push({t:'💯 Perfect Score',bg:'rgba(201,168,76,.15)',c:'#e8c96a'});
+  if(gMaxStreak>=5) badges.push({t:'⚡ Unstoppable',bg:'rgba(124,58,237,.15)',c:'#a78bfa'});
+  if(gDiff==='hard'&&pct>=60) badges.push({t:'🔥 Hard Mode Hero',bg:'rgba(239,68,68,.15)',c:'#fca5a5'});
+  badges.forEach(b=>{ const el=document.createElement('span'); el.className='badge'; el.style.cssText=`background:${b.bg};color:${b.c};border-color:${b.c}40`; el.textContent=b.t; bd.appendChild(el); });
+  document.getElementById('progFill').style.width='100%';
+}
+function var_css(n){ return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
+
+// Progress panel (simple)
+document.getElementById('launchStats').onclick=()=>{
+  const pct=Math.round((discovered.size/DB.length)*100);
+  const msg=`You've explored ${discovered.size} of ${DB.length} countries (${pct}%)!\n\nDiscovered: ${[...discovered].join(', ')||'None yet!'}`;
+  alert(msg);
+};
+</script>
+</body>
+</html>

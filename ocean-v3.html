@@ -1,0 +1,1004 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🌊 OCEAN EXPLORER — Dive Into The Deep</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Exo+2:ital,wght@0,300;0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-user-select:none;user-select:none;}
+:root{
+  --c1:#0D1B2A;--c2:#1B2838;--c3:#0A3352;--c4:#0E5C8A;--c5:#1A7FBF;
+  --c6:#1EB5E0;--c7:#48CAE4;--c8:#90E0EF;--c9:#ADE8F4;
+  --acc:#00E5FF;--gold:#FFD166;--coral:#FF6B6B;
+  --text-bright:#E0F7FF;--text-mid:#7EC8E3;--text-dim:#3A7CA5;
+  --fh:'Cinzel',serif;--fb:'Exo 2',sans-serif;
+}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--c1);font-family:var(--fb);}
+*{cursor:none!important;}
+#cursor{position:fixed;width:12px;height:12px;border:2px solid var(--acc);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);box-shadow:0 0 10px var(--acc);transition:transform .1s;}
+#cursor-ring{position:fixed;width:36px;height:36px;border:1px solid rgba(0,229,255,.3);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:all .15s ease;}
+
+/* LOADING */
+#loading{position:fixed;inset:0;background:var(--c1);z-index:9990;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity 1.2s;}
+#load-title{font-family:var(--fh);font-size:clamp(2rem,6vw,4.5rem);color:var(--acc);letter-spacing:.25em;text-shadow:0 0 60px var(--acc);animation:title-pulse 3s ease-in-out infinite;}
+@keyframes title-pulse{0%,100%{opacity:.9}50%{opacity:1;text-shadow:0 0 80px var(--acc),0 0 160px rgba(0,229,255,.5);}}
+#load-sub{font-size:.9rem;color:var(--text-mid);letter-spacing:.3em;margin:.5rem 0 2rem;text-transform:uppercase;}
+#load-ocean{width:320px;height:150px;position:relative;overflow:hidden;border-radius:14px;border:1px solid rgba(0,229,255,.2);margin-bottom:2rem;}
+#load-ocean-bg{position:absolute;inset:0;background:linear-gradient(to bottom,#0A3352,#021628);}
+.load-fish{position:absolute;font-size:1.6rem;animation:load-swim 3s linear infinite;}
+@keyframes load-swim{0%{left:110%;opacity:0}10%{opacity:1}90%{opacity:1}100%{left:-20%;opacity:0}}
+#load-bar-outer{width:320px;height:3px;background:rgba(0,229,255,.1);border-radius:3px;overflow:hidden;}
+#load-bar{height:100%;background:linear-gradient(90deg,var(--c4),var(--acc),var(--c4));background-size:200%;width:0;animation:bar-shimmer 1.5s linear infinite;transition:width .3s;}
+@keyframes bar-shimmer{0%{background-position:200%}100%{background-position:0%}}
+#load-tip{margin-top:1rem;font-size:.75rem;color:var(--text-dim);letter-spacing:.1em;}
+
+/* SCROLL */
+#scroll-driver{position:fixed;inset:0;overflow-y:scroll;z-index:1;opacity:0;pointer-events:all;}
+#scroll-driver::-webkit-scrollbar{display:none;}
+#scroll-driver{scrollbar-width:none;}
+#scroll-inner{height:1110vh;}
+
+/* APP */
+#app{position:fixed;inset:0;overflow:hidden;}
+#ocean-bg{position:absolute;inset:0;transition:background .8s;}
+#rays-canvas,#fx-canvas,#current-canvas{position:absolute;inset:0;pointer-events:none;}
+#rays-canvas{z-index:2;}#current-canvas{z-index:3;}
+#caustics{position:absolute;inset:0;z-index:4;pointer-events:none;opacity:.12;
+  background-image:radial-gradient(ellipse 80px 60px at 20% 30%,rgba(0,229,255,.3),transparent),
+    radial-gradient(ellipse 60px 80px at 70% 20%,rgba(0,229,255,.2),transparent);
+  animation:caustic-shift 8s ease-in-out infinite alternate;}
+@keyframes caustic-shift{0%{background-position:0%}100%{background-position:10% 20%}}
+#fx-canvas{z-index:5;}
+#scene{position:absolute;inset:0;z-index:10;}
+#ocean-floor{position:absolute;z-index:40;width:100%;pointer-events:none;}
+#surface-layer{position:absolute;top:0;left:0;width:100%;height:120px;z-index:6;pointer-events:none;}
+
+/* Y-AXIS */
+#yaxis{position:fixed;left:0;top:0;width:54px;height:100%;z-index:400;pointer-events:none;background:linear-gradient(to right,rgba(0,10,30,.85),transparent);}
+.yaxis-tick{position:absolute;left:0;width:54px;display:flex;align-items:center;gap:4px;}
+.yaxis-line{width:14px;height:1px;background:rgba(0,229,255,.4);}
+.yaxis-text{font-family:var(--fh);font-size:9px;color:rgba(0,229,255,.7);letter-spacing:.05em;}
+#yaxis-cursor{position:fixed;left:0;width:200px;height:1px;background:linear-gradient(to right,var(--acc),transparent);z-index:401;pointer-events:none;box-shadow:0 0 6px var(--acc);}
+
+/* LANDMARK SIDEBAR (right) */
+#landmark-sidebar{position:fixed;right:0;top:0;width:220px;height:100%;z-index:402;pointer-events:none;}
+.lm-line-item{position:absolute;right:0;display:flex;align-items:center;gap:0;transform:translateY(-50%);pointer-events:none;}
+.lm-line-bar{height:1px;width:50px;background:linear-gradient(90deg,transparent,var(--gold));flex-shrink:0;}
+.lm-line-card{display:flex;align-items:center;gap:7px;background:rgba(5,18,40,.88);
+  backdrop-filter:blur(12px);padding:5px 10px 5px 6px;
+  border-radius:20px 0 0 20px;border:1px solid rgba(255,209,102,.3);border-right:none;
+  box-shadow:-4px 0 20px rgba(0,0,0,.4);}
+.lm-line-card img{width:30px;height:30px;object-fit:contain;border-radius:5px;flex-shrink:0;}
+.lm-line-name{font-family:var(--fh);font-size:.58rem;color:var(--gold);letter-spacing:.05em;line-height:1.3;}
+.lm-line-depth{font-size:.52rem;color:var(--text-mid);}
+
+/* HUD - RIGHT BOTTOM */
+#hud{position:fixed;right:10px;bottom:20px;z-index:403;display:flex;flex-direction:column;gap:5px;pointer-events:none;width:200px;}
+.hud-card{background:rgba(5,20,45,.78);border:1px solid rgba(0,229,255,.18);border-radius:10px;padding:6px 10px;backdrop-filter:blur(16px);}
+.hud-card-title{font-family:var(--fh);font-size:.45rem;color:var(--acc);letter-spacing:.15em;text-transform:uppercase;margin-bottom:3px;}
+.hud-val{font-family:var(--fh);font-size:1rem;font-weight:700;color:var(--text-bright);line-height:1;}
+.hud-unit{font-size:.5rem;color:var(--text-mid);margin-left:2px;}
+.hud-sub{font-size:.5rem;color:var(--text-dim);margin-top:1px;}
+.hud-bar{height:2px;background:rgba(0,229,255,.1);border-radius:1px;margin-top:3px;overflow:hidden;}
+.hud-bar-fill{height:100%;border-radius:1px;transition:width .5s;}
+
+/* ZONE BANNER */
+#zone-banner{position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:400;background:rgba(5,20,45,.82);border:1px solid rgba(0,229,255,.2);border-radius:13px;padding:9px 18px;backdrop-filter:blur(16px);text-align:center;pointer-events:none;transition:all .5s;}
+#zone-name{font-family:var(--fh);font-size:.9rem;color:var(--acc);letter-spacing:.12em;}
+#zone-depth-range{font-size:.6rem;color:var(--text-mid);margin-top:2px;}
+
+/* ZONE TRANSITION */
+#zone-transition{position:fixed;inset:0;z-index:350;pointer-events:none;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .8s;}
+.zt-text{font-family:var(--fh);font-size:clamp(2.5rem,7vw,6rem);color:rgba(0,229,255,.12);letter-spacing:.3em;text-align:center;text-transform:uppercase;white-space:nowrap;}
+
+/* DEPTH DISPLAY */
+#depth-display{position:fixed;bottom:22px;left:70px;z-index:400;text-align:left;pointer-events:none;}
+#depth-main{font-family:var(--fh);font-size:clamp(1.8rem,4vw,3rem);color:var(--text-bright);line-height:1;text-shadow:0 0 30px rgba(0,229,255,.4);}
+#depth-desc{font-size:.65rem;color:var(--text-mid);letter-spacing:.2em;margin-top:3px;}
+
+/* SUBMARINE */
+#sub-wrap{position:fixed;z-index:300;pointer-events:none;transform:translate(-50%,-50%);filter:drop-shadow(0 0 16px rgba(0,229,255,.7));}
+#sub-beam{position:fixed;z-index:299;pointer-events:none;width:220px;height:70px;opacity:.85;transform:translate(-50%,-50%);}
+
+/* SONAR */
+#sonar-wrap{position:fixed;bottom:80px;right:228px;width:70px;height:70px;z-index:400;pointer-events:none;}
+.sonar-ring{position:absolute;border-radius:50%;border:1px solid rgba(0,229,255,.5);animation:sonar-out 2.4s ease-out infinite;}
+.sonar-ring:nth-child(2){animation-delay:.8s;}.sonar-ring:nth-child(3){animation-delay:1.6s;}
+@keyframes sonar-out{0%{width:6px;height:6px;top:32px;left:32px;opacity:1;}100%{width:70px;height:70px;top:0;left:0;opacity:0;}}
+.sonar-dot{position:absolute;width:7px;height:7px;background:var(--acc);border-radius:50%;top:31px;left:31px;box-shadow:0 0 8px var(--acc);}
+
+/* ── ANIMALS ── */
+.animal-wrap{
+  position:absolute;z-index:50;
+  cursor:pointer !important;
+  pointer-events:auto !important;
+}
+.animal-wrap:hover{z-index:9999 !important;}
+
+/* Star pin at top */
+.animal-pin{
+  position:absolute;top:-18px;left:50%;transform:translateX(-50%);
+  width:22px;height:22px;z-index:51;pointer-events:none;
+}
+
+/* Photo floating */
+.animal-photo{
+  display:block;width:90px;height:90px;object-fit:contain;
+  border-radius:12px;
+  box-shadow:0 4px 20px rgba(0,0,0,.5),0 0 0 1px rgba(0,229,255,.15);
+  pointer-events:none;
+  animation:float-anim var(--fd,5s) ease-in-out infinite;
+  animation-delay:var(--fl,0s);
+  transition:box-shadow .3s,filter .3s;
+}
+.animal-wrap:hover .animal-photo{
+  box-shadow:0 8px 40px rgba(0,229,255,.55),0 0 0 2px var(--acc);
+  filter:brightness(1.18) saturate(1.2);
+}
+@keyframes float-anim{
+  0%,100%{transform:translateY(0) rotate(var(--rot,0deg));}
+  50%{transform:translateY(-10px) rotate(calc(var(--rot,0deg) + 1deg));}
+}
+
+/* ── CREATURE NAME LABEL — clickable ── */
+.creature-name-label{
+  position:absolute;
+  /* sits just below the photo (photo is 90px tall) */
+  top:96px;
+  left:50%;transform:translateX(-50%);
+  font-family:var(--fh);
+  font-size:.62rem;
+  color:#FFFFFF;
+  font-weight:600;
+  letter-spacing:.06em;
+  white-space:nowrap;
+  text-shadow:0 0 12px var(--acc),0 0 24px rgba(0,229,255,.5),0 1px 3px rgba(0,0,0,.8);
+  background:rgba(2,12,28,.55);
+  padding:3px 11px 4px;
+  border-radius:20px;
+  border:1px solid rgba(0,229,255,.3);
+  backdrop-filter:blur(6px);
+  /* Make it clickable */
+  pointer-events:auto !important;
+  cursor:pointer !important;
+  z-index:60;
+  transition:background .2s,border-color .2s,text-shadow .2s,transform .15s;
+  user-select:none;
+}
+.creature-name-label:hover{
+  background:rgba(0,229,255,.18);
+  border-color:rgba(0,229,255,.7);
+  text-shadow:0 0 16px #fff,0 0 28px var(--acc);
+  transform:translateX(-50%) scale(1.07);
+}
+
+/* ── INFO DIALOG (modal) ── */
+#info-overlay{
+  position:fixed;inset:0;z-index:10000;
+  background:rgba(0,5,20,.7);
+  backdrop-filter:blur(8px);
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;
+  transition:opacity .3s ease;
+}
+#info-overlay.active{opacity:1;pointer-events:all;}
+
+#info-dialog{
+  position:relative;
+  width:min(480px,92vw);
+  max-height:90vh;
+  overflow-y:auto;
+  background:radial-gradient(ellipse at 10% 10%,#0d2545 0%,#061830 40%,#020e1e 100%);
+  border:1.5px solid rgba(0,229,255,.45);
+  border-radius:20px;
+  padding:24px 22px 20px;
+  box-shadow:
+    0 0 60px rgba(0,229,255,.18),
+    0 30px 80px rgba(0,0,0,.9),
+    inset 0 1px 0 rgba(255,255,255,.06);
+  animation:dialog-in .32s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes dialog-in{from{transform:scale(.88) translateY(16px);opacity:0;}to{transform:scale(1) translateY(0);opacity:1;}}
+
+/* scanline texture */
+#info-dialog::before{
+  content:'';position:absolute;inset:0;border-radius:20px;
+  background:repeating-linear-gradient(0deg,transparent,transparent 20px,rgba(0,229,255,.022) 20px,rgba(0,229,255,.022) 21px);
+  pointer-events:none;
+}
+/* top glowline */
+#info-dialog::after{
+  content:'';position:absolute;top:0;left:12px;right:12px;height:2px;
+  background:linear-gradient(90deg,transparent,var(--acc),transparent);
+  border-radius:2px;
+}
+
+/* corner brackets */
+.dlg-corner{position:absolute;width:14px;height:14px;border-color:rgba(0,229,255,.5);}
+.dlg-c-tl{top:7px;left:7px;border-top:1.5px solid;border-left:1.5px solid;}
+.dlg-c-tr{top:7px;right:7px;border-top:1.5px solid;border-right:1.5px solid;}
+.dlg-c-bl{bottom:7px;left:7px;border-bottom:1.5px solid;border-left:1.5px solid;}
+.dlg-c-br{bottom:7px;right:7px;border-bottom:1.5px solid;border-right:1.5px solid;}
+
+/* close btn */
+#info-close{
+  position:absolute;top:12px;right:14px;
+  background:none;border:none;
+  font-family:var(--fh);font-size:.85rem;color:var(--text-mid);
+  cursor:pointer !important;z-index:2;
+  transition:color .2s;letter-spacing:.08em;
+}
+#info-close:hover{color:var(--acc);}
+
+/* dialog header */
+.dlg-header{display:flex;align-items:flex-start;gap:14px;margin-bottom:14px;}
+.dlg-img{
+  width:88px;height:88px;object-fit:contain;flex-shrink:0;
+  border-radius:14px;
+  border:1px solid rgba(0,229,255,.3);
+  background:rgba(0,20,50,.4);
+  filter:drop-shadow(0 0 14px rgba(0,229,255,.35));
+}
+.dlg-titles{}
+.dlg-name{font-family:var(--fh);font-size:1.05rem;color:var(--acc);line-height:1.2;margin-bottom:3px;}
+.dlg-sci{font-size:.65rem;color:var(--text-dim);font-style:italic;margin-bottom:6px;}
+.dlg-danger{display:inline-block;font-size:.58rem;padding:3px 10px;border-radius:20px;font-weight:600;}
+.danger-safe{background:rgba(0,255,120,.12);color:#0f9;border:1px solid rgba(0,255,120,.25);}
+.danger-caution{background:rgba(255,210,0,.12);color:#fd0;border:1px solid rgba(255,210,0,.25);}
+.danger-dangerous{background:rgba(255,60,60,.12);color:#f66;border:1px solid rgba(255,60,60,.25);}
+
+.dlg-divider{height:1px;background:linear-gradient(90deg,transparent,rgba(0,229,255,.28),transparent);margin:10px 0;}
+
+/* stats grid */
+.dlg-stats{display:grid;grid-template-columns:1fr 1fr;gap:5px 16px;margin-bottom:2px;}
+.dlg-stat{display:flex;flex-direction:column;}
+.dlg-sl{font-size:.55rem;color:var(--text-dim);letter-spacing:.06em;text-transform:uppercase;margin-bottom:1px;}
+.dlg-sv{font-size:.7rem;color:var(--text-bright);font-weight:600;}
+
+/* description */
+.dlg-desc{font-size:.68rem;color:var(--text-mid);line-height:1.6;margin-top:10px;}
+
+/* fun fact box */
+.dlg-fact{
+  margin-top:10px;padding:10px 12px;
+  background:rgba(0,229,255,.07);
+  border-radius:10px;
+  border-left:2.5px solid var(--acc);
+  font-size:.65rem;color:var(--text-mid);line-height:1.55;
+  position:relative;
+}
+.dlg-fact-label{
+  font-family:var(--fh);font-size:.5rem;color:var(--acc);
+  letter-spacing:.1em;text-transform:uppercase;
+  margin-bottom:4px;display:block;
+}
+
+/* MILESTONES */
+.milestone-banner{position:absolute;left:50%;transform:translateX(-50%);z-index:60;
+  background:rgba(5,20,45,.87);border:1px solid rgba(255,209,102,.3);border-radius:11px;
+  padding:7px 18px;text-align:center;pointer-events:none;backdrop-filter:blur(12px);
+  animation:banner-pop .5s ease;}
+@keyframes banner-pop{from{opacity:0;transform:translateX(-50%) scale(.9)}to{opacity:1;transform:translateX(-50%) scale(1)}}
+.ms-title{font-family:var(--fh);font-size:.75rem;color:var(--gold);}
+.ms-sub{font-size:.6rem;color:var(--text-mid);margin-top:2px;}
+
+/* SCROLL HINT */
+#scroll-hint{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);font-family:var(--fh);font-size:.6rem;color:rgba(0,229,255,.5);letter-spacing:.2em;z-index:400;animation:hint-bob 2.5s ease-in-out infinite;pointer-events:none;}
+@keyframes hint-bob{0%,100%{opacity:.4;transform:translateX(-50%) translateY(0);}50%{opacity:.8;transform:translateX(-50%) translateY(-6px);}}
+
+/* GAME BTN */
+#minigame-btn{position:fixed;bottom:22px;right:232px;z-index:400;background:rgba(5,20,45,.82);border:1px solid rgba(0,229,255,.3);border-radius:11px;padding:7px 13px;cursor:pointer;font-family:var(--fh);font-size:.6rem;color:var(--acc);letter-spacing:.1em;transition:all .2s;backdrop-filter:blur(12px);}
+#minigame-btn:hover{background:rgba(0,229,255,.12);border-color:var(--acc);transform:scale(1.05);}
+
+/* GAME */
+#minigame{position:fixed;inset:0;z-index:800;background:rgba(0,5,20,.92);backdrop-filter:blur(20px);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .4s;}
+#minigame.active{opacity:1;pointer-events:all;}
+#game-title{font-family:var(--fh);font-size:1.8rem;color:var(--acc);letter-spacing:.2em;text-shadow:0 0 40px var(--acc);margin-bottom:.4rem;}
+#game-sub{font-size:.75rem;color:var(--text-mid);letter-spacing:.08em;margin-bottom:1rem;}
+#game-canvas{border:1px solid rgba(0,229,255,.3);border-radius:14px;box-shadow:0 0 50px rgba(0,229,255,.12);}
+#game-close{position:absolute;top:18px;right:22px;background:none;border:none;font-family:var(--fh);font-size:.9rem;color:var(--text-mid);cursor:pointer;transition:color .2s;}
+#game-close:hover{color:var(--acc);}
+#game-score-wrap{display:flex;gap:24px;margin-top:.8rem;}
+.gsi{text-align:center;}.gsl{font-size:.55rem;color:var(--text-dim);letter-spacing:.1em;}.gsv{font-family:var(--fh);font-size:1.2rem;color:var(--text-bright);}
+#game-timer-bar-wrap{width:480px;height:4px;background:rgba(0,229,255,.1);border-radius:2px;margin-top:.6rem;overflow:hidden;}
+#game-timer-bar{height:100%;background:linear-gradient(90deg,var(--acc),#0077b6);border-radius:2px;transition:width .1s linear;}
+#game-msg{font-family:var(--fh);font-size:.85rem;color:var(--gold);margin-top:.7rem;height:1.4em;text-align:center;}
+
+/* scrollbar for dialog */
+#info-dialog::-webkit-scrollbar{width:4px;}
+#info-dialog::-webkit-scrollbar-track{background:transparent;}
+#info-dialog::-webkit-scrollbar-thumb{background:rgba(0,229,255,.3);border-radius:2px;}
+</style>
+</head>
+<body>
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+
+<!-- LOADING -->
+<div id="loading">
+  <div id="load-title">OCEAN EXPLORER</div>
+  <div id="load-sub">Dive into the unknown</div>
+  <div id="load-ocean">
+    <div id="load-ocean-bg"></div>
+    <div class="load-fish" style="top:25px;animation-delay:0s">🐟</div>
+    <div class="load-fish" style="top:70px;animation-delay:1s;font-size:2rem">🐙</div>
+    <div class="load-fish" style="top:45px;animation-delay:2s">🦈</div>
+    <div class="load-fish" style="top:105px;animation-delay:.5s;font-size:1.3rem">🐠</div>
+    <div class="load-fish" style="top:130px;animation-delay:1.8s">🦑</div>
+  </div>
+  <div id="load-bar-outer"><div id="load-bar"></div></div>
+  <div id="load-tip">Initialising depth sensors…</div>
+</div>
+
+<!-- SCROLL DRIVER -->
+<div id="scroll-driver"><div id="scroll-inner"></div></div>
+
+<!-- APP -->
+<div id="app">
+  <div id="ocean-bg"></div>
+  <div id="caustics"></div>
+  <canvas id="rays-canvas"></canvas>
+  <canvas id="current-canvas"></canvas>
+  <canvas id="fx-canvas"></canvas>
+  <div id="surface-layer"></div>
+  <div id="scene"></div>
+  <div id="ocean-floor"></div>
+</div>
+
+<!-- ZONE TRANSITION -->
+<div id="zone-transition"><div class="zt-text" id="zt-text"></div></div>
+
+<!-- Y-AXIS -->
+<div id="yaxis"></div>
+<div id="yaxis-cursor"></div>
+
+<!-- LANDMARK SIDEBAR (right) — Empire State & Statue of Liberty EXCLUDED -->
+<div id="landmark-sidebar"></div>
+
+<!-- HUD -->
+<div id="hud">
+  <div class="hud-card">
+    <div class="hud-card-title">Depth</div>
+    <span class="hud-val" id="hud-depth">0</span><span class="hud-unit">m</span>
+    <div class="hud-sub" id="hud-ft">0 ft</div>
+  </div>
+  <div class="hud-card">
+    <div class="hud-card-title">Temperature</div>
+    <span class="hud-val" id="hud-temp">24</span><span class="hud-unit">°C</span>
+    <div class="hud-sub" id="hud-tf">75.2°F</div>
+    <div class="hud-bar"><div class="hud-bar-fill" id="temp-bar" style="width:80%;background:linear-gradient(90deg,#0096C7,#FF6B6B)"></div></div>
+  </div>
+  <div class="hud-card">
+    <div class="hud-card-title">Pressure</div>
+    <span class="hud-val" id="hud-pres">1</span><span class="hud-unit">atm</span>
+    <div class="hud-bar"><div class="hud-bar-fill" id="pres-bar" style="width:0%;background:linear-gradient(90deg,#00E5FF,#FF6B6B)"></div></div>
+  </div>
+  <div class="hud-card">
+    <div class="hud-card-title">Light</div>
+    <span class="hud-val" id="hud-light">100</span><span class="hud-unit">%</span>
+    <div class="hud-bar"><div class="hud-bar-fill" id="light-bar" style="width:100%;background:linear-gradient(90deg,#FFD166,#FFF)"></div></div>
+  </div>
+  <div class="hud-card">
+    <div class="hud-card-title">O₂ Dissolved</div>
+    <span class="hud-val" id="hud-o2">8.5</span><span class="hud-unit">mg/L</span>
+  </div>
+</div>
+
+<!-- ZONE BANNER -->
+<div id="zone-banner">
+  <div id="zone-name">SUNLIGHT ZONE — EPIPELAGIC</div>
+  <div id="zone-depth-range">0–200 m · Photosynthesis · 90% of marine life</div>
+</div>
+
+<!-- DEPTH DISPLAY -->
+<div id="depth-display">
+  <div id="depth-main"><span id="dm-val">0</span><span style="font-size:.45em;color:var(--text-mid)"> m</span></div>
+  <div id="depth-desc">SEA LEVEL</div>
+</div>
+
+<!-- SUBMARINE -->
+<div id="sub-wrap">
+  <svg width="76" height="38" viewBox="0 0 76 38">
+    <defs><linearGradient id="sg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1a7fbf"/><stop offset="100%" stop-color="#0a3352"/></linearGradient></defs>
+    <ellipse cx="36" cy="25" rx="30" ry="11" fill="url(#sg)" stroke="var(--acc)" stroke-width=".7"/>
+    <rect x="23" y="12" width="17" height="13" rx="4" fill="#0a3352" stroke="var(--acc)" stroke-width=".6"/>
+    <line x1="31" y1="12" x2="31" y2="7" stroke="var(--acc)" stroke-width="1.2"/>
+    <circle cx="31" cy="6" r="1.8" fill="var(--acc)" opacity=".9"/>
+    <g transform="translate(66,25)">
+      <ellipse cx="0" cy="-3.5" rx="1.8" ry="4" fill="var(--acc)" opacity=".7"/>
+      <ellipse cx="0" cy="-3.5" rx="1.8" ry="4" fill="var(--acc)" opacity=".7" transform="rotate(60)"/>
+      <ellipse cx="0" cy="-3.5" rx="1.8" ry="4" fill="var(--acc)" opacity=".7" transform="rotate(120)"/>
+      <circle cx="0" cy="0" r="2.2" fill="#0a3352" stroke="var(--acc)" stroke-width=".6"/>
+    </g>
+    <circle cx="16" cy="25" r="3" fill="rgba(0,229,255,.12)" stroke="var(--acc)" stroke-width=".5"/>
+    <circle cx="27" cy="25" r="2.5" fill="rgba(0,229,255,.1)" stroke="var(--acc)" stroke-width=".5"/>
+    <polygon points="5,25 5,34 15,29" fill="#0a3352" stroke="var(--acc)" stroke-width=".5"/>
+    <polygon points="5,25 5,16 14,20" fill="#0a3352" stroke="var(--acc)" stroke-width=".5"/>
+  </svg>
+</div>
+<svg id="sub-beam" width="200" height="70" viewBox="0 0 200 70">
+  <defs><radialGradient id="bg" cx="0%" cy="50%" r="100%"><stop offset="0%" stop-color="rgba(255,255,220,.2)"/><stop offset="100%" stop-color="transparent"/></radialGradient></defs>
+  <polygon points="0,26 200,0 200,70 0,44" fill="url(#bg)"/>
+</svg>
+
+<!-- SONAR -->
+<div id="sonar-wrap">
+  <div class="sonar-ring"></div><div class="sonar-ring"></div><div class="sonar-ring"></div>
+  <div class="sonar-dot"></div>
+</div>
+
+<div id="scroll-hint">↓ SCROLL TO DIVE DEEPER ↓</div>
+<button id="minigame-btn" onclick="openGame()">🎮 FISH CATCHER</button>
+
+<!-- GAME -->
+<div id="minigame">
+  <div id="game-title">🐟 FISH CATCHER</div>
+  <div id="game-sub">Click fish to catch · Faster each level · 60 seconds!</div>
+  <button id="game-close" onclick="closeGame()">✕ CLOSE</button>
+  <canvas id="game-canvas" width="520" height="320"></canvas>
+  <div id="game-timer-bar-wrap"><div id="game-timer-bar" style="width:100%"></div></div>
+  <div id="game-score-wrap">
+    <div class="gsi"><div class="gsl">SCORE</div><div class="gsv" id="g-score">0</div></div>
+    <div class="gsi"><div class="gsl">LEVEL</div><div class="gsv" id="g-level">1</div></div>
+    <div class="gsi"><div class="gsl">BEST</div><div class="gsv" id="g-best">0</div></div>
+    <div class="gsi"><div class="gsl">TIME</div><div class="gsv" id="g-time">60</div></div>
+  </div>
+  <div id="game-msg"></div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     INFO DIALOG (opens when name label clicked)
+     ══════════════════════════════════════════ -->
+<div id="info-overlay">
+  <div id="info-dialog">
+    <div class="dlg-corner dlg-c-tl"></div>
+    <div class="dlg-corner dlg-c-tr"></div>
+    <div class="dlg-corner dlg-c-bl"></div>
+    <div class="dlg-corner dlg-c-br"></div>
+    <button id="info-close" onclick="closeInfo()">✕ CLOSE</button>
+    <div class="dlg-header">
+      <img id="dlg-img" class="dlg-img" src="" alt="">
+      <div class="dlg-titles">
+        <div id="dlg-name" class="dlg-name"></div>
+        <div id="dlg-sci" class="dlg-sci"></div>
+        <span id="dlg-danger" class="dlg-danger"></span>
+      </div>
+    </div>
+    <div class="dlg-divider"></div>
+    <div id="dlg-stats" class="dlg-stats"></div>
+    <div class="dlg-divider"></div>
+    <div id="dlg-desc" class="dlg-desc"></div>
+    <div class="dlg-fact">
+      <span class="dlg-fact-label">🌊 Fun Fact</span>
+      <span id="dlg-fact"></span>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════
+// DATA
+// ═══════════════════════════════════
+const ZONES=[
+  {name:"SUNLIGHT ZONE — EPIPELAGIC",range:"0–200 m · Photosynthesis · 90% of all marine life",minD:0,maxD:200,bg:["#1A7FBF","#0E5C8A"]},
+  {name:"TWILIGHT ZONE — MESOPELAGIC",range:"200–1000 m · Faint light · Bioluminescence begins",minD:200,maxD:1000,bg:["#0A3352","#061E30"]},
+  {name:"MIDNIGHT ZONE — BATHYPELAGIC",range:"1000–4000 m · Total darkness · Extreme pressure",minD:1000,maxD:4000,bg:["#061220","#020A14"]},
+  {name:"ABYSSAL ZONE — ABYSSOPELAGIC",range:"4000–6000 m · Near-freezing · Only scavengers survive",minD:4000,maxD:6000,bg:["#030810","#010508"]},
+  {name:"HADAL ZONE — ULTRA-DEEP TRENCHES",range:"6000–11000 m · Deepest life on Earth",minD:6000,maxD:11000,bg:["#020408","#010205"]},
+];
+
+// All images use Wikimedia CDN as fallback — works on ANY device without local files
+const A=[
+ {id:"dolphin",n:"Bottlenose Dolphin",s:"Tursiops truncatus",
+  f:"dolphin.png",fb:"https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Tursiops_truncatus_01.jpg/240px-Tursiops_truncatus_01.jpg",
+  d:10,x:15,rot:-3,fd:5,fl:0,dr:"0–200 m",len:"2–4 m",wt:"150–650 kg",diet:"Fish, squid",ls:"20–45 yrs",zone:"Sunlight",
+  desc:"Highly intelligent, social dolphins use echolocation to hunt. They sleep with one eye open.",
+  fun:"Dolphins have names for each other — they use unique whistle signatures to call specific individuals!",danger:"safe"},
+ {id:"clownfish",n:"Clownfish",s:"Amphiprion ocellaris",
+  f:"clownfish.png",fb:"https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Amphiprion_ocellaris_%28Clown_anemonefish%29_by_Nick_Hobgood.jpg/240px-Amphiprion_ocellaris_%28Clown_anemonefish%29_by_Nick_Hobgood.jpg",
+  d:12,x:55,rot:4,fd:4,fl:.5,dr:"1–15 m",len:"7–11 cm",wt:"~250 g",diet:"Algae, plankton",ls:"6–10 yrs",zone:"Sunlight",
+  desc:"Famous for living in sea anemones and immune to their sting. Made famous by Finding Nemo!",
+  fun:"All clownfish are born male — the dominant fish changes sex to female when needed!",danger:"safe"},
+ {id:"dory",n:"Blue Tang",s:"Paracanthurus hepatus",
+  f:"dory.png",fb:"https://upload.wikimedia.org/wikipedia/commons/thumb/e/e2/Paracanthurus_hepatus_by_NPS.jpg/240px-Paracanthurus_hepatus_by_NPS.jpg",
+  d:20,x:72,rot:2,fd:6,fl:1,dr:"2–40 m",len:"25–31 cm",wt:"~600 g",diet:"Algae, plankton",ls:"8–20 yrs",zone:"Sunlight",
+  desc:"Vibrant blue reef fish. Can deploy a sharp spine near the tail for defence.",
+  fun:"Despite the movie, blue tangs DO have short memories — only about 9 seconds!",danger:"caution"},
+ {id:"shark",n:"Great White Shark",s:"Carcharodon carcharias",
+  f:"shark.png",fb:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/56/White_shark.jpg/240px-White_shark.jpg",
+  d:60,x:30,rot:-1,fd:8,fl:.3,dr:"0–1200 m",len:"4.6–6 m",wt:"680–1100 kg",diet:"Seals, fish, dolphins",ls:"70+ yrs",zone:"Sunlight",
+  desc:"Ocean apex predator with 300 serrated teeth in rows. Can detect blood from 5 km away.",
+  fun:"Great whites can go months without eating after one big meal — extreme energy savers!",danger:"dangerous"},
+ {id:"turtle",n:"Leatherback Turtle",s:"Dermochelys coriacea",
+  f:"turtle.png",fb:"https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/Leatherback_sea_turtle_Tinglar_USVI_%285839996545%29.jpg/240px-Leatherback_sea_turtle_Tinglar_USVI_%285839996545%29.jpg",
+  d:35,x:65,rot:3,fd:7,fl:.8,dr:"0–1280 m",len:"1.5–2 m",wt:"250–900 kg",diet:"Jellyfish",ls:"45–100 yrs",zone:"Sunlight",
+  desc:"World's largest turtle. Can regulate body temperature unlike most reptiles.",
+  fun:"Leatherbacks can dive deeper than any other sea turtle — down to 1,280 metres!",danger:"safe"},
+ {id:"whaleshark",n:"Whale Shark",s:"Rhincodon typus",
+  f:"whaleshark.png",fb:"https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Whaleshark_Georgia_aquarium.jpg/240px-Whaleshark_Georgia_aquarium.jpg",
+  d:45,x:18,rot:-2,fd:9,fl:.2,dr:"0–1928 m",len:"5.5–14 m",wt:"up to 21,500 kg",diet:"Plankton, krill",ls:"70–130 yrs",zone:"Sunlight",
+  desc:"World's largest fish. Gentle filter feeders that pose absolutely no threat to humans.",
+  fun:"Each whale shark has a unique spot pattern — just like a human fingerprint!",danger:"safe"},
+ {id:"manta",n:"Giant Manta Ray",s:"Mobula birostris",
+  f:"manta.png",fb:"https://upload.wikimedia.org/wikipedia/commons/thumb/5/5d/Mobula_birostris-Maldives.jpg/240px-Mobula_birostris-Maldives.jpg",
+  d:80,x:50,rot:-4,fd:6,fl:1.2,dr:"0–1000 m",len:"wingspan up to 7 m",wt:"up to 2,000 kg",diet:"Plankton",ls:"40+ yrs",zone:"Sunlight",
+  desc:"Graceful giants with the largest brain-to-body ratio of any fish. Highly intelligent.",
+  fun:"Manta rays visit 'cleaning stations' where small fish remove parasites from them!",danger:"safe"},
+ {id:"seahorse",n:"Seahorse",s:"Hippocampus",
+  f:"https://drive.google.com/uc?export=view&id=1Tc3-U1cZCE4WFYw2dFWuGrgQC5FhtkN-",fb:"https://upload.wikimedia.org/wikipedia/commons/thumb/c/c6/Hippocampus_reidi.jpg/160px-Hippocampus_reidi.jpg",
+  d:15,x:82,rot:5,fd:4.5,fl:.6,dr:"0–100 m",len:"2–35 cm",wt:"<1g–600g",diet:"Tiny crustaceans",ls:"1–5 yrs",zone:"Sunlight",
+  desc:"The only animal where the MALE gets pregnant and gives birth to live young.",
+  fun:"Seahorses mate for life and hold each other's tails while swimming together!",danger:"safe"},
+ {id:"jellyfish",n:"Lion's Mane Jellyfish",s:"Cyanea capillata",
+  f:"https://drive.google.com/uc?export=view&id=18bJqNZxin3uyjjkYLv_9tKqbJ9drTA1p",fb:"https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/Cyanea_capillata_2.jpg/240px-Cyanea_capillata_2.jpg",
+  d:100,x:40,rot:0,fd:7,fl:.4,dr:"0–200 m",len:"bell 2.1 m, tentacles 37 m",wt:"N/A",diet:"Fish, plankton",ls:"~1 yr",zone:"Sunlight",
+  desc:"World's largest jellyfish. 95% water. No brain, heart, or bones. Tentacles longer than a blue whale!",
+  fun:"A type of jellyfish (Turritopsis) is biologically immortal — it can revert back to its juvenile form!",danger:"caution"},
+ {id:"octopus",n:"Giant Pacific Octopus",s:"Enteroctopus dofleini",
+  f:"octopus.png",fb:"https://upload.wikimedia.org/wikipedia/commons/thumb/a/aa/Octopus2_moray.jpg/240px-Octopus2_moray.jpg",
+  d:200,x:22,rot:2,fd:5.5,fl:1,dr:"0–2000 m",len:"arm span 4.3 m",wt:"up to 71 kg",diet:"Crabs, clams",ls:"3–5 yrs",zone:"Twilight",
+  desc:"Three hearts, blue blood, 9 brains. Master of camouflage and puzzle solving.",
+  fun:"Octopuses can change skin texture in milliseconds to match coral, rock, or sand!",danger:"safe"},
+ {id:"anglerfish",n:"Deep Sea Anglerfish",s:"Melanocetus johnsonii",
+  f:"anglerfish.png",fb:"https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/Melanocetus_johnsonii.jpg/240px-Melanocetus_johnsonii.jpg",
+  d:800,x:60,rot:-3,fd:6,fl:.7,dr:"200–4000 m",len:"20 cm (female)",wt:"~0.5 kg",diet:"Fish, crustaceans",ls:"~20 yrs",zone:"Twilight→Midnight",
+  desc:"Uses bioluminescent lure in pitch darkness. Male is a tiny parasite fused to female.",
+  fun:"Male anglerfish permanently fuse onto the female, sharing her bloodstream — literally one organism!",danger:"caution"},
+ {id:"spermwhale",n:"Sperm Whale",s:"Physeter macrocephalus",
+  f:"spermwhale.png",fb:"https://upload.wikimedia.org/wikipedia/commons/thumb/3/37/Sperm_whale_adult_male.jpg/240px-Sperm_whale_adult_male.jpg",
+  d:350,x:10,rot:-1,fd:10,fl:.1,dr:"0–3000 m",len:"16–20 m",wt:"40,000–57,000 kg",diet:"Giant squid, fish",ls:"60–70 yrs",zone:"Twilight",
+  desc:"Largest toothed predator. Dives 3 km for 90 min hunting squid in total darkness.",
+  fun:"Sperm whales have the LARGEST brain of any animal that has EVER lived on Earth!",danger:"safe"},
+ {id:"giantsquid",n:"Giant Squid",s:"Architeuthis dux",
+  f:"giantsquid.png",fb:"https://upload.wikimedia.org/wikipedia/commons/thumb/c/cb/Giant_squid_catalina2.jpg/240px-Giant_squid_catalina2.jpg",
+  d:600,x:55,rot:4,fd:6.5,fl:.9,dr:"300–1000 m",len:"up to 13 m",wt:"up to 275 kg",diet:"Fish, other squid",ls:"5 yrs",zone:"Twilight",
+  desc:"Legendary creature with basketball-sized eyes — the largest of any living animal.",
+  fun:"Giant squid eyes can be 30 cm wide — the size of a dinner plate — to see in deep darkness!",danger:"caution"},
+ {id:"viperfish",n:"Pacific Viperfish",s:"Chauliodus macouni",
+  f:"viperfish.png",fb:"https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Chauliodus_macouni.jpg/240px-Chauliodus_macouni.jpg",
+  d:1500,x:38,rot:-5,fd:5,fl:.3,dr:"200–5000 m",len:"25–35 cm",wt:"~50 g",diet:"Fish, crustaceans",ls:"unknown",zone:"Midnight",
+  desc:"Needle-like fangs so large it cannot close its mouth. Bioluminescent dots line the body.",
+  fun:"Viperfish migrate UP to the surface every night to hunt, then dive back to the deep at dawn!",danger:"caution"},
+ {id:"dumbooctopus",n:"Dumbo Octopus",s:"Grimpoteuthis",
+  f:"dumbooctopus.png",fb:"https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Dumbo_Octopus.jpg/240px-Dumbo_Octopus.jpg",
+  d:3500,x:70,rot:3,fd:7,fl:.5,dr:"1000–7000 m",len:"20–30 cm",wt:"~6 kg",diet:"Worms, crustaceans",ls:"unknown",zone:"Abyssal",
+  desc:"Named after Disney's Dumbo for ear-like fins. Deepest-living octopus, gliding in total darkness.",
+  fun:"Dumbo octopuses swallow prey WHOLE — unlike all other octopuses that tear food apart!",danger:"safe"},
+ {id:"barreleye",n:"Barreleye Fish",s:"Macropinna microstoma",
+  f:"barreleye.png",fb:"https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Macropinna_microstoma.jpg/240px-Macropinna_microstoma.jpg",
+  d:1200,x:25,rot:1,fd:6,fl:.8,dr:"400–2500 m",len:"15 cm",wt:"~100 g",diet:"Jellyfish, crustaceans",ls:"unknown",zone:"Midnight",
+  desc:"Transparent dome over barrel-shaped tubular eyes that rotate freely within its head.",
+  fun:"Green pigments in its eyes filter sunlight so it can spot bioluminescent prey in total darkness!",danger:"safe"},
+ {id:"blobfish",n:"Blobfish",s:"Psychrolutes marcidus",
+  f:"blobfish.png",fb:"https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Blobfish_%28Psychrolutes_marcidus%29.jpg/240px-Blobfish_%28Psychrolutes_marcidus%29.jpg",
+  d:2500,x:48,rot:2,fd:7,fl:.4,dr:"600–1200 m",len:"30 cm",wt:"~2 kg",diet:"Sea urchins, molluscs",ls:"unknown",zone:"Midnight",
+  desc:"Only looks blobby at the surface — at depth it looks like a totally normal fish!",
+  fun:"The famous 'sad face' blobfish is just decompression damage from being hauled up. At depth it looks normal!",danger:"safe"},
+ {id:"coelacanth",n:"Coelacanth",s:"Latimeria chalumnae",
+  f:"coelacanth.png",fb:"https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Coelacanth_-_Latimeria_chalumnae_%28head%2C_right_side%29.jpg/240px-Coelacanth_-_Latimeria_chalumnae_%28head%2C_right_side%29.jpg",
+  d:700,x:15,rot:-2,fd:8,fl:.6,dr:"100–700 m",len:"1.8 m",wt:"up to 95 kg",diet:"Fish, squid",ls:"60+ yrs",zone:"Twilight",
+  desc:"Living fossil thought extinct for 65 million years. Rediscovered in 1938 off South Africa.",
+  fun:"Coelacanths have a 'rostral organ' that detects electric fields — to sense prey in total darkness!",danger:"safe"},
+ {id:"vampiresquid",n:"Vampire Squid",s:"Vampyroteuthis infernalis",
+  f:"vampiresquid.png",fb:"https://upload.wikimedia.org/wikipedia/commons/thumb/2/21/Vampire_squid.jpg/240px-Vampire_squid.jpg",
+  d:2000,x:62,rot:-3,fd:6,fl:1.1,dr:"600–3000 m",len:"30 cm",wt:"~100 g",diet:"Marine snow, detritus",ls:"unknown",zone:"Midnight",
+  desc:"Neither squid nor octopus — its own order. Cloaks itself in webbed arms and glows deep red.",
+  fun:"Vampire squid can turn themselves INSIDE-OUT, exposing spiky projections as defence!",danger:"safe"},
+ {id:"fangtooth",n:"Common Fangtooth",s:"Anoplogaster cornuta",
+  f:"fangtooth.png",fb:"https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Anoplogaster_cornuta_2.jpg/240px-Anoplogaster_cornuta_2.jpg",
+  d:2200,x:30,rot:4,fd:5.5,fl:.7,dr:"200–5000 m",len:"16 cm",wt:"~30 g",diet:"Fish, shrimp",ls:"unknown",zone:"Midnight",
+  desc:"Largest teeth relative to body size of any fish. Cannot fully close their mouths.",
+  fun:"Despite the terrifying look, fangtooth fish are harmless to humans — far too small to bother you!",danger:"safe"},
+ {id:"seapig",n:"Sea Pig",s:"Scotoplanes globosa",
+  f:"seapig.png",fb:"https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/Scotoplanes_globosa.jpg/240px-Scotoplanes_globosa.jpg",
+  d:4800,x:45,rot:0,fd:8,fl:.3,dr:"1000–5000 m",len:"10–15 cm",wt:"~50 g",diet:"Marine sediment",ls:"unknown",zone:"Abyssal",
+  desc:"Deep-sea sea cucumbers that look like plump pink pigs. Gather in herds on the abyssal plains.",
+  fun:"Sea pigs always face into the current — like a field of tiny sunflowers tracking water flow!",danger:"safe"},
+ {id:"megalodon",n:"Megalodon (Extinct)",s:"Otodus megalodon",
+  f:"megalodon.png",fb:"https://upload.wikimedia.org/wikipedia/commons/thumb/8/86/Megalodon_scale.svg/240px-Megalodon_scale.svg.png",
+  d:500,x:35,rot:-2,fd:11,fl:.1,dr:"0–3000 m (historical)",len:"15–20 m",wt:"up to 100,000 kg",diet:"Whales, large fish",ls:"N/A (extinct ~3.6M yrs ago)",zone:"Twilight (historical)",
+  desc:"The largest shark ever. Extinct ~3.6 million years ago. Its teeth are the size of a human hand.",
+  fun:"Megalodon's bite force was 108,000–182,000 N — 10× stronger than a great white shark!",danger:"dangerous"},
+ {id:"kraken",n:"Kraken (Mythical)",s:"Architeuthis gigantus (legend)",
+  f:"kraken.png",fb:"https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/The_Kraken.jpg/240px-The_Kraken.jpg",
+  d:900,x:58,rot:5,fd:9,fl:.8,dr:"0–11000 m (myth)",len:"1.6 km (myth)",wt:"unknown",diet:"Ships and sailors (myth)",ls:"immortal (myth)",zone:"All zones (myth)",
+  desc:"Legendary Norse sea monster, likely inspired by giant squid sightings by sailors.",
+  fun:"The word 'Kraken' comes from the Old Norse for 'twisted' or 'crooked'!",danger:"dangerous"},
+];
+
+// LANDMARKS — Empire State and Statue of Liberty are EXCLUDED
+const LANDMARKS=[
+ {id:"eiffel",img:"eiffel.png",fb:"https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Camponotus_flavomarginatus_ant.jpg/100px-Camponotus_flavomarginatus_ant.jpg",
+  label:"Eiffel Tower",note:"330 m tall",depth:330,h:100,w:40},
+ {id:"burj",img:"burjkhalifa.png",fb:"https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Burj_Khalifa.jpg/100px-Burj_Khalifa.jpg",
+  label:"Burj Khalifa",note:"828 m — world's tallest",depth:828,h:130,w:32},
+ {id:"titanic",img:"titanic.png",fb:"https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/RMS_Titanic_3.jpg/200px-RMS_Titanic_3.jpg",
+  label:"RMS Titanic",note:"Rests at 2,435 m",depth:2435,h:70,w:180},
+ {id:"atlantis",img:"atlantis.png",fb:"https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Atlantis_Paradise_Island_from_above_%28Unsplash%29.jpg/200px-Atlantis_Paradise_Island_from_above_%28Unsplash%29.jpg",
+  label:"✦ ATLANTIS",note:"The lost city · 3,000 m",depth:3000,h:130,w:160},
+ {id:"trident",img:"trident.png",fb:"https://upload.wikimedia.org/wikipedia/commons/thumb/8/8b/Trident.svg/100px-Trident.svg.png",
+  label:"⚡ Aquaman's Realm",note:"Kingdom of Atlantis · 4,500 m",depth:4500,h:130,w:100},
+ {id:"everest",img:"everest.png",fb:"https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Everest_North_Face_toward_Base_Camp_Tibet_Luca_Galuzzi_2006.jpg/100px-Everest_North_Face_toward_Base_Camp_Tibet_Luca_Galuzzi_2006.jpg",
+  label:"Mt Everest (8,849 m)",note:"Would just touch the surface if placed here!",depth:5490,h:130,w:65},
+];
+
+const MILESTONES=[
+  {depth:333,title:"🤿 Deepest SCUBA Dive",note:"332 m — Ahmed Gabr, 2014"},
+  {depth:1000,title:"🌑 Midnight Zone Entry",note:"Below 1,000 m — total darkness forever"},
+  {depth:3800,title:"📉 Average Ocean Floor",note:"~3,800 m — the typical depth of Earth's oceans"},
+  {depth:6000,title:"🕳️ Hadal Zone Begins",note:"Only 2% of ocean is this deep"},
+  {depth:8336,title:"🐟 Deepest Fish Record",note:"Mariana Snailfish, 8,336 m"},
+  {depth:10928,title:"🏆 CHALLENGER DEEP",note:"10,928 m — the deepest point on Earth"},
+];
+
+// ═══════════════
+// HELPERS
+// ═══════════════
+const MAX_DEPTH=11000,TOTAL_PX=110000;
+function depthToY(d){return(d/MAX_DEPTH)*TOTAL_PX;}
+function getTemp(d){if(d<200)return+(24-d*.065).toFixed(1);if(d<1000)return+(24-200*.065-(d-200)*.012).toFixed(1);if(d<4000)return+(11.6-(d-1000)*.002).toFixed(1);return+(5.6-(d-4000)*.0004).toFixed(1);}
+function getPressure(d){return+(1+d/10).toFixed(0);}
+function getLight(d){return d>=1000?0:Math.max(0,Math.round(100*Math.exp(-d/180)));}
+function getO2(d){if(d<100)return+(8.5-d*.005).toFixed(1);if(d<1000)return+(8-(d-100)*.003).toFixed(1);if(d<4000)return+(5.3-(d-1000)*.001).toFixed(1);return+(2.3+(d-4000)*.0001).toFixed(1);}
+function getZone(d){return ZONES.find(z=>d>=z.minD&&d<z.maxD)||ZONES[ZONES.length-1];}
+
+// ═══════════════
+// STATE
+// ═══════════════
+let depth=0,mouseX=innerWidth/2,mouseY=innerHeight/2,subX=innerWidth/2,subY=innerHeight/2;
+let particles=[],subBubbles=[],bioSparkles=[],loaded=false,lastZoneIdx=-1;
+const animalEls={},landmarkSideEls={},milestoneEls={};
+
+// ═══════════════
+// LOADING
+// ═══════════════
+const TIPS=["Initialising depth sensors…","Loading ocean creatures…","Building Atlantis kingdom…","Calibrating pressure gauges…","Ready to dive!"];
+let lp=0;
+function stepLoad(){
+  lp+=Math.random()*14+7;if(lp>100)lp=100;
+  document.getElementById('load-bar').style.width=lp+'%';
+  document.getElementById('load-tip').textContent=TIPS[Math.min(TIPS.length-1,Math.floor(lp/100*(TIPS.length-1)))];
+  if(lp<100)setTimeout(stepLoad,200+Math.random()*180);
+  else setTimeout(()=>{const l=document.getElementById('loading');l.style.opacity='0';setTimeout(()=>{l.style.display='none';loaded=true;},1000);},400);
+}
+setTimeout(stepLoad,500);
+
+// ═══════════════
+// CURSOR
+// ═══════════════
+const cur=document.getElementById('cursor'),curR=document.getElementById('cursor-ring');
+document.addEventListener('mousemove',e=>{
+  mouseX=e.clientX;mouseY=e.clientY;
+  cur.style.left=e.clientX+'px';cur.style.top=e.clientY+'px';
+  curR.style.left=e.clientX+'px';curR.style.top=e.clientY+'px';
+});
+document.addEventListener('mousedown',()=>cur.style.transform='translate(-50%,-50%) scale(1.6)');
+document.addEventListener('mouseup',()=>cur.style.transform='translate(-50%,-50%) scale(1)');
+
+// ═══════════════
+// CANVASES
+// ═══════════════
+const fxCanvas=document.getElementById('fx-canvas'),fxCtx=fxCanvas.getContext('2d');
+const rayCanvas=document.getElementById('rays-canvas'),rayCtx=rayCanvas.getContext('2d');
+const curCanvas=document.getElementById('current-canvas'),curCtx=curCanvas.getContext('2d');
+function resizeC(){[fxCanvas,rayCanvas,curCanvas].forEach(c=>{c.width=innerWidth;c.height=innerHeight;});}
+resizeC();window.addEventListener('resize',()=>{resizeC();buildYAxis();buildLandmarkSidebar();updateAll();});
+
+// ═══════════════
+// Y-AXIS
+// ═══════════════
+function buildYAxis(){
+  const ya=document.getElementById('yaxis');ya.innerHTML='';
+  [0,200,500,1000,1500,2000,2435,3000,4000,4500,5000,6000,7000,8000,9000,10000,10928].forEach(m=>{
+    const div=document.createElement('div');div.className='yaxis-tick';
+    div.style.cssText=`top:${(m/MAX_DEPTH*100)}%;position:absolute;`;
+    div.innerHTML=`<div class="yaxis-line"></div><div class="yaxis-text">${m>=1000?(m/1000).toFixed(1)+'km':m+'m'}</div>`;
+    ya.appendChild(div);
+  });
+}
+buildYAxis();
+
+// ═══════════════════════════════════
+// LANDMARK SIDEBAR
+// Empire State (empire) and Statue of Liberty (statue) are NOT in LANDMARKS array
+// ═══════════════════════════════════
+function buildLandmarkSidebar(){
+  const sb=document.getElementById('landmark-sidebar');sb.innerHTML='';
+  LANDMARKS.forEach(lm=>{
+    const el=document.createElement('div');el.className='lm-line-item';
+    const pct=(lm.depth/MAX_DEPTH)*100;
+    el.style.top=pct+'%';
+    el.innerHTML=`
+      <div class="lm-line-bar"></div>
+      <div class="lm-line-card">
+        <img src="${lm.img}" onerror="this.onerror=null;this.src='${lm.fb}'" alt="${lm.label}">
+        <div class="lm-line-info">
+          <div class="lm-line-name">${lm.label}</div>
+          <div class="lm-line-depth">${lm.depth} m · ${lm.note}</div>
+        </div>
+      </div>`;
+    sb.appendChild(el);
+    landmarkSideEls[lm.id]=el;
+  });
+}
+buildLandmarkSidebar();
+
+// ═══════════════════════════════════
+// INFO DIALOG — opens when creature name is clicked
+// ═══════════════════════════════════
+function openInfo(a){
+  const overlay=document.getElementById('info-overlay');
+  // fill image with CDN fallback
+  const imgEl=document.getElementById('dlg-img');
+  imgEl.src=a.f;
+  imgEl.onerror=function(){this.onerror=null;this.src=a.fb;};
+  document.getElementById('dlg-name').textContent=a.n;
+  document.getElementById('dlg-sci').textContent=a.sci||a.s;
+  const dCls=a.danger==='safe'?'danger-safe':a.danger==='caution'?'danger-caution':'danger-dangerous';
+  const dTxt=a.danger==='safe'?'✓ Harmless to humans':a.danger==='caution'?'⚠ Use caution':'⚠ Potentially dangerous';
+  const dEl=document.getElementById('dlg-danger');
+  dEl.className='dlg-danger '+dCls;dEl.textContent=dTxt;
+  document.getElementById('dlg-stats').innerHTML=[
+    ['Depth range',a.dr],['Length',a.len],['Weight',a.wt],['Diet',a.diet],
+    ['Lifespan',a.ls],['Zone',a.zone],
+    ['Habitat temp',getTemp(a.d)+'°C'],['Pressure',getPressure(a.d)+' atm'],
+  ].map(([l,v])=>`<div class="dlg-stat"><span class="dlg-sl">${l}</span><span class="dlg-sv">${v}</span></div>`).join('');
+  document.getElementById('dlg-desc').textContent=a.desc;
+  document.getElementById('dlg-fact').textContent=a.fun;
+  overlay.classList.add('active');
+}
+function closeInfo(){document.getElementById('info-overlay').classList.remove('active');}
+
+// Click overlay background to close
+document.getElementById('info-overlay').addEventListener('click',function(e){
+  if(e.target===this)closeInfo();
+});
+
+// ═══════════════════════════════════
+// BUILD SCENE — animals with name labels
+// ═══════════════════════════════════
+const scene=document.getElementById('scene');
+
+A.forEach(a=>{
+  const w=document.createElement('div');
+  w.className='animal-wrap';
+  const xp=a.x||Math.round(10+Math.random()*75);
+  w.style.cssText=`left:${xp}%;--rot:${a.rot||0}deg;--fd:${a.fd||5}s;--fl:${a.fl||0}s;top:-300px;`;
+
+  // Star clip SVG (blue-ocean starfish pin)
+  const pinSVG=`<svg viewBox="0 0 22 22" xmlns="http://www.w3.org/2000/svg">
+    <polygon points="11,1 13.8,8 21,8.7 15.7,13.5 17.3,20.5 11,17 4.7,20.5 6.3,13.5 1,8.7 8.2,8"
+      fill="#0E5C8A" stroke="#00E5FF" stroke-width=".8"/>
+    <circle cx="11" cy="11" r="2.5" fill="rgba(0,229,255,.5)"/>
+  </svg>`;
+
+  // Image with CDN fallback
+  const imgSrc=`src="${a.f}" onerror="this.onerror=null;this.src='${a.fb}'"`;
+
+  w.innerHTML=`
+    <div class="animal-pin">${pinSVG}</div>
+    <img class="animal-photo" ${imgSrc} alt="${a.n}">
+    <div class="creature-name-label" data-id="${a.id}">${a.n}</div>
+  `;
+
+  scene.appendChild(w);
+  animalEls[a.id]=w;
+
+  // Bind click on the name label to open the info dialog
+  w.querySelector('.creature-name-label').addEventListener('click',function(e){
+    e.stopPropagation();
+    openInfo(a);
+  });
+});
+
+// Ocean floor
+document.getElementById('ocean-floor').innerHTML=`
+<svg width="100%" height="200" viewBox="0 0 1440 200" preserveAspectRatio="none">
+  <defs><linearGradient id="fg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#010408"/><stop offset="100%" stop-color="#000205"/></linearGradient></defs>
+  <path d="M0,80 C150,40 300,100 450,60 C600,20 750,90 900,50 C1050,10 1200,70 1440,40 L1440,200 L0,200Z" fill="url(#fg)"/>
+  <line x1="300" y1="80" x2="300" y2="40" stroke="#FF4500" stroke-width="3" opacity=".7"/>
+  <ellipse cx="300" cy="38" rx="8" ry="4" fill="rgba(255,69,0,.4)"/>
+  <line x1="900" y1="60" x2="900" y2="20" stroke="#FF6600" stroke-width="4" opacity=".6"/>
+  <ellipse cx="900" cy="18" rx="10" ry="5" fill="rgba(255,102,0,.35)"/>
+  <text x="50" y="170" fill="rgba(0,229,255,.25)" font-family="monospace" font-size="11">◆ CHALLENGER DEEP · 10,928 m · MARIANA TRENCH ◆</text>
+</svg>`;
+
+// Milestones
+MILESTONES.forEach(ms=>{
+  const el=document.createElement('div');el.className='milestone-banner';el.style.cssText='top:-500px;display:none;';
+  el.innerHTML=`<div class="ms-title">${ms.title}</div><div class="ms-sub">${ms.note}</div>`;
+  scene.appendChild(el);milestoneEls[ms.depth]=el;
+});
+
+// ═══════════════
+// PARTICLES & FX
+// ═══════════════
+setInterval(()=>{if(!loaded)return;for(let i=0;i<2;i++)particles.push({x:Math.random()*innerWidth,y:Math.random()*innerHeight,r:Math.random()*2.5+.4,vx:(Math.random()-.5)*.5,vy:-(Math.random()*.8+.1),a:Math.random()*.6+.1,life:1,dec:Math.random()*.004+.001});},55);
+setInterval(()=>{if(!loaded)return;subBubbles.push({x:subX+(Math.random()-.5)*22,y:subY+10+Math.random()*6,r:Math.random()*3.5+1.2,vx:(Math.random()-.5)*.7,vy:-(Math.random()*1.8+.4),a:.6,life:1,dec:.009});},80);
+
+const rays=Array.from({length:8},(_,i)=>({x:(i+.5)/8,angle:(Math.random()-.5)*.3,phase:Math.random()*Math.PI*2}));
+let rayT=0;
+function drawRays(){
+  rayCtx.clearRect(0,0,rayCanvas.width,rayCanvas.height);
+  const lp2=getLight(depth)/100;if(lp2<.02)return;
+  rayT+=.01;
+  rays.forEach(r=>{
+    const x=r.x*rayCanvas.width+Math.sin(rayT*.04+r.phase)*40;
+    const ang=r.angle+Math.sin(rayT+r.phase)*.05;
+    const g=rayCtx.createLinearGradient(x,0,x+Math.tan(ang)*rayCanvas.height,rayCanvas.height);
+    g.addColorStop(0,`rgba(150,230,255,${lp2*.08})`);g.addColorStop(.5,`rgba(100,200,240,${lp2*.05})`);g.addColorStop(1,'transparent');
+    rayCtx.save();rayCtx.translate(x,0);rayCtx.rotate(ang);rayCtx.fillStyle=g;rayCtx.fillRect(-18,0,36,rayCanvas.height);rayCtx.restore();
+  });
+}
+const currentLines=Array.from({length:14},()=>({y:Math.random()*innerHeight,x:Math.random()*innerWidth,len:Math.random()*130+50,speed:Math.random()*.6+.2,a:Math.random()*.15+.04,vy:(Math.random()-.5)*.3}));
+function drawCurrents(){
+  curCtx.clearRect(0,0,curCanvas.width,curCanvas.height);
+  const dp=Math.min(1,depth/2000);
+  currentLines.forEach(c=>{
+    c.x-=c.speed*(1+dp);c.y+=c.vy;
+    if(c.x<-c.len)c.x=innerWidth+10;if(c.y<0||c.y>innerHeight)c.vy*=-1;
+    const g=curCtx.createLinearGradient(c.x,c.y,c.x+c.len,c.y);
+    g.addColorStop(0,'transparent');g.addColorStop(.5,`rgba(0,229,255,${c.a*(1+dp*.5)})`);g.addColorStop(1,'transparent');
+    curCtx.beginPath();curCtx.moveTo(c.x,c.y);curCtx.lineTo(c.x+c.len,c.y);curCtx.strokeStyle=g;curCtx.lineWidth=1;curCtx.stroke();
+  });
+}
+function drawFX(){
+  fxCtx.clearRect(0,0,fxCanvas.width,fxCanvas.height);
+  particles=particles.filter(p=>{if(p.life<=0)return false;fxCtx.beginPath();fxCtx.arc(p.x,p.y,p.r,0,7);fxCtx.fillStyle=`rgba(180,240,255,${p.a*p.life*.5})`;fxCtx.fill();p.x+=p.vx;p.y+=p.vy;p.life-=p.dec;return true;});
+  subBubbles=subBubbles.filter(b=>{if(b.life<=0)return false;fxCtx.beginPath();fxCtx.arc(b.x,b.y,b.r,0,7);fxCtx.strokeStyle=`rgba(180,240,255,${b.a*b.life})`;fxCtx.lineWidth=.7;fxCtx.stroke();b.x+=b.vx;b.y+=b.vy;b.vx+=(Math.random()-.5)*.1;b.life-=b.dec;return true;});
+  if(depth>300&&Math.random()<Math.min(.12,(depth-300)/5000)){
+    bioSparkles.push({x:Math.random()*innerWidth,y:Math.random()*innerHeight,r:Math.random()*2.5+.8,a:1,dec:.014,h:Math.random()<.5?'0,255,150':'100,200,255'});
+  }
+  if(bioSparkles.length>200)bioSparkles.splice(0,40);
+  bioSparkles=bioSparkles.filter(s=>{if(s.a<=0)return false;fxCtx.beginPath();fxCtx.arc(s.x,s.y,s.r,0,7);fxCtx.fillStyle=`rgba(${s.h},${s.a})`;fxCtx.fill();fxCtx.beginPath();fxCtx.arc(s.x,s.y,s.r*3,0,7);fxCtx.fillStyle=`rgba(${s.h},${s.a*.08})`;fxCtx.fill();s.a-=s.dec;return true;});
+  requestAnimationFrame(()=>{drawRays();drawCurrents();drawFX();});
+}
+drawFX();
+
+// ═══════════════
+// SUBMARINE
+// ═══════════════
+function animSub(){
+  subX+=(mouseX-subX)*.09;subY+=(mouseY-subY)*.09;
+  const sw=document.getElementById('sub-wrap'),sb=document.getElementById('sub-beam');
+  sw.style.left=subX+'px';sw.style.top=subY+'px';
+  sb.style.left=(subX+36)+'px';sb.style.top=(subY-20)+'px';
+  const dx=mouseX-subX;sw.style.transform=`translate(-50%,-50%) rotate(${Math.max(-15,Math.min(15,dx*.04))}deg)`;
+  requestAnimationFrame(animSub);
+}
+animSub();
+
+// ═══════════════
+// SCROLL
+// ═══════════════
+const scrollD=document.getElementById('scroll-driver');
+scrollD.addEventListener('scroll',()=>{
+  depth=(scrollD.scrollTop/(scrollD.scrollHeight-scrollD.clientHeight))*MAX_DEPTH;
+  updateAll();
+},{passive:true});
+document.getElementById('app').addEventListener('wheel',e=>{e.preventDefault();scrollD.scrollTop+=e.deltaY;},{passive:false});
+
+// ═══════════════
+// ZONE TEXT
+// ═══════════════
+function showZoneText(name){
+  const zt=document.getElementById('zone-transition'),t=document.getElementById('zt-text');
+  t.textContent=name.split('—')[0].trim();
+  zt.style.opacity='1';
+  setTimeout(()=>zt.style.opacity='0',2200);
+}
+
+// ═══════════════
+// UPDATE ALL
+// ═══════════════
+const activeMs=new Set();
+function updateAll(){
+  const d=depth,iH=innerHeight;
+  const z=getZone(d);const zi=ZONES.indexOf(z);
+  document.getElementById('ocean-bg').style.background=`linear-gradient(to bottom,${z.bg[0]},${z.bg[1]})`;
+  document.getElementById('caustics').style.opacity=Math.max(0,.18-d/2000);
+  if(zi!==lastZoneIdx&&lastZoneIdx!==-1)showZoneText(z.name);
+  lastZoneIdx=zi;
+  document.getElementById('hud-depth').textContent=Math.round(d);
+  document.getElementById('hud-ft').textContent=Math.round(d*3.281)+' ft';
+  const temp=getTemp(d);
+  document.getElementById('hud-temp').textContent=temp;
+  document.getElementById('hud-tf').textContent=(temp*9/5+32).toFixed(1)+'°F';
+  document.getElementById('temp-bar').style.width=Math.max(0,100-d/110)+'%';
+  const pres=getPressure(d);
+  document.getElementById('hud-pres').textContent=pres;
+  document.getElementById('pres-bar').style.width=Math.min(100,pres/1101*100)+'%';
+  const light=getLight(d);
+  document.getElementById('hud-light').textContent=light;
+  document.getElementById('light-bar').style.width=light+'%';
+  document.getElementById('hud-o2').textContent=getO2(d);
+  document.getElementById('zone-name').textContent=z.name;
+  document.getElementById('zone-depth-range').textContent=z.range;
+  document.getElementById('dm-val').textContent=Math.round(d).toLocaleString();
+  const dDescs=['SEA LEVEL','SUNLIGHT ZONE','TWILIGHT ZONE','MIDNIGHT ZONE','ABYSSAL ZONE','HADAL ZONE'];
+  document.getElementById('depth-desc').textContent=dDescs[d<1?0:d<200?1:d<1000?2:d<4000?3:d<6000?4:5];
+  document.getElementById('yaxis-cursor').style.top=(d/MAX_DEPTH*100)+'vh';
+  document.getElementById('scroll-hint').style.opacity=d<30?1:0;
+  document.getElementById('surface-layer').style.opacity=Math.max(0,1-d/80);
+
+  // Position animals
+  A.forEach(a=>{
+    const el=animalEls[a.id];if(!el)return;
+    const relY=depthToY(a.d)-depthToY(d);
+    if(relY>-250&&relY<iH+250){el.style.display='';el.style.top=relY+'px';}
+    else el.style.display='none';
+  });
+
+  // Landmark sidebar highlight
+  LANDMARKS.forEach(lm=>{
+    const el=landmarkSideEls[lm.id];if(!el)return;
+    const dist=Math.abs(d-lm.depth);
+    el.style.opacity=dist<800?Math.max(.35,1-dist/800):'.35';
+    el.querySelector('.lm-line-card').style.borderColor=dist<200?'rgba(255,209,102,.7)':'rgba(255,209,102,.3)';
+  });
+
+  // Ocean floor
+  const fEl=document.getElementById('ocean-floor');
+  const fY=depthToY(MAX_DEPTH)-depthToY(d)-200;
+  if(fY>-300&&fY<iH+100){fEl.style.display='';fEl.style.top=fY+'px';}else fEl.style.display='none';
+
+  // Milestones
+  MILESTONES.forEach(ms=>{
+    const el=milestoneEls[ms.depth];if(!el)return;
+    const relY=depthToY(ms.depth)-depthToY(d);
+    if(relY>iH*.25&&relY<iH*.75){
+      if(!activeMs.has(ms.depth)){
+        activeMs.add(ms.depth);el.style.display='';el.style.top=relY+'px';
+        setTimeout(()=>{el.style.display='none';activeMs.delete(ms.depth);},3500);
+      }
+    }
+  });
+}
+updateAll();
+
+// ═══════════════
+// GAME
+// ═══════════════
+const FEMOJI=['🐟','🐠','🐡','🦈','🐙','🦑','🦐','🐚','🦀','🐢','🐬','🦭','🦞','🦪'];
+let gameActive=false,gameId=null,gScore=0,gLevel=1,gBest=0,gTime=60,gameFish=[],gameT=0,gameInterval=null;
+function openGame(){
+  document.getElementById('minigame').classList.add('active');
+  gameActive=true;gScore=0;gLevel=1;gTime=60;gameFish=[];gameT=0;
+  updateGameUI();clearInterval(gameInterval);
+  gameInterval=setInterval(()=>{if(!gameActive)return;gTime--;document.getElementById('g-time').textContent=gTime;document.getElementById('game-timer-bar').style.width=(gTime/60*100)+'%';if(gTime<=0)endGame();},1000);
+  cancelAnimationFrame(gameId);gameLoop();
+}
+function endGame(){gameActive=false;clearInterval(gameInterval);if(gScore>gBest)gBest=gScore;document.getElementById('g-best').textContent=gBest;document.getElementById('game-msg').textContent=`⏱ Time's up! Score: ${gScore}${gScore===gBest?' 🏆 NEW BEST!':''}`;}
+function closeGame(){document.getElementById('minigame').classList.remove('active');gameActive=false;clearInterval(gameInterval);cancelAnimationFrame(gameId);}
+function updateGameUI(){document.getElementById('g-score').textContent=gScore;document.getElementById('g-level').textContent=gLevel;document.getElementById('g-best').textContent=gBest;document.getElementById('g-time').textContent=gTime;}
+function spawnFish(){const gc=document.getElementById('game-canvas');const dir=Math.random()<.5?1:-1;gameFish.push({x:dir===1?-50:gc.width+50,y:25+Math.random()*(gc.height-60),s:2.5+gLevel*.9+Math.random()*2,sz:22+Math.random()*18,e:FEMOJI[Math.floor(Math.random()*FEMOJI.length)],dir,wobble:Math.random()*Math.PI*2,bonus:Math.random()<.12});}
+function gameLoop(){
+  if(!gameActive)return;const gc=document.getElementById('game-canvas'),gx=gc.getContext('2d');gameT++;
+  const spawnRate=Math.max(18,55-gLevel*6);if(gameT%spawnRate===0)spawnFish();
+  if(gameT%200===0&&gLevel<10){gLevel++;updateGameUI();document.getElementById('game-msg').textContent=`⚡ Level ${gLevel}! Faster!`;setTimeout(()=>document.getElementById('game-msg').textContent='',1200);}
+  gx.clearRect(0,0,gc.width,gc.height);
+  const gbg=gx.createLinearGradient(0,0,0,gc.height);gbg.addColorStop(0,'#061830');gbg.addColorStop(1,'#010c18');gx.fillStyle=gbg;gx.fillRect(0,0,gc.width,gc.height);
+  for(let i=0;i<4;i++){gx.beginPath();gx.arc((Math.sin(gameT*.015+i*2)+1)/2*gc.width,((gameT*(.3+i*.2))%gc.height),2.5,0,7);gx.strokeStyle='rgba(0,229,255,.15)';gx.lineWidth=.6;gx.stroke();}
+  gameFish=gameFish.filter(f=>{f.x+=f.s*f.dir;f.wobble+=.08;const wy=Math.sin(f.wobble)*3;if(f.bonus){gx.beginPath();gx.arc(f.x+f.sz/2,f.y+wy,f.sz*.8,0,7);gx.fillStyle='rgba(255,209,102,.1)';gx.fill();}gx.save();gx.font=`${f.sz}px serif`;gx.textBaseline='middle';if(f.dir<0){gx.scale(-1,1);gx.fillText(f.e,-(f.x+f.sz),f.y+wy);}else{gx.fillText(f.e,f.x,f.y+wy);}gx.restore();return f.x>-100&&f.x<gc.width+100;});
+  if(gameT<100){gx.fillStyle='rgba(0,229,255,.6)';gx.font='13px sans-serif';gx.textAlign='center';gx.fillText('Click fish! ⭐ glowing = 3 pts',gc.width/2,gc.height-15);}
+  gameId=requestAnimationFrame(gameLoop);
+}
+document.getElementById('game-canvas').addEventListener('click',e=>{
+  if(!gameActive)return;
+  const r=document.getElementById('game-canvas').getBoundingClientRect();
+  const cx=e.clientX-r.left,cy=e.clientY-r.top;let changed=false;
+  gameFish=gameFish.filter(f=>{const hit=Math.abs(cx-f.x)<f.sz*1.2&&Math.abs(cy-f.y)<f.sz*1.2;if(hit){gScore+=f.bonus?3:1;changed=true;document.getElementById('game-msg').textContent=f.bonus?'+3 ⭐':'+1 🎉';setTimeout(()=>document.getElementById('game-msg').textContent='',500);}return!hit;});
+  if(changed)updateGameUI();
+});
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){closeGame();closeInfo();}
+  if(e.key==='ArrowDown')scrollD.scrollTop+=300;
+  if(e.key==='ArrowUp')scrollD.scrollTop-=300;
+});
+document.addEventListener('dragstart',e=>e.preventDefault());
+</script>
+</body>
+</html>

@@ -644,6 +644,12 @@ function getLight(d){return d>=1000?0:Math.max(0,Math.round(100*Math.exp(-d/180)
 function getO2(d){if(d<100)return+(8.5-d*.005).toFixed(1);if(d<1000)return+(8-(d-100)*.003).toFixed(1);if(d<4000)return+(5.3-(d-1000)*.001).toFixed(1);return+(2.3+(d-4000)*.0001).toFixed(1);}
 function getZone(d){return ZONES.find(z=>d>=z.minD&&d<z.maxD)||ZONES[ZONES.length-1];}
 
+function resolveImgPath(path, folder){
+  if(!path) return '';
+  if(path.startsWith('http') || path.startsWith('data:') || path.startsWith('images/')) return path;
+  return `images/${folder}/${path}`;
+}
+
 // ═══════════════
 // STATE
 // ═══════════════
@@ -713,7 +719,7 @@ function buildLandmarkSidebar(){
     el.innerHTML=`
       <div class="lm-line-bar"></div>
       <div class="lm-line-card">
-        <img src="${lm.img}" onerror="this.onerror=null;this.src='${lm.fb}'" alt="${lm.label}">
+        <img src="${resolveImgPath(lm.img,'landmarks')}" onerror="this.onerror=null;this.src='${lm.fb}'" alt="${lm.label}">
         <div class="lm-line-info">
           <div class="lm-line-name">${lm.label}</div>
           <div class="lm-line-depth">${lm.depth} m · ${lm.note}</div>
@@ -732,7 +738,7 @@ function openInfo(a){
   const overlay=document.getElementById('info-overlay');
   // fill image with CDN fallback
   const imgEl=document.getElementById('dlg-img');
-  imgEl.src=a.f;
+  imgEl.src=resolveImgPath(a.f,'creatures');
   imgEl.onerror=function(){this.onerror=null;this.src=a.fb;};
   document.getElementById('dlg-name').textContent=a.n;
   document.getElementById('dlg-sci').textContent=a.sci||a.s;
@@ -775,7 +781,7 @@ A.forEach(a=>{
   </svg>`;
 
   // Image with CDN fallback
-  const imgSrc=`src="${a.f}" onerror="this.onerror=null;this.src='${a.fb}'"`;
+  const imgSrc=`src="${resolveImgPath(a.f,'creatures')}" onerror="this.onerror=null;this.src='${a.fb}'"`;
 
   w.innerHTML=`
     <div class="animal-pin">${pinSVG}</div>

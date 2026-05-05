@@ -661,7 +661,29 @@ body {
   font-weight: 400;
 }
 
-.site-footer-copy {
+.site-footer {
+    padding: 4rem 2rem;
+    background: rgba(8, 14, 36, 0.95);
+    text-align: center;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .site-footer p {
+    max-width: 720px;
+    margin: 0 auto;
+    color: rgba(232, 238, 255, 0.78);
+    line-height: 1.8;
+    font-size: 0.95rem;
+  }
+
+  .site-footer h2 {
+    font-family: var(--font-clash);
+    font-size: clamp(1.6rem, 3vw, 2.2rem);
+    color: var(--text);
+    margin-bottom: 1rem;
+  }
+
+  .site-footer-copy {
   font-size: 0.72rem;
   color: rgba(107, 126, 184, 0.45);
   letter-spacing: 0.06em;
@@ -1115,6 +1137,14 @@ gsap.to('.hero-inner', {
     })();
   });
 </script>
+
+<footer class="site-footer">
+  <div class="site-footer-inner">
+    <h2>About Us</h2>
+    <p>WorldUnfold is a portal for exploring Earth, ocean and sky worlds in immersive interactive scenes. We combine elegant visuals and intuitive controls to help people connect with the planet and beyond.</p>
+    <p class="site-footer-copy">© 2026 WorldUnfold. Built for discovery and exploration.</p>
+  </div>
+</footer>
 
 </body>
 </html>

@@ -1,0 +1,1120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WorldUnfold — Explore Earth, Ocean & Sky</title>
+
+<!-- Clash Display from CDN -->
+<link rel="stylesheet" href="https://fonts.cdnfonts.com/css/clash-display">
+<!-- Playfair Display from Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+
+<!-- GSAP + ScrollTrigger -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+<style>
+/* ── Reset & Root ─────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg-deep:   #040612;
+  --bg-mid:    #080e24;
+  --bg-light:  #0c1535;
+  --accent:    #4f91ff;
+  --accent2:   #a78bfa;
+  --gold:      #f7c948;
+  --text:      #e8eeff;
+  --text-dim:  #6b7eb8;
+  --card-earth-1: #1a3a0f;
+  --card-earth-2: #0d2208;
+  --card-earth-accent: #6dbf4a;
+  --card-ocean-1: #052a4e;
+  --card-ocean-2: #021825;
+  --card-ocean-accent: #00c8ff;
+  --card-sky-1: #090d2e;
+  --card-sky-2: #05071a;
+  --card-sky-accent: #f7c948;
+  --font-clash: 'Clash Display', 'DM Sans', sans-serif;
+  --font-playfair: 'Playfair Display', Georgia, serif;
+  --font-body: 'Nunito', sans-serif;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg-deep);
+  color: var(--text);
+  overflow-x: hidden;
+}
+
+/* ── Particle Canvas ──────────────────────────────────────────── */
+#particle-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* ── Hero Section ─────────────────────────────────────────────── */
+#hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  overflow: hidden;
+}
+
+/* Layered cosmic backgrounds */
+#hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 10%, rgba(63, 94, 251, 0.12) 0%, transparent 70%),
+    radial-gradient(ellipse 60% 40% at 80% 80%, rgba(167, 139, 250, 0.10) 0%, transparent 70%),
+    radial-gradient(ellipse 100% 80% at 50% 50%, rgba(8, 14, 36, 0.95) 0%, var(--bg-deep) 100%);
+  z-index: -1;
+}
+
+/* Nebula layer */
+#hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 45% 35% at 15% 75%, rgba(79, 145, 255, 0.06) 0%, transparent 60%),
+    radial-gradient(ellipse 35% 25% at 85% 20%, rgba(247, 201, 72, 0.05) 0%, transparent 60%);
+  z-index: -1;
+}
+
+.hero-inner {
+  position: relative;
+  text-align: center;
+  padding: 2rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.75rem;
+}
+
+/* ── The Logotype ─────────────────────────────────────────────── */
+.logotype {
+  display: flex;
+  align-items: baseline;
+  gap: 0;
+  line-height: 1;
+  filter: drop-shadow(0 0 60px rgba(79, 145, 255, 0.25));
+}
+
+.logo-world {
+  font-family: var(--font-clash);
+  font-weight: 600;
+  font-size: clamp(3.5rem, 11vw, 9rem);
+  color: #e8eeff;
+  letter-spacing: -0.02em;
+}
+
+.logo-unfold {
+  font-family: var(--font-playfair);
+  font-weight: 600;
+  font-size: clamp(3.5rem, 11vw, 9rem);
+  color: var(--gold);
+  letter-spacing: -0.01em;
+  font-style: italic;
+}
+
+/* ── Tagline ──────────────────────────────────────────────────── */
+.hero-tagline {
+  font-size: clamp(1rem, 2.2vw, 1.4rem);
+  color: var(--text-dim);
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+/* ── Hero Description ─────────────────────────────────────────── */
+.hero-desc {
+  max-width: 560px;
+  font-size: clamp(1rem, 1.8vw, 1.2rem);
+  color: rgba(232, 238, 255, 0.65);
+  line-height: 1.75;
+  font-weight: 400;
+}
+
+/* ── Scroll Cue ───────────────────────────────────────────────── */
+.scroll-cue {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  opacity: 0.5;
+}
+
+.scroll-cue-text {
+  font-size: 0.7rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+.scroll-arrow {
+  width: 22px;
+  height: 22px;
+  border-right: 2px solid var(--text-dim);
+  border-bottom: 2px solid var(--text-dim);
+  transform: rotate(45deg);
+  animation: scroll-bob 2s ease-in-out infinite;
+}
+
+@keyframes scroll-bob {
+  0%, 100% { transform: rotate(45deg) translateY(0); }
+  50% { transform: rotate(45deg) translateY(5px); }
+}
+
+/* Decorative divider between hero and cards */
+.section-divider {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(79, 145, 255, 0.3), rgba(247, 201, 72, 0.3), transparent);
+  margin: 0;
+}
+
+/* ══════════════════════════════════════
+   EARTH REVEAL SECTION
+══════════════════════════════════════ */
+#earth-reveal {
+  position: relative;
+  z-index: 10;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3rem;
+  padding: 4rem 1.5rem;
+  background:
+    radial-gradient(ellipse 70% 60% at 50% 50%, rgba(0, 60, 30, 0.18) 0%, transparent 70%),
+    radial-gradient(ellipse 100% 80% at 50% 30%, rgba(0, 40, 80, 0.15) 0%, transparent 80%),
+    var(--bg-deep);
+  overflow: hidden;
+}
+
+/* CSS Earth Globe */
+.earth-globe-wrap {
+  width: min(500px, 80vw);
+  height: min(500px, 80vw);
+  max-width: 500px;
+  max-height: 500px;
+  position: relative;
+  will-change: transform;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto;
+}
+
+#globeViz {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto;
+  position: static !important;
+  background: transparent;
+}
+
+#globeViz canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  margin: 0 auto !important;
+}
+
+/* "Choose Your World" text */
+.earth-reveal-text {
+  text-align: center;
+}
+
+
+.earth-reveal-text h2 {
+  font-family: var(--font-clash);
+  font-weight: 600;
+  font-size: clamp(2.2rem, 6vw, 5rem);
+  color: var(--text);
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+}
+
+.earth-reveal-text h2 em {
+  font-family: var(--font-playfair);
+  font-style: italic;
+  color: var(--gold);
+}
+
+/* ── Cards Section ────────────────────────────────────────────── */
+#domains {
+  position: relative;
+  z-index: 10;
+  padding: clamp(4rem, 8vw, 8rem) clamp(1rem, 5vw, 3rem);
+  background:
+    radial-gradient(ellipse 100% 60% at 50% 0%, rgba(8, 14, 36, 0.8) 0%, transparent 80%),
+    var(--bg-deep);
+}
+
+.domains-label {
+  text-align: center;
+  font-size: 0.7rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 0.8rem;
+}
+
+.domains-heading {
+  text-align: center;
+  font-family: var(--font-clash);
+  font-weight: 600;
+  font-size: clamp(1.8rem, 4vw, 3rem);
+  color: var(--text);
+  margin-bottom: 3.5rem;
+  letter-spacing: -0.01em;
+}
+
+.domains-heading em {
+  font-style: italic;
+  font-family: var(--font-playfair);
+  color: var(--gold);
+}
+
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+  gap: 2rem;
+  max-width: 1140px;
+  margin: 0 auto;
+}
+
+/* ── Domain Card ──────────────────────────────────────────────── */
+.domain-card {
+  position: relative;
+  border-radius: 24px;
+  overflow: hidden;
+  text-decoration: none;
+  display: block;
+  cursor: pointer;
+  outline: none;
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+              box-shadow 0.4s ease;
+  will-change: transform;
+}
+
+.domain-card:hover {
+  transform: translateY(-10px) scale(1.02);
+}
+
+/* Card body */
+.card-body {
+  position: relative;
+  padding: 2.5rem 2rem 2rem;
+  min-height: 400px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  z-index: 2;
+}
+
+/* Animated background layers inside each card */
+.card-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  transition: transform 0.6s ease, opacity 0.6s ease;
+}
+
+/* Card content above bg */
+.card-body > * {
+  position: relative;
+  z-index: 3;
+}
+
+/* Top icon/preview area */
+.card-preview {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 200px;
+  z-index: 1;
+  overflow: hidden;
+  border-radius: 24px 24px 0 0;
+}
+
+.card-preview-art {
+  width: 100%;
+  height: 100%;
+  transition: transform 0.6s ease;
+}
+
+.domain-card:hover .card-preview-art {
+  transform: scale(1.06);
+}
+
+/* Card icon */
+.card-icon {
+  font-size: 3.5rem;
+  margin-bottom: 1rem;
+  display: block;
+  filter: drop-shadow(0 4px 16px rgba(0,0,0,0.5));
+  transition: transform 0.4s ease;
+}
+
+.domain-card:hover .card-icon {
+  transform: scale(1.12) translateY(-3px);
+}
+
+.card-label {
+  font-size: 0.65rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+  font-weight: 700;
+  opacity: 0.8;
+}
+
+.card-title {
+  font-family: var(--font-clash);
+  font-weight: 600;
+  font-size: clamp(1.8rem, 3.5vw, 2.4rem);
+  line-height: 1.05;
+  margin-bottom: 0.75rem;
+  letter-spacing: -0.01em;
+}
+
+.card-desc {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  opacity: 0.75;
+  margin-bottom: 1.5rem;
+}
+
+/* Card CTA */
+.card-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 0.7rem 1.4rem;
+  border-radius: 50px;
+  transition: gap 0.3s ease, padding 0.3s ease, box-shadow 0.3s ease;
+  border: 1.5px solid currentColor;
+}
+
+.domain-card:hover .card-cta {
+  gap: 0.9rem;
+  padding: 0.7rem 1.6rem;
+}
+
+.cta-arrow {
+  transition: transform 0.3s ease;
+}
+
+.domain-card:hover .cta-arrow {
+  transform: translateX(4px);
+}
+
+/* ── Earth Card ───────────────────────────────────────────────── */
+.card-earth {
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(109, 191, 74, 0.15);
+}
+
+.card-earth:hover {
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(109, 191, 74, 0.4),
+              0 0 60px rgba(109, 191, 74, 0.12);
+}
+
+.card-earth .card-body {
+  background: linear-gradient(160deg, var(--card-earth-1) 0%, var(--card-earth-2) 100%);
+}
+
+.card-earth .card-preview {
+  background: linear-gradient(180deg, #0d2208 0%, #1a3a0f 60%, #0f4a20 100%);
+}
+
+.card-earth .card-label { color: var(--card-earth-accent); }
+.card-earth .card-title { color: #c8efaa; }
+.card-earth .card-cta {
+  color: var(--card-earth-accent);
+  background: rgba(109, 191, 74, 0.08);
+}
+
+.card-earth:hover .card-cta {
+  background: rgba(109, 191, 74, 0.18);
+  box-shadow: 0 0 20px rgba(109, 191, 74, 0.2);
+}
+
+/* Earth preview art: rolling hills */
+.earth-art {
+  background:
+    radial-gradient(circle 120px at 30% 30%, rgba(45, 80, 22, 0.4) 0%, transparent 60%),
+    radial-gradient(circle 80px at 70% 20%, rgba(92, 61, 17, 0.3) 0%, transparent 50%),
+    linear-gradient(180deg, #0a1f06 0%, #122c09 40%, #1c4010 70%, #152d0c 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.earth-art::before {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 0;
+  right: 0;
+  height: 70px;
+  background: #0d2208;
+  clip-path: ellipse(60% 50% at 30% 100%);
+  opacity: 0.6;
+}
+
+.earth-art::after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background: #152d0c;
+  clip-path: ellipse(55% 50% at 75% 100%);
+  opacity: 0.5;
+}
+
+/* ── Ocean Card ───────────────────────────────────────────────── */
+.card-ocean {
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(0, 200, 255, 0.15);
+}
+
+.card-ocean:hover {
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(0, 200, 255, 0.4),
+              0 0 60px rgba(0, 200, 255, 0.12);
+}
+
+.card-ocean .card-body {
+  background: linear-gradient(160deg, var(--card-ocean-1) 0%, var(--card-ocean-2) 100%);
+}
+
+.card-ocean .card-preview {
+  background: linear-gradient(180deg, #021825 0%, #052a4e 50%, #084070 100%);
+}
+
+.card-ocean .card-label { color: var(--card-ocean-accent); }
+.card-ocean .card-title { color: #9de4ff; }
+.card-ocean .card-cta {
+  color: var(--card-ocean-accent);
+  background: rgba(0, 200, 255, 0.06);
+}
+
+.card-ocean:hover .card-cta {
+  background: rgba(0, 200, 255, 0.15);
+  box-shadow: 0 0 20px rgba(0, 200, 255, 0.2);
+}
+
+/* Ocean art: waves */
+.ocean-art {
+  background: linear-gradient(180deg, #021825 0%, #052a4e 40%, #063a5e 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.ocean-art .wave {
+  position: absolute;
+  width: 200%;
+  height: 40px;
+  border-radius: 50%;
+  opacity: 0.25;
+  animation: wave-move linear infinite;
+}
+
+.ocean-art .wave:nth-child(1) {
+  background: rgba(0, 200, 255, 0.6);
+  top: 50px;
+  left: -50%;
+  animation-duration: 6s;
+}
+
+.ocean-art .wave:nth-child(2) {
+  background: rgba(0, 150, 200, 0.5);
+  top: 80px;
+  left: -30%;
+  animation-duration: 8s;
+  animation-delay: -2s;
+}
+
+.ocean-art .wave:nth-child(3) {
+  background: rgba(0, 100, 160, 0.4);
+  top: 110px;
+  left: -70%;
+  animation-duration: 10s;
+  animation-delay: -4s;
+}
+
+@keyframes wave-move {
+  0% { transform: translateX(0) scaleY(1); }
+  50% { transform: translateX(25%) scaleY(0.7); }
+  100% { transform: translateX(50%) scaleY(1); }
+}
+
+/* ── Sky Card ─────────────────────────────────────────────────── */
+.card-sky {
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(247, 201, 72, 0.15);
+}
+
+.card-sky:hover {
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(247, 201, 72, 0.4),
+              0 0 60px rgba(247, 201, 72, 0.10);
+}
+
+.card-sky .card-body {
+  background: linear-gradient(160deg, var(--card-sky-1) 0%, var(--card-sky-2) 100%);
+}
+
+.card-sky .card-preview {
+  background: linear-gradient(180deg, #02030f 0%, #090d2e 50%, #0c1148 100%);
+}
+
+.card-sky .card-label { color: var(--card-sky-accent); }
+.card-sky .card-title { color: #ffe9a0; }
+.card-sky .card-cta {
+  color: var(--card-sky-accent);
+  background: rgba(247, 201, 72, 0.06);
+}
+
+.card-sky:hover .card-cta {
+  background: rgba(247, 201, 72, 0.15);
+  box-shadow: 0 0 20px rgba(247, 201, 72, 0.15);
+}
+
+/* Sky art: star canvas */
+.sky-art {
+  background: radial-gradient(ellipse 80% 80% at 50% 40%, #0c1148 0%, #02030f 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.sky-art canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* ── SITE FOOTER ──────────────────────────────────────────────── */
+#site-footer {
+  position: relative;
+  z-index: 10;
+  text-align: center;
+  padding: 4rem 1.5rem 3rem;
+  background: var(--bg-deep);
+  border-top: 1px solid rgba(79, 145, 255, 0.10);
+}
+
+.site-footer-logo {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0;
+  line-height: 1;
+  margin-bottom: 1rem;
+}
+
+.site-footer-logo .fw {
+  font-family: var(--font-clash);
+  font-weight: 700;
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  color: var(--text);
+  letter-spacing: -0.02em;
+}
+
+.site-footer-logo .fu {
+  font-family: var(--font-playfair);
+  font-weight: 700;
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  color: var(--gold);
+  font-style: italic;
+  letter-spacing: -0.01em;
+}
+
+.site-footer-tagline {
+  font-size: clamp(0.85rem, 1.8vw, 1rem);
+  color: var(--text-dim);
+  letter-spacing: 0.06em;
+  margin-bottom: 1.5rem;
+  font-weight: 400;
+}
+
+.site-footer-copy {
+  font-size: 0.72rem;
+  color: rgba(107, 126, 184, 0.45);
+  letter-spacing: 0.06em;
+}
+
+/* ── Visibility-trigger utility ────────────────────────────────── */
+.reveal-item {
+  opacity: 0;
+  transform: translateY(40px);
+}
+
+/* ── Responsive ───────────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .logotype {
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    line-height: 1.05;
+  }
+  .cards-grid {
+    grid-template-columns: 1fr;
+  }
+  .earth-globe-wrap {
+    width: 88vw;
+    height: 88vw;
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- Particle background canvas -->
+<canvas id="particle-canvas"></canvas>
+
+<!-- ══════════════════════════════════════
+     HERO
+══════════════════════════════════════ -->
+<section id="hero">
+  <div class="hero-inner">
+    <div class="logotype" id="logotype">
+      <span class="logo-world">World</span><span class="logo-unfold">Unfold</span>
+    </div>
+    <p class="hero-tagline reveal-item" id="hero-tagline">Your interactive exploration platform</p>
+    <p class="hero-desc reveal-item" id="hero-desc">
+      Dive into the ocean's darkest depths, roam across continents and civilisations,
+      or gaze at the night sky and hear the stories stars have told for millennia.
+      Three worlds. Infinite wonder.
+    </p>
+    <div class="scroll-cue reveal-item" id="scroll-cue">
+      <span class="scroll-cue-text">Explore</span>
+      <div class="scroll-arrow"></div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ══════════════════════════════════════
+     EARTH REVEAL
+══════════════════════════════════════ -->
+<section id="earth-reveal">
+  <div class="earth-globe-wrap" id="earth-globe-wrap">
+    <div id="globeViz"></div>
+  </div>
+  <div class="earth-reveal-text" id="earth-reveal-text">
+    <h2>Choose Your <em>World</em></h2>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ══════════════════════════════════════
+     DOMAIN CARDS
+══════════════════════════════════════ -->
+<section id="domains">
+  <p class="domains-label">Choose your adventure</p>
+  <h2 class="domains-heading">Three worlds to <em>discover</em></h2>
+
+  <div class="cards-grid">
+
+    <!-- Earth Card -->
+    <a href="land_v4.html" class="domain-card card-earth reveal-item" aria-label="Explore Earth">
+      <div class="card-preview">
+        <div class="card-preview-art earth-art"></div>
+      </div>
+      <div class="card-body">
+        <span class="card-icon">🌍</span>
+        <div class="card-label">Earth Explorer</div>
+        <h3 class="card-title">Explore<br>Our World</h3>
+        <p class="card-desc">
+          Journey across every country on Earth. Discover cultures, landmarks,
+          capitals, and astonishing facts from seven continents.
+        </p>
+        <span class="card-cta">
+          Start Exploring <span class="cta-arrow">→</span>
+        </span>
+      </div>
+    </a>
+
+    <!-- Ocean Card -->
+    <a href="ocean-v3.html" class="domain-card card-ocean reveal-item" aria-label="Dive into the Ocean">
+      <div class="card-preview">
+        <div class="card-preview-art ocean-art">
+          <div class="wave"></div>
+          <div class="wave"></div>
+          <div class="wave"></div>
+        </div>
+      </div>
+      <div class="card-body">
+        <span class="card-icon">🌊</span>
+        <div class="card-label">Ocean Explorer</div>
+        <h3 class="card-title">Dive Into<br>The Deep</h3>
+        <p class="card-desc">
+          Scroll down through 11,000 metres of ocean. Encounter 22 remarkable
+          creatures — from dolphins to the legendary Kraken.
+        </p>
+        <span class="card-cta">
+          Start Diving <span class="cta-arrow">→</span>
+        </span>
+      </div>
+    </a>
+
+    <!-- Sky Card -->
+    <a href="night_sky_explorer.html" class="domain-card card-sky reveal-item" aria-label="Explore the Night Sky">
+      <div class="card-preview">
+        <div class="card-preview-art sky-art">
+          <canvas id="card-sky-canvas"></canvas>
+        </div>
+      </div>
+      <div class="card-body">
+        <span class="card-icon">✨</span>
+        <div class="card-label">Night Sky Explorer</div>
+        <h3 class="card-title">Read The<br>Stars</h3>
+        <p class="card-desc">
+          Explore real-time constellations from your location. Discover myths,
+          science, and stories behind 18 constellations across cultures.
+        </p>
+        <span class="card-cta">
+          Look Up <span class="cta-arrow">→</span>
+        </span>
+      </div>
+    </a>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     SITE FOOTER
+══════════════════════════════════════ -->
+<footer id="site-footer">
+  <div class="site-footer-logo">
+    <span class="fw">World</span><span class="fu">Unfold</span>
+  </div>
+  <p class="site-footer-tagline">Explore the Earth. Dive the Ocean. Discover the Sky.</p>
+  <p class="site-footer-copy">&copy; 2025 WorldUnfold</p>
+</footer>
+
+
+<script>
+// ══════════════════════════════════════════════════════
+// PARTICLE FIELD
+// ══════════════════════════════════════════════════════
+(function () {
+  const canvas  = document.getElementById('particle-canvas');
+  const ctx     = canvas.getContext('2d');
+  let W, H, stars = [];
+
+  function resize() {
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+  window.addEventListener('resize', () => { resize(); initStars(); });
+  resize();
+
+  function initStars() {
+    stars = [];
+    const count = Math.floor((W * H) / 7000);
+    for (let i = 0; i < count; i++) {
+      stars.push({
+        x:       Math.random() * W,
+        y:       Math.random() * H,
+        r:       Math.random() * 1.4 + 0.2,
+        alpha:   Math.random() * 0.5 + 0.1,
+        twinkle: Math.random() * Math.PI * 2,
+        speed:   Math.random() * 0.015 + 0.005,
+        dx:      (Math.random() - 0.5) * 0.08,
+        dy:      (Math.random() - 0.5) * 0.04,
+      });
+    }
+  }
+  initStars();
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    for (const s of stars) {
+      s.twinkle += s.speed;
+      const alpha = s.alpha * (0.6 + 0.4 * Math.sin(s.twinkle));
+      s.x = (s.x + s.dx + W) % W;
+      s.y = (s.y + s.dy + H) % H;
+
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(200, 220, 255, ${alpha})`;
+      ctx.fill();
+    }
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// ══════════════════════════════════════════════════════
+// STAR MINI-CANVAS inside sky card preview
+// ══════════════════════════════════════════════════════
+(function () {
+  const canvas = document.getElementById('card-sky-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let W, H, stars = [];
+
+  function resize() {
+    const rect = canvas.parentElement.getBoundingClientRect();
+    W = canvas.width  = rect.width  || 320;
+    H = canvas.height = rect.height || 200;
+  }
+
+  function init() {
+    resize();
+    stars = [];
+    for (let i = 0; i < 120; i++) {
+      stars.push({
+        x:     Math.random() * W,
+        y:     Math.random() * H,
+        r:     Math.random() * 1.5 + 0.3,
+        alpha: Math.random() * 0.7 + 0.2,
+        phase: Math.random() * Math.PI * 2,
+        speed: Math.random() * 0.02 + 0.008,
+      });
+    }
+    for (let i = 0; i < 8; i++) {
+      stars.push({
+        x: Math.random() * W, y: Math.random() * H,
+        r: 1.8 + Math.random(), alpha: 0.9,
+        phase: Math.random() * Math.PI * 2,
+        speed: 0.03,
+        gold: true,
+      });
+    }
+  }
+
+  let t = 0;
+  function draw() {
+    t += 0.016;
+    ctx.clearRect(0, 0, W, H);
+    const band = ctx.createLinearGradient(0, H * 0.2, W, H * 0.8);
+    band.addColorStop(0, 'rgba(79, 100, 200, 0)');
+    band.addColorStop(0.5, 'rgba(79, 100, 200, 0.05)');
+    band.addColorStop(1, 'rgba(79, 100, 200, 0)');
+    ctx.fillStyle = band;
+    ctx.fillRect(0, 0, W, H);
+
+    for (const s of stars) {
+      const a = s.alpha * (0.5 + 0.5 * Math.sin(t * s.speed * 10 + s.phase));
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = s.gold
+        ? `rgba(247, 201, 72, ${a})`
+        : `rgba(200, 220, 255, ${a})`;
+      ctx.fill();
+    }
+    requestAnimationFrame(draw);
+  }
+
+  setTimeout(() => { init(); draw(); window.addEventListener('resize', init); }, 100);
+})();
+
+
+// ══════════════════════════════════════════════════════
+// GSAP ANIMATIONS
+// ══════════════════════════════════════════════════════
+gsap.registerPlugin(ScrollTrigger);
+
+// Hero entrance — logotype splits in from both sides
+gsap.timeline({ defaults: { ease: 'power3.out' } })
+  .from('.logo-world',   { x: -60, opacity: 0, duration: 1.1 }, 0.2)
+  .from('.logo-unfold',  { x:  60, opacity: 0, duration: 1.1 }, 0.2)
+  .to('#hero-tagline',   { opacity: 1, y: 0, duration: 0.8 }, 0.9)
+  .to('#hero-desc',      { opacity: 1, y: 0, duration: 0.8 }, 1.1)
+  .to('#scroll-cue',     { opacity: 0.5, y: 0, duration: 0.8 }, 1.4);
+
+// Earth globe: scale up from 0.3 → 1 as user scrolls the section in
+gsap.fromTo('#earth-globe-wrap',
+  { scale: 0.3, opacity: 0 },
+  {
+    scale: 1,
+    opacity: 1,
+    ease: 'power2.out',
+    scrollTrigger: {
+      trigger: '#earth-reveal',
+      start: 'top 85%',
+      end: 'center 55%',
+      scrub: 1.2,
+    },
+  }
+);
+
+// "Choose Your World" text fades up after globe
+gsap.from('#earth-reveal-text', {
+  opacity: 0,
+  y: 40,
+  duration: 1,
+  ease: 'power3.out',
+  scrollTrigger: {
+    trigger: '#earth-reveal',
+    start: 'center 70%',
+    toggleActions: 'play none none none',
+  },
+});
+
+// Domain cards animate in on scroll with stagger
+gsap.utils.toArray('.domain-card').forEach((card, i) => {
+  gsap.to(card, {
+    opacity: 1,
+    y: 0,
+    duration: 0.85,
+    ease: 'power3.out',
+    delay: i * 0.12,
+    scrollTrigger: {
+      trigger: '#domains',
+      start: 'top 75%',
+      toggleActions: 'play none none none',
+    },
+  });
+});
+
+// Section heading reveals
+gsap.utils.toArray('.domains-label, .domains-heading').forEach((el) => {
+  gsap.from(el, {
+    opacity: 0,
+    y: 30,
+    duration: 0.9,
+    ease: 'power3.out',
+    scrollTrigger: {
+      trigger: el,
+      start: 'top 85%',
+      toggleActions: 'play none none none',
+    },
+  });
+});
+
+// Subtle parallax on hero description
+gsap.to('.hero-inner', {
+  yPercent: -15,
+  ease: 'none',
+  scrollTrigger: {
+    trigger: '#hero',
+    start: 'top top',
+    end: 'bottom top',
+    scrub: true,
+  },
+});
+</script>
+
+<script type="module">
+  import Globe from 'https://esm.sh/globe.gl';
+  import { TextureLoader, ShaderMaterial, Vector2 } from 'https://esm.sh/three';
+  import * as solar from 'https://esm.sh/solar-calculator';
+
+  const VELOCITY = 1; // minutes per frame
+
+  const dayNightShader = {
+    vertexShader: `
+      varying vec3 vNormal;
+      varying vec2 vUv;
+      void main() {
+        vNormal = normalize(normalMatrix * normal);
+        vUv = uv;
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+      }
+    `,
+    fragmentShader: `
+      #define PI 3.141592653589793
+      uniform sampler2D dayTexture;
+      uniform sampler2D nightTexture;
+      uniform vec2 sunPosition;
+      uniform vec2 globeRotation;
+      varying vec3 vNormal;
+      varying vec2 vUv;
+
+      void main() {
+        float sunLat = sunPosition.x;
+        float sunLng = sunPosition.y + globeRotation.y;
+        vec3 sunDir = vec3(
+          cos(sunLat) * sin(sunLng),
+          sin(sunLat),
+          cos(sunLat) * cos(sunLng)
+        );
+
+        float cosAngle = dot(vNormal, sunDir);
+        float mixAmt = clamp(cosAngle * 10.0, -1.0, 1.0) * 0.5 + 0.5;
+
+        vec4 dayColor = texture2D(dayTexture, vUv);
+        vec4 nightColor = texture2D(nightTexture, vUv);
+        gl_FragColor = mix(nightColor, dayColor, mixAmt);
+      }
+    `
+  };
+
+  Promise.all([
+    new TextureLoader().loadAsync('//cdn.jsdelivr.net/npm/three-globe/example/img/earth-day.jpg'),
+    new TextureLoader().loadAsync('//cdn.jsdelivr.net/npm/three-globe/example/img/earth-night.jpg')
+  ]).then(([dayTex, nightTex]) => {
+    const material = new ShaderMaterial({
+      uniforms: {
+        dayTexture: { value: dayTex },
+        nightTexture: { value: nightTex },
+        sunPosition: { value: new Vector2() },
+        globeRotation: { value: new Vector2() }
+      },
+      vertexShader: dayNightShader.vertexShader,
+      fragmentShader: dayNightShader.fragmentShader
+    });
+
+    const globe = Globe()
+      .globeMaterial(material)
+      .backgroundColor('rgba(0,0,0,0)')
+      (document.getElementById('globeViz'));
+
+    const controls = globe.controls();
+    controls.autoRotate = true;
+    controls.autoRotateSpeed = 0.5;
+    controls.enableZoom = true;
+    controls.enablePan = false;
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.05;
+    controls.target.set(0, 0, 0);
+    controls.update();
+
+    let dt = new Date();
+
+    (function animate() {
+      dt = new Date(+dt + VELOCITY * 60 * 1000);
+      const sunEcliptic = solar.position(dt);
+      const obliquity = solar.obliquityOfEcliptic(dt);
+      const sunLng = sunEcliptic.longitude - Math.PI;
+      const sinSunLat = Math.sin(obliquity) * Math.sin(sunEcliptic.latitude || 0);
+      const sunLat = Math.asin(sinSunLat);
+
+      material.uniforms.sunPosition.value.set(sunLat, sunLng);
+      material.uniforms.globeRotation.value.set(0, controls.getAzimuthalAngle());
+      requestAnimationFrame(animate);
+    })();
+  });
+</script>
+
+</body>
+</html>

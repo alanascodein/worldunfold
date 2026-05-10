@@ -1,0 +1,1503 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;family=Work+Sans:wght@500;600&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-container": "#88acb4",
+                        "outline": "#717973",
+                        "on-tertiary": "#ffffff",
+                        "primary-fixed": "#c1ecd4",
+                        "surface-container-low": "#f3f4f5",
+                        "on-error": "#ffffff",
+                        "surface-container": "#edeeef",
+                        "primary-container": "#1b4332",
+                        "surface": "#f8f9fa",
+                        "tertiary": "#012b31",
+                        "primary-fixed-dim": "#a5d0b9",
+                        "secondary-container": "#67bafd",
+                        "tertiary-fixed": "#c3e9f1",
+                        "on-surface-variant": "#414844",
+                        "on-surface": "#191c1d",
+                        "surface-variant": "#e1e3e4",
+                        "on-background": "#191c1d",
+                        "on-primary-fixed": "#002114",
+                        "on-primary-container": "#86af99",
+                        "on-secondary-fixed": "#001d32",
+                        "on-error-container": "#93000a",
+                        "tertiary-container": "#1c4147",
+                        "primary": "#012d1d",
+                        "error": "#ba1a1a",
+                        "secondary-fixed": "#cde5ff",
+                        "secondary-fixed-dim": "#94ccff",
+                        "surface-dim": "#d9dadb",
+                        "outline-variant": "#c1c8c2",
+                        "inverse-primary": "#a5d0b9",
+                        "on-tertiary-fixed": "#001f24",
+                        "tertiary-fixed-dim": "#a8cdd5",
+                        "surface-container-highest": "#e1e3e4",
+                        "inverse-on-surface": "#f0f1f2",
+                        "background": "#f8f9fa",
+                        "on-secondary": "#ffffff",
+                        "surface-bright": "#f8f9fa",
+                        "on-secondary-fixed-variant": "#004b74",
+                        "surface-container-high": "#e7e8e9",
+                        "error-container": "#ffdad6",
+                        "on-tertiary-fixed-variant": "#284c53",
+                        "on-secondary-container": "#004972",
+                        "inverse-surface": "#2e3132",
+                        "on-primary": "#ffffff",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary": "#006399",
+                        "on-primary-fixed-variant": "#274e3d",
+                        "surface-tint": "#3f6653"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "24px",
+                        "sm": "12px",
+                        "xs": "4px",
+                        "container-max": "1280px",
+                        "md": "24px",
+                        "base": "8px",
+                        "margin-mobile": "16px",
+                        "xl": "80px",
+                        "lg": "48px"
+                    },
+                    "fontFamily": {
+                        "label-sm": ["Work Sans"],
+                        "label-md": ["Work Sans"],
+                        "body-lg": ["Plus Jakarta Sans"],
+                        "headline-lg": ["Plus Jakarta Sans"],
+                        "display-lg-mobile": ["Plus Jakarta Sans"],
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "display-lg": ["Plus Jakarta Sans"],
+                        "body-md": ["Plus Jakarta Sans"]
+                    },
+                    "fontSize": {
+                        "label-sm": ["12px", { "lineHeight": "1.2", "fontWeight": "600" }],
+                        "label-md": ["14px", { "lineHeight": "1.2", "letterSpacing": "0.01em", "fontWeight": "500" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "headline-lg": ["32px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "display-lg-mobile": ["32px", { "lineHeight": "1.2", "fontWeight": "700" }],
+                        "headline-md": ["24px", { "lineHeight": "1.4", "fontWeight": "600" }],
+                        "display-lg": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }]
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        .soft-depth {
+            box-shadow: 0 20px 40px -15px rgba(1, 45, 29, 0.06);
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@600;700&amp;display=swap" rel="stylesheet" />
+    <style>
+        *,
+        ::before,
+        ::after {
+            --tw-border-spacing-x: 0;
+            --tw-border-spacing-y: 0;
+            --tw-translate-x: 0;
+            --tw-translate-y: 0;
+            --tw-rotate: 0;
+            --tw-skew-x: 0;
+            --tw-skew-y: 0;
+            --tw-scale-x: 1;
+            --tw-scale-y: 1;
+            --tw-pan-x: ;
+            --tw-pan-y: ;
+            --tw-pinch-zoom: ;
+            --tw-scroll-snap-strictness: proximity;
+            --tw-gradient-from-position: ;
+            --tw-gradient-via-position: ;
+            --tw-gradient-to-position: ;
+            --tw-ordinal: ;
+            --tw-slashed-zero: ;
+            --tw-numeric-figure: ;
+            --tw-numeric-spacing: ;
+            --tw-numeric-fraction: ;
+            --tw-ring-inset: ;
+            --tw-ring-offset-width: 0px;
+            --tw-ring-offset-color: #fff;
+            --tw-ring-color: rgb(59 130 246 / 0.5);
+            --tw-ring-offset-shadow: 0 0 #0000;
+            --tw-ring-shadow: 0 0 #0000;
+            --tw-shadow: 0 0 #0000;
+            --tw-shadow-colored: 0 0 #0000;
+            --tw-blur: ;
+            --tw-brightness: ;
+            --tw-contrast: ;
+            --tw-grayscale: ;
+            --tw-hue-rotate: ;
+            --tw-invert: ;
+            --tw-saturate: ;
+            --tw-sepia: ;
+            --tw-drop-shadow: ;
+            --tw-backdrop-blur: ;
+            --tw-backdrop-brightness: ;
+            --tw-backdrop-contrast: ;
+            --tw-backdrop-grayscale: ;
+            --tw-backdrop-hue-rotate: ;
+            --tw-backdrop-invert: ;
+            --tw-backdrop-opacity: ;
+            --tw-backdrop-saturate: ;
+            --tw-backdrop-sepia: ;
+            --tw-contain-size: ;
+            --tw-contain-layout: ;
+            --tw-contain-paint: ;
+            --tw-contain-style:
+        }
+
+        ::backdrop {
+            --tw-border-spacing-x: 0;
+            --tw-border-spacing-y: 0;
+            --tw-translate-x: 0;
+            --tw-translate-y: 0;
+            --tw-rotate: 0;
+            --tw-skew-x: 0;
+            --tw-skew-y: 0;
+            --tw-scale-x: 1;
+            --tw-scale-y: 1;
+            --tw-pan-x: ;
+            --tw-pan-y: ;
+            --tw-pinch-zoom: ;
+            --tw-scroll-snap-strictness: proximity;
+            --tw-gradient-from-position: ;
+            --tw-gradient-via-position: ;
+            --tw-gradient-to-position: ;
+            --tw-ordinal: ;
+            --tw-slashed-zero: ;
+            --tw-numeric-figure: ;
+            --tw-numeric-spacing: ;
+            --tw-numeric-fraction: ;
+            --tw-ring-inset: ;
+            --tw-ring-offset-width: 0px;
+            --tw-ring-offset-color: #fff;
+            --tw-ring-color: rgb(59 130 246 / 0.5);
+            --tw-ring-offset-shadow: 0 0 #0000;
+            --tw-ring-shadow: 0 0 #0000;
+            --tw-shadow: 0 0 #0000;
+            --tw-shadow-colored: 0 0 #0000;
+            --tw-blur: ;
+            --tw-brightness: ;
+            --tw-contrast: ;
+            --tw-grayscale: ;
+            --tw-hue-rotate: ;
+            --tw-invert: ;
+            --tw-saturate: ;
+            --tw-sepia: ;
+            --tw-drop-shadow: ;
+            --tw-backdrop-blur: ;
+            --tw-backdrop-brightness: ;
+            --tw-backdrop-contrast: ;
+            --tw-backdrop-grayscale: ;
+            --tw-backdrop-hue-rotate: ;
+            --tw-backdrop-invert: ;
+            --tw-backdrop-opacity: ;
+            --tw-backdrop-saturate: ;
+            --tw-backdrop-sepia: ;
+            --tw-contain-size: ;
+            --tw-contain-layout: ;
+            --tw-contain-paint: ;
+            --tw-contain-style:
+        }
+
+        /* ! tailwindcss v3.4.17 | MIT License | https://tailwindcss.com */
+        *,
+        ::after,
+        ::before {
+            box-sizing: border-box;
+            border-width: 0;
+            border-style: solid;
+            border-color: #e5e7eb
+        }
+
+        ::after,
+        ::before {
+            --tw-content: ''
+        }
+
+        :host,
+        html {
+            line-height: 1.5;
+            -webkit-text-size-adjust: 100%;
+            -moz-tab-size: 4;
+            tab-size: 4;
+            font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+            font-feature-settings: normal;
+            font-variation-settings: normal;
+            -webkit-tap-highlight-color: transparent
+        }
+
+        body {
+            margin: 0;
+            line-height: inherit
+        }
+
+        hr {
+            height: 0;
+            color: inherit;
+            border-top-width: 1px
+        }
+
+        abbr:where([title]) {
+            -webkit-text-decoration: underline dotted;
+            text-decoration: underline dotted
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            font-size: inherit;
+            font-weight: inherit
+        }
+
+        a {
+            color: inherit;
+            text-decoration: inherit
+        }
+
+        b,
+        strong {
+            font-weight: bolder
+        }
+
+        code,
+        kbd,
+        pre,
+        samp {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+            font-feature-settings: normal;
+            font-variation-settings: normal;
+            font-size: 1em
+        }
+
+        small {
+            font-size: 80%
+        }
+
+        sub,
+        sup {
+            font-size: 75%;
+            line-height: 0;
+            position: relative;
+            vertical-align: baseline
+        }
+
+        sub {
+            bottom: -.25em
+        }
+
+        sup {
+            top: -.5em
+        }
+
+        table {
+            text-indent: 0;
+            border-color: inherit;
+            border-collapse: collapse
+        }
+
+        button,
+        input,
+        optgroup,
+        select,
+        textarea {
+            font-family: inherit;
+            font-feature-settings: inherit;
+            font-variation-settings: inherit;
+            font-size: 100%;
+            font-weight: inherit;
+            line-height: inherit;
+            letter-spacing: inherit;
+            color: inherit;
+            margin: 0;
+            padding: 0
+        }
+
+        button,
+        select {
+            text-transform: none
+        }
+
+        button,
+        input:where([type=button]),
+        input:where([type=reset]),
+        input:where([type=submit]) {
+            -webkit-appearance: button;
+            background-color: transparent;
+            background-image: none
+        }
+
+        :-moz-focusring {
+            outline: auto
+        }
+
+        :-moz-ui-invalid {
+            box-shadow: none
+        }
+
+        progress {
+            vertical-align: baseline
+        }
+
+        ::-webkit-inner-spin-button,
+        ::-webkit-outer-spin-button {
+            height: auto
+        }
+
+        [type=search] {
+            -webkit-appearance: textfield;
+            outline-offset: -2px
+        }
+
+        ::-webkit-search-decoration {
+            -webkit-appearance: none
+        }
+
+        ::-webkit-file-upload-button {
+            -webkit-appearance: button;
+            font: inherit
+        }
+
+        summary {
+            display: list-item
+        }
+
+        blockquote,
+        dd,
+        dl,
+        figure,
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6,
+        hr,
+        p,
+        pre {
+            margin: 0
+        }
+
+        fieldset {
+            margin: 0;
+            padding: 0
+        }
+
+        legend {
+            padding: 0
+        }
+
+        menu,
+        ol,
+        ul {
+            list-style: none;
+            margin: 0;
+            padding: 0
+        }
+
+        dialog {
+            padding: 0
+        }
+
+        textarea {
+            resize: vertical
+        }
+
+        input::placeholder,
+        textarea::placeholder {
+            opacity: 1;
+            color: #9ca3af
+        }
+
+        [role=button],
+        button {
+            cursor: pointer
+        }
+
+        :disabled {
+            cursor: default
+        }
+
+        audio,
+        canvas,
+        embed,
+        iframe,
+        img,
+        object,
+        svg,
+        video {
+            display: block;
+            vertical-align: middle
+        }
+
+        img,
+        video {
+            max-width: 100%;
+            height: auto
+        }
+
+        [hidden]:where(:not([hidden=until-found])) {
+            display: none
+        }
+
+        [type='text'],
+        input:where(:not([type])),
+        [type='email'],
+        [type='url'],
+        [type='password'],
+        [type='number'],
+        [type='date'],
+        [type='datetime-local'],
+        [type='month'],
+        [type='search'],
+        [type='tel'],
+        [type='time'],
+        [type='week'],
+        [multiple],
+        textarea,
+        select {
+            -webkit-appearance: none;
+            appearance: none;
+            background-color: #fff;
+            border-color: #6b7280;
+            border-width: 1px;
+            border-radius: 0px;
+            padding-top: 0.5rem;
+            padding-right: 0.75rem;
+            padding-bottom: 0.5rem;
+            padding-left: 0.75rem;
+            font-size: 1rem;
+            line-height: 1.5rem;
+            --tw-shadow: 0 0 #0000;
+        }
+
+        [type='text']:focus,
+        input:where(:not([type])):focus,
+        [type='email']:focus,
+        [type='url']:focus,
+        [type='password']:focus,
+        [type='number']:focus,
+        [type='date']:focus,
+        [type='datetime-local']:focus,
+        [type='month']:focus,
+        [type='search']:focus,
+        [type='tel']:focus,
+        [type='time']:focus,
+        [type='week']:focus,
+        [multiple]:focus,
+        textarea:focus,
+        select:focus {
+            outline: 2px solid transparent;
+            outline-offset: 2px;
+            --tw-ring-inset: var(--tw-empty,
+                    /*!*/
+                    /*!*/
+                );
+            --tw-ring-offset-width: 0px;
+            --tw-ring-offset-color: #fff;
+            --tw-ring-color: #2563eb;
+            --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
+            --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(1px + var(--tw-ring-offset-width)) var(--tw-ring-color);
+            box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
+            border-color: #2563eb
+        }
+
+        input::placeholder,
+        textarea::placeholder {
+            color: #6b7280;
+            opacity: 1
+        }
+
+        ::-webkit-datetime-edit-fields-wrapper {
+            padding: 0
+        }
+
+        ::-webkit-date-and-time-value {
+            min-height: 1.5em;
+            text-align: inherit
+        }
+
+        ::-webkit-datetime-edit {
+            display: inline-flex
+        }
+
+        ::-webkit-datetime-edit,
+        ::-webkit-datetime-edit-year-field,
+        ::-webkit-datetime-edit-month-field,
+        ::-webkit-datetime-edit-day-field,
+        ::-webkit-datetime-edit-hour-field,
+        ::-webkit-datetime-edit-minute-field,
+        ::-webkit-datetime-edit-second-field,
+        ::-webkit-datetime-edit-millisecond-field,
+        ::-webkit-datetime-edit-meridiem-field {
+            padding-top: 0;
+            padding-bottom: 0
+        }
+
+        select {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 0.5rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5em 1.5em;
+            padding-right: 2.5rem;
+            print-color-adjust: exact
+        }
+
+        [multiple],
+        [size]:where(select:not([size="1"])) {
+            background-image: initial;
+            background-position: initial;
+            background-repeat: unset;
+            background-size: initial;
+            padding-right: 0.75rem;
+            print-color-adjust: unset
+        }
+
+        [type='checkbox'],
+        [type='radio'] {
+            -webkit-appearance: none;
+            appearance: none;
+            padding: 0;
+            print-color-adjust: exact;
+            display: inline-block;
+            vertical-align: middle;
+            background-origin: border-box;
+            -webkit-user-select: none;
+            user-select: none;
+            flex-shrink: 0;
+            height: 1rem;
+            width: 1rem;
+            color: #2563eb;
+            background-color: #fff;
+            border-color: #6b7280;
+            border-width: 1px;
+            --tw-shadow: 0 0 #0000
+        }
+
+        [type='checkbox'] {
+            border-radius: 0px
+        }
+
+        [type='radio'] {
+            border-radius: 100%
+        }
+
+        [type='checkbox']:focus,
+        [type='radio']:focus {
+            outline: 2px solid transparent;
+            outline-offset: 2px;
+            --tw-ring-inset: var(--tw-empty,
+                    /*!*/
+                    /*!*/
+                );
+            --tw-ring-offset-width: 2px;
+            --tw-ring-offset-color: #fff;
+            --tw-ring-color: #2563eb;
+            --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
+            --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);
+            box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow)
+        }
+
+        [type='checkbox']:checked,
+        [type='radio']:checked {
+            border-color: transparent;
+            background-color: currentColor;
+            background-size: 100% 100%;
+            background-position: center;
+            background-repeat: no-repeat
+        }
+
+        [type='checkbox']:checked {
+            background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z'/%3e%3c/svg%3e");
+        }
+
+        @media (forced-colors: active) {
+            [type='checkbox']:checked {
+                -webkit-appearance: auto;
+                appearance: auto
+            }
+        }
+
+        [type='radio']:checked {
+            background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3ccircle cx='8' cy='8' r='3'/%3e%3c/svg%3e");
+        }
+
+        @media (forced-colors: active) {
+            [type='radio']:checked {
+                -webkit-appearance: auto;
+                appearance: auto
+            }
+        }
+
+        [type='checkbox']:checked:hover,
+        [type='checkbox']:checked:focus,
+        [type='radio']:checked:hover,
+        [type='radio']:checked:focus {
+            border-color: transparent;
+            background-color: currentColor
+        }
+
+        [type='checkbox']:indeterminate {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 16 16'%3e%3cpath stroke='white' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M4 8h8'/%3e%3c/svg%3e");
+            border-color: transparent;
+            background-color: currentColor;
+            background-size: 100% 100%;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        @media (forced-colors: active) {
+            [type='checkbox']:indeterminate {
+                -webkit-appearance: auto;
+                appearance: auto
+            }
+        }
+
+        [type='checkbox']:indeterminate:hover,
+        [type='checkbox']:indeterminate:focus {
+            border-color: transparent;
+            background-color: currentColor
+        }
+
+        [type='file'] {
+            background: unset;
+            border-color: inherit;
+            border-width: 0;
+            border-radius: 0;
+            padding: 0;
+            font-size: unset;
+            line-height: inherit
+        }
+
+        [type='file']:focus {
+            outline: 1px solid ButtonText;
+            outline: 1px auto -webkit-focus-ring-color
+        }
+
+        .absolute {
+            position: absolute
+        }
+
+        .relative {
+            position: relative
+        }
+
+        .sticky {
+            position: sticky
+        }
+
+        .bottom-0 {
+            bottom: 0px
+        }
+
+        .top-0 {
+            top: 0px
+        }
+
+        .z-50 {
+            z-index: 50
+        }
+
+        .mx-auto {
+            margin-left: auto;
+            margin-right: auto
+        }
+
+        .mb-lg {
+            margin-bottom: 48px
+        }
+
+        .mb-md {
+            margin-bottom: 24px
+        }
+
+        .mb-xl {
+            margin-bottom: 80px
+        }
+
+        .mb-xs {
+            margin-bottom: 4px
+        }
+
+        .mt-lg {
+            margin-top: 48px
+        }
+
+        .block {
+            display: block
+        }
+
+        .flex {
+            display: flex
+        }
+
+        .grid {
+            display: grid
+        }
+
+        .hidden {
+            display: none
+        }
+
+        .aspect-square {
+            aspect-ratio: 1 / 1
+        }
+
+        .h-1 {
+            height: 0.25rem
+        }
+
+        .h-16 {
+            height: 4rem
+        }
+
+        .h-20 {
+            height: 5rem
+        }
+
+        .h-24 {
+            height: 6rem
+        }
+
+        .w-16 {
+            width: 4rem
+        }
+
+        .w-20 {
+            width: 5rem
+        }
+
+        .w-24 {
+            width: 6rem
+        }
+
+        .w-full {
+            width: 100%
+        }
+
+        .max-w-2xl {
+            max-width: 42rem
+        }
+
+        .max-w-\[900px\] {
+            max-width: 900px
+        }
+
+        .max-w-container-max {
+            max-width: 1280px
+        }
+
+        .cursor-pointer {
+            cursor: pointer
+        }
+
+        .grid-cols-1 {
+            grid-template-columns: repeat(1, minmax(0, 1fr))
+        }
+
+        .flex-col {
+            flex-direction: column
+        }
+
+        .flex-wrap {
+            flex-wrap: wrap
+        }
+
+        .items-center {
+            align-items: center
+        }
+
+        .justify-center {
+            justify-content: center
+        }
+
+        .justify-between {
+            justify-content: space-between
+        }
+
+        .gap-1 {
+            gap: 0.25rem
+        }
+
+        .gap-lg {
+            gap: 48px
+        }
+
+        .gap-md {
+            gap: 24px
+        }
+
+        .gap-sm {
+            gap: 12px
+        }
+
+        .gap-xs {
+            gap: 4px
+        }
+
+        .overflow-hidden {
+            overflow: hidden
+        }
+
+        .rounded-full {
+            border-radius: 9999px
+        }
+
+        .rounded-lg {
+            border-radius: 0.5rem
+        }
+
+        .rounded-xl {
+            border-radius: 0.75rem
+        }
+
+        .border {
+            border-width: 1px
+        }
+
+        .border-b {
+            border-bottom-width: 1px
+        }
+
+        .border-b-2 {
+            border-bottom-width: 2px
+        }
+
+        .border-on-tertiary-container\/40 {
+            border-color: rgb(136 172 180 / 0.4)
+        }
+
+        .border-outline-variant\/30 {
+            border-color: rgb(193 200 194 / 0.3)
+        }
+
+        .border-primary {
+            --tw-border-opacity: 1;
+            border-color: rgb(1 45 29 / var(--tw-border-opacity, 1))
+        }
+
+        .border-primary-container\/40 {
+            border-color: rgb(27 67 50 / 0.4)
+        }
+
+        .border-secondary-container\/40 {
+            border-color: rgb(103 186 253 / 0.4)
+        }
+
+        .bg-background {
+            --tw-bg-opacity: 1;
+            background-color: rgb(248 249 250 / var(--tw-bg-opacity, 1))
+        }
+
+        .bg-primary {
+            --tw-bg-opacity: 1;
+            background-color: rgb(1 45 29 / var(--tw-bg-opacity, 1))
+        }
+
+        .bg-primary-container\/10 {
+            background-color: rgb(27 67 50 / 0.1)
+        }
+
+        .bg-secondary-container\/10 {
+            background-color: rgb(103 186 253 / 0.1)
+        }
+
+        .bg-surface-container-high {
+            --tw-bg-opacity: 1;
+            background-color: rgb(231 232 233 / var(--tw-bg-opacity, 1))
+        }
+
+        .bg-surface-container-low {
+            --tw-bg-opacity: 1;
+            background-color: rgb(243 244 245 / var(--tw-bg-opacity, 1))
+        }
+
+        .bg-surface-container-lowest {
+            --tw-bg-opacity: 1;
+            background-color: rgb(255 255 255 / var(--tw-bg-opacity, 1))
+        }
+
+        .bg-surface-container-lowest\/80 {
+            background-color: rgb(255 255 255 / 0.8)
+        }
+
+        .bg-surface\/90 {
+            background-color: rgb(248 249 250 / 0.9)
+        }
+
+        .bg-tertiary-fixed-dim\/20 {
+            background-color: rgb(168 205 213 / 0.2)
+        }
+
+        .object-contain {
+            object-fit: contain
+        }
+
+        .p-md {
+            padding: 24px
+        }
+
+        .px-2 {
+            padding-left: 0.5rem;
+            padding-right: 0.5rem
+        }
+
+        .px-lg {
+            padding-left: 48px;
+            padding-right: 48px
+        }
+
+        .px-margin-mobile {
+            padding-left: 16px;
+            padding-right: 16px
+        }
+
+        .py-0\.5 {
+            padding-top: 0.125rem;
+            padding-bottom: 0.125rem
+        }
+
+        .py-lg {
+            padding-top: 48px;
+            padding-bottom: 48px
+        }
+
+        .py-sm {
+            padding-top: 12px;
+            padding-bottom: 12px
+        }
+
+        .py-xl {
+            padding-top: 80px;
+            padding-bottom: 80px
+        }
+
+        .pb-1 {
+            padding-bottom: 0.25rem
+        }
+
+        .text-center {
+            text-align: center
+        }
+
+        .font-body-lg {
+            font-family: Plus Jakarta Sans
+        }
+
+        .font-body-md {
+            font-family: Plus Jakarta Sans
+        }
+
+        .font-display-lg {
+            font-family: Plus Jakarta Sans
+        }
+
+        .font-headline-lg {
+            font-family: Plus Jakarta Sans
+        }
+
+        .font-headline-md {
+            font-family: Plus Jakarta Sans
+        }
+
+        .font-label-md {
+            font-family: Work Sans
+        }
+
+        .font-label-sm {
+            font-family: Work Sans
+        }
+
+        .\!text-\[12px\] {
+            font-size: 12px !important
+        }
+
+        .text-\[10px\] {
+            font-size: 10px
+        }
+
+        .text-body-lg {
+            font-size: 18px;
+            line-height: 1.6;
+            font-weight: 400
+        }
+
+        .text-body-md {
+            font-size: 16px;
+            line-height: 1.6;
+            font-weight: 400
+        }
+
+        .text-display-lg-mobile {
+            font-size: 32px;
+            line-height: 1.2;
+            font-weight: 700
+        }
+
+        .text-headline-lg {
+            font-size: 32px;
+            line-height: 1.3;
+            font-weight: 600
+        }
+
+        .text-headline-md {
+            font-size: 24px;
+            line-height: 1.4;
+            font-weight: 600
+        }
+
+        .text-label-md {
+            font-size: 14px;
+            line-height: 1.2;
+            letter-spacing: 0.01em;
+            font-weight: 500
+        }
+
+        .text-label-sm {
+            font-size: 12px;
+            line-height: 1.2;
+            font-weight: 600
+        }
+
+        .font-bold {
+            font-weight: 700
+        }
+
+        .font-medium {
+            font-weight: 500
+        }
+
+        .uppercase {
+            text-transform: uppercase
+        }
+
+        .leading-tight {
+            line-height: 1.25
+        }
+
+        .tracking-\[0\.2em\] {
+            letter-spacing: 0.2em
+        }
+
+        .tracking-tight {
+            letter-spacing: -0.025em
+        }
+
+        .tracking-wider {
+            letter-spacing: 0.05em
+        }
+
+        .text-on-background {
+            --tw-text-opacity: 1;
+            color: rgb(25 28 29 / var(--tw-text-opacity, 1))
+        }
+
+        .text-on-primary {
+            --tw-text-opacity: 1;
+            color: rgb(255 255 255 / var(--tw-text-opacity, 1))
+        }
+
+        .text-on-primary-container {
+            --tw-text-opacity: 1;
+            color: rgb(134 175 153 / var(--tw-text-opacity, 1))
+        }
+
+        .text-on-secondary-container {
+            --tw-text-opacity: 1;
+            color: rgb(0 73 114 / var(--tw-text-opacity, 1))
+        }
+
+        .text-on-surface-variant {
+            --tw-text-opacity: 1;
+            color: rgb(65 72 68 / var(--tw-text-opacity, 1))
+        }
+
+        .text-on-tertiary-container {
+            --tw-text-opacity: 1;
+            color: rgb(136 172 180 / var(--tw-text-opacity, 1))
+        }
+
+        .text-on-tertiary-fixed-variant {
+            --tw-text-opacity: 1;
+            color: rgb(40 76 83 / var(--tw-text-opacity, 1))
+        }
+
+        .text-outline {
+            --tw-text-opacity: 1;
+            color: rgb(113 121 115 / var(--tw-text-opacity, 1))
+        }
+
+        .text-primary {
+            --tw-text-opacity: 1;
+            color: rgb(1 45 29 / var(--tw-text-opacity, 1))
+        }
+
+        .text-primary-container {
+            --tw-text-opacity: 1;
+            color: rgb(27 67 50 / var(--tw-text-opacity, 1))
+        }
+
+        .text-secondary {
+            --tw-text-opacity: 1;
+            color: rgb(0 99 153 / var(--tw-text-opacity, 1))
+        }
+
+        .antialiased {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale
+        }
+
+        .opacity-80 {
+            opacity: 0.8
+        }
+
+        .shadow-sm {
+            --tw-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --tw-shadow-colored: 0 1px 2px 0 var(--tw-shadow-color);
+            box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)
+        }
+
+        .backdrop-blur-md {
+            --tw-backdrop-blur: blur(12px);
+            -webkit-backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);
+            backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)
+        }
+
+        .backdrop-blur-sm {
+            --tw-backdrop-blur: blur(4px);
+            -webkit-backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);
+            backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)
+        }
+
+        .transition-all {
+            transition-property: all;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+            transition-duration: 150ms
+        }
+
+        .transition-colors {
+            transition-property: color, background-color, border-color, fill, stroke, -webkit-text-decoration-color;
+            transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+            transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, -webkit-text-decoration-color;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+            transition-duration: 150ms
+        }
+
+        .duration-100 {
+            transition-duration: 100ms
+        }
+
+        .duration-200 {
+            transition-duration: 200ms
+        }
+
+        .ease-in-out {
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1)
+        }
+
+        .hover\:text-primary:hover {
+            --tw-text-opacity: 1;
+            color: rgb(1 45 29 / var(--tw-text-opacity, 1))
+        }
+
+        .hover\:opacity-100:hover {
+            opacity: 1
+        }
+
+        .hover\:opacity-90:hover {
+            opacity: 0.9
+        }
+
+        .active\:scale-95:active {
+            --tw-scale-x: .95;
+            --tw-scale-y: .95;
+            transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))
+        }
+
+        .dark\:border-primary-fixed-dim:is(.dark *) {
+            --tw-border-opacity: 1;
+            border-color: rgb(165 208 185 / var(--tw-border-opacity, 1))
+        }
+
+        .dark\:bg-surface-container-lowest:is(.dark *) {
+            --tw-bg-opacity: 1;
+            background-color: rgb(255 255 255 / var(--tw-bg-opacity, 1))
+        }
+
+        .dark\:bg-surface-dim\/90:is(.dark *) {
+            background-color: rgb(217 218 219 / 0.9)
+        }
+
+        .dark\:text-outline-variant:is(.dark *) {
+            --tw-text-opacity: 1;
+            color: rgb(193 200 194 / var(--tw-text-opacity, 1))
+        }
+
+        .dark\:text-primary-fixed-dim:is(.dark *) {
+            --tw-text-opacity: 1;
+            color: rgb(165 208 185 / var(--tw-text-opacity, 1))
+        }
+
+        .dark\:text-surface-variant:is(.dark *) {
+            --tw-text-opacity: 1;
+            color: rgb(225 227 228 / var(--tw-text-opacity, 1))
+        }
+
+        .dark\:hover\:text-primary-fixed-dim:hover:is(.dark *) {
+            --tw-text-opacity: 1;
+            color: rgb(165 208 185 / var(--tw-text-opacity, 1))
+        }
+
+        @media (min-width: 640px) {
+            .sm\:grid-cols-2 {
+                grid-template-columns: repeat(2, minmax(0, 1fr))
+            }
+        }
+
+        @media (min-width: 768px) {
+            .md\:flex {
+                display: flex
+            }
+
+            .md\:flex-row {
+                flex-direction: row
+            }
+
+            .md\:items-start {
+                align-items: flex-start
+            }
+
+            .md\:px-gutter {
+                padding-left: 24px;
+                padding-right: 24px
+            }
+
+            .md\:text-display-lg {
+                font-size: 48px;
+                line-height: 1.1;
+                letter-spacing: -0.02em;
+                font-weight: 700
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .lg\:grid-cols-4 {
+                grid-template-columns: repeat(4, minmax(0, 1fr))
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-background text-on-background font-body-md antialiased" data-mode="connect">
+    <!-- TopAppBar -->
+    <header
+        class="bg-surface/90 dark:bg-surface-dim/90 backdrop-blur-md docked full-width top-0 sticky border-b border-outline-variant/30 z-50">
+        <div class="flex justify-between items-center max-w-container-max mx-auto px-margin-mobile md:px-gutter h-20">
+            <div class="font-display-lg text-headline-md tracking-tight text-primary dark:text-primary-fixed-dim">World
+                Unfold</div>
+            <nav class="hidden md:flex items-center gap-lg">
+                <a class="text-on-surface-variant dark:text-surface-variant font-medium hover:text-primary dark:hover:text-primary-fixed-dim transition-colors duration-200 font-label-md text-label-md"
+                    href="#"><br /></a>
+                <a class="text-on-surface-variant dark:text-surface-variant font-medium hover:text-primary dark:hover:text-primary-fixed-dim transition-colors duration-200 font-label-md text-label-md"
+                    href="#"><br /></a>
+                <a class="text-primary dark:text-primary-fixed-dim font-bold border-b-2 border-primary dark:border-primary-fixed-dim pb-1 font-label-md text-label-md"
+                    href="#">About</a>
+                <a class="text-on-surface-variant dark:text-surface-variant font-medium hover:text-primary dark:hover:text-primary-fixed-dim transition-colors duration-200 font-label-md text-label-md"
+                    href="#"><br /></a>
+            </nav>
+            <button
+                class="bg-primary text-on-primary px-lg py-sm rounded-full font-label-md text-label-md hover:opacity-90 active:scale-95 duration-100 ease-in-out">
+                Start Exploring
+            </button>
+        </div>
+    </header>
+    <main>
+        <!-- Hero Section -->
+        <!-- Brand Ethos / Stats Grid -->
+        <!-- Team Section -->
+        <section class="bg-background py-xl">
+            <div class="max-w-[900px] mx-auto px-margin-mobile md:px-gutter text-center">
+                <span
+                    class="block font-label-md text-label-md text-primary font-bold uppercase tracking-[0.2em] mb-md">Our
+                    Mission</span>
+                <h1
+                    class="font-display-lg text-display-lg-mobile md:text-display-lg text-on-background mb-lg leading-tight">
+                    Children today are drowning in mindless content. We built World Unfold to change that — <span
+                        class="text-primary">guiding young minds through the wonders of Earth's lands, oceans, and
+                        skies.</span>
+                </h1>
+                <p class="font-body-lg text-body-lg text-outline max-w-2xl mx-auto">
+                    Because we believe curiosity deserves better than garbage. Real knowledge, beautifully delivered.
+                    Our platform is designed to inspire awe and respect for the natural world through deep focus and
+                    academic exploration.
+                </p>
+            </div>
+        </section>
+        <section class="bg-surface-container-low py-xl">
+            <div class="max-w-container-max mx-auto px-margin-mobile md:px-gutter">
+                <div class="text-center mb-xl">
+                    <h2 class="font-headline-lg text-headline-lg text-primary mb-md">Meet the Explorers</h2>
+                    <div class="h-1 w-20 bg-primary mx-auto rounded-full"></div>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-md">
+                    <!-- Alan A S -->
+                    <div
+                        class="group bg-surface-container-lowest rounded-xl overflow-hidden border border-outline-variant/30 soft-depth flex flex-col">
+                        <div
+                            class="aspect-square w-24 h-24 mx-auto mt-lg mb-md relative rounded-full bg-surface-container-high flex items-center justify-center overflow-hidden">
+                            <span aria-hidden="true"
+                                class="material-symbols-outlined text-outline w-16 h-16 flex items-center justify-center !text-[64px]">face_6</span>
+                            <div class="absolute bottom-0"><span
+                                    class="flex items-center gap-1 border border-outline-variant/30 text-outline px-2 py-0.5 rounded-lg text-[10px] font-bold uppercase bg-surface-container-lowest/80 backdrop-blur-sm shadow-sm"><span
+                                        class="material-symbols-outlined !text-[12px]">hub</span>Platform</span></div>
+                        </div>
+                        <div class="p-md flex flex-col items-center text-center">
+                            <h4 class="font-headline-md text-headline-md text-primary mb-xs"
+                                style="font-family: 'Manrope', sans-serif;">Alan A S</h4>
+                            <p class="font-label-md text-label-md text-outline mb-md uppercase tracking-wider">Platform
+                                &amp; Systems Lead</p>
+                            <div class="flex gap-sm">
+                                <span
+                                    class="material-symbols-outlined text-outline hover:text-primary cursor-pointer transition-colors">hub</span>
+                                <span
+                                    class="material-symbols-outlined text-outline hover:text-primary cursor-pointer transition-colors">code</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Algia Joy -->
+                    <div
+                        class="group bg-surface-container-lowest rounded-xl overflow-hidden border border-outline-variant/30 soft-depth flex flex-col">
+                        <div
+                            class="aspect-square w-24 h-24 mx-auto mt-lg mb-md relative rounded-full bg-primary-container/10 flex items-center justify-center overflow-hidden">
+                            <span aria-hidden="true"
+                                class="material-symbols-outlined text-primary-container w-16 h-16 flex items-center justify-center !text-[64px]">face_3</span>
+                            <div class="absolute bottom-0"><span
+                                    class="flex items-center gap-1 border border-primary-container/40 text-on-primary-container px-2 py-0.5 rounded-lg text-[10px] font-bold uppercase bg-surface-container-lowest/80 backdrop-blur-sm shadow-sm"><span
+                                        class="material-symbols-outlined !text-[12px]">forest</span>Land</span></div>
+                        </div>
+                        <div class="p-md flex flex-col items-center text-center">
+                            <h4 class="font-headline-md text-headline-md text-primary mb-xs"
+                                style="font-family: 'Manrope', sans-serif;">Algia Joy</h4>
+                            <p
+                                class="font-label-md text-label-md text-on-primary-container mb-md uppercase tracking-wider">
+                                Land Module Lead</p>
+                            <div class="flex gap-sm">
+                                <span
+                                    class="material-symbols-outlined text-primary-container hover:text-primary cursor-pointer transition-colors">forest</span>
+                                <span
+                                    class="material-symbols-outlined text-primary-container hover:text-primary cursor-pointer transition-colors">magnification_small</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Angel Maria Joy -->
+                    <div
+                        class="group bg-surface-container-lowest rounded-xl overflow-hidden border border-outline-variant/30 soft-depth flex flex-col">
+                        <div
+                            class="aspect-square w-24 h-24 mx-auto mt-lg mb-md relative rounded-full bg-secondary-container/10 flex items-center justify-center overflow-hidden">
+                            <span aria-hidden="true"
+                                class="material-symbols-outlined text-secondary w-16 h-16 flex items-center justify-center !text-[64px]">face_3</span>
+                            <div class="absolute bottom-0"><span
+                                    class="flex items-center gap-1 border border-secondary-container/40 text-on-secondary-container px-2 py-0.5 rounded-lg text-[10px] font-bold uppercase bg-surface-container-lowest/80 backdrop-blur-sm shadow-sm"><span
+                                        class="material-symbols-outlined !text-[12px]">water_drop</span>Ocean</span>
+                            </div>
+                        </div>
+                        <div class="p-md flex flex-col items-center text-center">
+                            <h4 class="font-headline-md text-headline-md text-primary mb-xs"
+                                style="font-family: 'Manrope', sans-serif;">Angel Maria Joy</h4>
+                            <p
+                                class="font-label-md text-label-md text-on-secondary-container mb-md uppercase tracking-wider">
+                                Ocean Module Lead</p>
+                            <div class="flex gap-sm">
+                                <span
+                                    class="material-symbols-outlined text-secondary hover:text-primary cursor-pointer transition-colors">water_drop</span>
+                                <span
+                                    class="material-symbols-outlined text-secondary hover:text-primary cursor-pointer transition-colors">sailing</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Aneena Josan -->
+                    <div
+                        class="group bg-surface-container-lowest rounded-xl overflow-hidden border border-outline-variant/30 soft-depth flex flex-col">
+                        <div
+                            class="aspect-square w-24 h-24 mx-auto mt-lg mb-md relative rounded-full bg-tertiary-fixed-dim/20 flex items-center justify-center overflow-hidden">
+                            <span aria-hidden="true"
+                                class="material-symbols-outlined text-on-tertiary-container w-16 h-16 flex items-center justify-center !text-[64px]">face_3</span>
+                            <div class="absolute bottom-0"><span
+                                    class="flex items-center gap-1 border border-on-tertiary-container/40 text-on-tertiary-fixed-variant px-2 py-0.5 rounded-lg text-[10px] font-bold uppercase bg-surface-container-lowest/80 backdrop-blur-sm shadow-sm"><span
+                                        class="material-symbols-outlined !text-[12px]">air</span>Sky</span></div>
+                        </div>
+                        <div class="p-md flex flex-col items-center text-center">
+                            <h4 class="font-headline-md text-headline-md text-primary mb-xs"
+                                style="font-family: 'Manrope', sans-serif;">Aneena Josan</h4>
+                            <p
+                                class="font-label-md text-label-md text-on-tertiary-fixed-variant mb-md uppercase tracking-wider">
+                                Sky Module Lead</p>
+                            <div class="flex gap-sm">
+                                <span
+                                    class="material-symbols-outlined text-on-tertiary-container hover:text-primary cursor-pointer transition-colors">air</span>
+                                <span
+                                    class="material-symbols-outlined text-on-tertiary-container hover:text-primary cursor-pointer transition-colors">rocket_launch</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Values Section -->
+    </main>
+    <!-- Footer -->
+    <footer
+        class="w-full py-lg px-margin-mobile md:px-gutter max-w-container-max mx-auto flex flex-col md:flex-row justify-between items-center gap-md bg-surface-container-low dark:bg-surface-container-lowest full-width bottom-0">
+        <div class="flex flex-col items-center md:items-start gap-xs">
+            <div class="font-display-lg text-headline-md text-primary dark:text-primary-fixed-dim">World Unfold</div>
+            <p class="font-body-md text-body-md text-outline dark:text-outline-variant">© 2026 World Unfold. For the
+                explorers of tomorrow.</p>
+        </div>
+        <div class="flex flex-wrap justify-center gap-lg">
+            <a class="text-outline dark:text-outline-variant font-label-sm text-label-sm hover:text-primary dark:hover:text-primary-fixed-dim transition-all opacity-80 hover:opacity-100"
+                href="#">Privacy Policy</a>
+            <a class="text-outline dark:text-outline-variant font-label-sm text-label-sm hover:text-primary dark:hover:text-primary-fixed-dim transition-all opacity-80 hover:opacity-100"
+                href="#">Terms of Service</a>
+            <a class="text-outline dark:text-outline-variant font-label-sm text-label-sm hover:text-primary dark:hover:text-primary-fixed-dim transition-all opacity-80 hover:opacity-100"
+                href="#">Educational Standards</a>
+            <a class="text-outline dark:text-outline-variant font-label-sm text-label-sm hover:text-primary dark:hover:text-primary-fixed-dim transition-all opacity-80 hover:opacity-100"
+                href="#">Contact</a>
+        </div>
+    </footer>
+</body>
+
+</html>

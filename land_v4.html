@@ -3068,6 +3068,54 @@ const DB = [
     {url:"", wiki:"St. Peter's Basilica", cap:"St. Peter's Basilica"},
     {url:"", wiki:"Sistine Chapel", cap:"Sistine Chapel Ceiling"},
     {url:"", wiki:"St. Peter's Square", cap:"St. Peter's Square"}
+  ]},
+{ iso:174, fc:"km", name:"Comoros", flag:"🇰🇲", capital:"Moroni", region:"Africa", lat:-11.64, lon:43.33,
+  pop:"836k", area:"1,861 km²", lang:"Comorian, Arabic, French", currency:"Franc (KMF)",
+  culture:"A volcanic archipelago off the east coast of Africa known as the 'Perfume Islands' for its fragrant plant life.",
+  trad:"The Grand Mariage, an elaborate and incredibly expensive traditional wedding ceremony that lasts for days.",
+  fact:"Comoros is the largest producer of ylang-ylang in the world, an essential oil widely used in luxury perfumes.",
+  dyk:"The extremely rare coelacanth, a prehistoric fish once thought to be completely extinct, can be found deep in its waters.",
+  travel:"🌋 Hike up the active Mount Karthala volcano on Grande Comore island.",
+  photos:[
+    {url:"", wiki:"Mount Karthala", cap:"Mount Karthala"},
+    {url:"", wiki:"Moroni, Comoros", cap:"Moroni"},
+    {url:"", wiki:"Mohéli", cap:"Mohéli Island"}
+  ]},
+{ iso:690, fc:"sc", name:"Seychelles", flag:"🇸🇨", capital:"Victoria", region:"Africa", lat:-4.67, lon:55.49,
+  pop:"100k", area:"459 km²", lang:"Seychellois Creole, English, French", currency:"Rupee (SCR)",
+  culture:"An unimaginably beautiful archipelago of 115 islands in the Indian Ocean, characterized by giant tortoises and pristine beaches.",
+  trad:"Dancing the Moutya around a bonfire, eating fresh grilled fish.",
+  fact:"It is the smallest African country by population.",
+  dyk:"The giant Aldabra tortoise, which can live for over 150 years, is native to the Seychelles.",
+  travel:"🐢 Visit the incredibly remote Aldabra Atoll to see thousands of wild giant tortoises.",
+  photos:[
+    {url:"", wiki:"Aldabra", cap:"Aldabra Atoll"},
+    {url:"", wiki:"La Digue", cap:"Beaches of La Digue"},
+    {url:"", wiki:"Vallée de Mai", cap:"Vallée de Mai"}
+  ]},
+{ iso:275, fc:"ps", name:"Palestine", flag:"🇵🇸", capital:"Ramallah / Jerusalem", region:"Asia", lat:31.95, lon:35.23,
+  pop:"5.4M", area:"6,020 km²", lang:"Arabic", currency:"Shekel (ILS), Dinar (JOD)",
+  culture:"A region of profound historical and religious significance, resiliently maintaining deep-rooted Levantine traditions.",
+  trad:"Dabke dancing, intricate cross-stitch embroidery (Tatreez), harvesting ancient olive trees.",
+  fact:"Jericho, located in the West Bank, is considered by many archaeologists to be one of the oldest continuously inhabited cities in the world.",
+  dyk:"The Dead Sea, which borders Palestine, is the lowest elevation point on land on Earth.",
+  travel:"🕌 Walk the ancient, deeply spiritual streets of the Old City of Jerusalem.",
+  photos:[
+    {url:"", wiki:"Jericho", cap:"Ancient Jericho"},
+    {url:"", wiki:"Bethlehem", cap:"Church of the Nativity"},
+    {url:"", wiki:"Al-Aqsa Mosque", cap:"Al-Aqsa Mosque"}
+  ]},
+{ iso:383, fc:"xk", name:"Kosovo", flag:"🇽🇰", capital:"Pristina", region:"Europe", lat:42.66, lon:21.16,
+  pop:"1.8M", area:"10,887 km²", lang:"Albanian, Serbian", currency:"Euro (€)",
+  culture:"Europe's youngest country, defined by a very young population, incredible hospitality, and a mix of Ottoman and Balkan history.",
+  trad:"Evening strolls (Korzo) through the city center, drinking extremely strong macchiatos.",
+  fact:"It is the second youngest country in the world, having declared independence in 2008.",
+  dyk:"Pristina's unique National Library is famously covered completely in bizarre metal netting and 99 white domes.",
+  travel:"🏔️ Hike through the spectacular, rugged peaks of the Accursed Mountains.",
+  photos:[
+    {url:"", wiki:"Accursed Mountains", cap:"Accursed Mountains"},
+    {url:"", wiki:"Pristina", cap:"Pristina City"},
+    {url:"", wiki:"Visoki Dečani", cap:"Visoki Dečani Monastery"}
   ]}
 ];
 
@@ -3080,41 +3128,59 @@ DB.forEach(c => { isoMap[String(c.iso)] = c; });
 // World-atlas TopoJSON uses UN M49 numeric codes (= ISO 3166-1 numeric for most countries).
 // Add known alternate IDs so every DB country lights up correctly:
 const altIds = {
-  // Australia territories sometimes appear under 10 (Antarctica) or 36; 36 is correct ✓
-  // France: TopoJSON may use 250 (metro) — already in DB ✓
-  // Some builds encode Kosovo=383, Western Sahara=732, etc. — not in DB so ignored.
-  // Add extras only when TopoJSON ID differs from ISO numeric:
-  "826": "826"  // UK placeholder (already correct)
+  // Mapping missing/unrecognized IDs to sovereign states to fill "dark spots"
+  "-099": "706", // Somaliland -> Somalia
+  "-99": "706",  // Somaliland (alternative) -> Somalia
+  "732": "504",  // Western Sahara -> Morocco
+  "254": "250",  // French Guiana -> France
+  "238": "826",  // Falkland Islands -> UK
+  "540": "250",  // New Caledonia -> France
+  "630": "840",  // Puerto Rico -> US
+  "744": "578",  // Svalbard -> Norway
+  "826": "826"   // UK placeholder
 };
 
 function getCountry(id){
-  return isoMap[String(id)] || null;
+  let trueId = altIds[String(id)] || String(id);
+  return isoMap[trueId] || null;
 }
 
 // Name-based fallback map for TopoJSON features that include a name property
 const nameMap = {};
 DB.forEach(c => { nameMap[c.name.toLowerCase()] = c; });
-// Common TopoJSON name variants
+// Common TopoJSON name variants & dark spots mappings
 const nameAliases = {
-  "united states of america": "United States",
-  "usa": "United States",
-  "uk": "United Kingdom",
-  "great britain": "United Kingdom",
-  "south korea": "South Korea",
-  "democratic republic of the congo": null,
-  "republic of the congo": null,
-  "côte d'ivoire": null,
-  "new zealand": "New Zealand",
-  "saudi arabia": "Saudi Arabia",
-  "south africa": "South Africa",
-  "united arab emirates": "UAE"
+  "united states of america": "united states",
+  "usa": "united states",
+  "uk": "united kingdom",
+  "great britain": "united kingdom",
+  "south korea": "south korea",
+  "democratic republic of the congo": "democratic republic of the congo",
+  "republic of the congo": "republic of the congo",
+  "côte d'ivoire": "côte d'ivoire",
+  "somaliland": "somalia",
+  "western sahara": "morocco",
+  "french guiana": "france",
+  "new caledonia": "france",
+  "falkland islands": "united kingdom",
+  "puerto rico": "united states",
+  "svalbard and jan mayen": "norway",
+  "northern cyprus": "cyprus",
+  "macao": "china",
+  "macau": "china",
+  "hong kong": "china",
+  "french southern and antarctic lands": "france",
+  "saudi arabia": "saudi arabia",
+  "united arab emirates": "united arab emirates",
+  "uae": "united arab emirates"
 };
 Object.entries(nameAliases).forEach(([alias, canonical]) => {
   if (canonical) nameMap[alias] = nameMap[canonical.toLowerCase()] || null;
 });
 
 function getCountryByFeature(d) {
-  let c = isoMap[String(d.id)];
+  let trueId = altIds[String(d.id)] || String(d.id);
+  let c = isoMap[trueId];
   if (!c && d.properties && d.properties.name) {
     c = nameMap[d.properties.name.toLowerCase()] || null;
   }

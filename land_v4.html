@@ -43,47 +43,73 @@
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{font-family:'Outfit',sans-serif;overflow:hidden;background:var(--bg);color:var(--text)}
 /* ── MAP ── */
-.map-wrap{position:fixed;inset:0;background:radial-gradient(ellipse 120% 100% at 50% 70%,var(--ocean2) 0%,var(--ocean) 40%,var(--bg) 100%);z-index:1;cursor:grab;overflow:hidden}
+@keyframes oceanBreathe {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+.map-wrap {
+  position: fixed; inset: 0;
+  background: linear-gradient(-45deg, #0f172a, #1e3a8a, #0284c7, #3b82f6);
+  background-size: 300% 300%;
+  animation: oceanBreathe 15s ease infinite;
+  z-index: 1; cursor: grab; overflow: hidden;
+}
 .map-wrap:active{cursor:grabbing}
+.map-wrap::after {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.5) 100%);
+  pointer-events: none;
+}
 svg{width:100%;height:100%}
 .country{stroke:rgba(255,255,255,0.6);stroke-width:0.5;stroke-linejoin:round;cursor:pointer;transition:filter .18s,stroke .18s,stroke-width .18s}
 .country.lit{stroke:#ffffff;stroke-width:1.2}
 .country.lit:hover{stroke:var(--gold2);stroke-width:2.2;filter:brightness(1.1) drop-shadow(0 0 9px rgba(0,0,0,0.15))}
 .cap-dot{fill:var(--gold2);stroke:#fff;stroke-width:1;cursor:pointer;opacity:.9;r:4}
 .ctry-label{font-family:'Outfit',sans-serif;font-size:6px;font-weight:700;fill:var(--text);pointer-events:none;opacity:0.4;text-shadow:0 1px 3px rgba(0,0,0,.9), 0 0 5px #000}
-/* ── HEADER ── */
-.header{position:absolute;top:0;left:0;right:0;padding:12px 22px;background:linear-gradient(180deg,var(--glass) 0%,transparent 100%);backdrop-filter:blur(8px);z-index:20;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border2)}
-.logo{font-family:'Cormorant Garamond',serif;font-size:1.22rem;font-weight:700;color:var(--gold2);letter-spacing:3px;display:flex;align-items:center;gap:8px}
-.logo-dot{width:8px;height:8px;border-radius:50%;background:var(--gold2);box-shadow:0 0 8px var(--gold)}
-.header-btns{display:flex;gap:8px}
-.hbtn{border:1px solid var(--border);border-radius:30px;padding:7px 18px;font-family:'Outfit',sans-serif;font-size:.76rem;font-weight:600;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:7px;letter-spacing:.4px}
-.hbtn-game{background:rgba(124,58,237,.12);color:var(--violet);border-color:rgba(124,58,237,.3)}
-.hbtn-game:hover{background:var(--violet);color:#fff;border-color:var(--violet);transform:translateY(-1px);box-shadow:0 6px 18px rgba(124,58,237,.3)}
-.hbtn-info{background:rgba(255,152,0,.15);color:var(--gold2);border-color:var(--border)}
-.hbtn-info:hover{background:var(--gold2);color:#fff;border-color:var(--gold2)}
+
+/* ── HEADER & STATS ── */
+.header{position:absolute;top:20px;left:50%;transform:translateX(-50%);padding:10px 14px;background:rgba(15,23,42,0.7);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);z-index:20;display:flex;align-items:center;justify-content:space-between;border:1px solid rgba(255,255,255,0.1);border-radius:50px;box-shadow:0 20px 40px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1);gap:24px;width:95%;max-width:1000px}
+.header-left {display:flex;align-items:center;gap:12px;padding-left:10px;}
+.logo{font-family:'Outfit',sans-serif;font-size:1.4rem;font-weight:800;color:#fff;letter-spacing:1px;display:flex;align-items:center;gap:8px;text-shadow:0 2px 10px rgba(0,0,0,0.5)}
+.logo-dot{width:10px;height:10px;border-radius:50%;background:var(--gold2);box-shadow:0 0 10px var(--gold)}
+.header-center {flex:1;display:flex;justify-content:center;}
+.stats-bar{background:rgba(0,0,0,0.3);border-radius:30px;padding:6px 16px;display:flex;align-items:center;gap:12px;border:1px solid rgba(255,255,255,0.05);min-width:250px;box-shadow:inset 0 2px 10px rgba(0,0,0,0.2)}
+.stats-info{font-size:.85rem;color:var(--text);font-weight:700;white-space:nowrap;display:flex;align-items:center;gap:6px;}
+.stats-info i{color:var(--gold2);}
+.stats-progress{flex:1;height:8px;background:rgba(255,255,255,0.1);border-radius:10px;overflow:hidden;position:relative;}
+.stats-fill{height:100%;background:linear-gradient(90deg, #10b981, #34d399);border-radius:10px;transition:width 0.5s ease-out;box-shadow:0 0 10px rgba(16,185,129,0.5);}
+
+.header-right{display:flex;gap:10px;}
+.hbtn{border:none;border-radius:30px;padding:10px 24px;font-family:'Outfit',sans-serif;font-size:.85rem;font-weight:800;cursor:pointer;transition:all .3s;display:flex;align-items:center;gap:8px;letter-spacing:.5px;}
+.hbtn-game{background:linear-gradient(135deg, #ec4899, #8b5cf6);color:#fff;box-shadow:0 4px 15px rgba(236,72,153,0.4);position:relative;overflow:hidden;}
+.hbtn-game:hover{transform:translateY(-2px) scale(1.02);box-shadow:0 8px 25px rgba(236,72,153,0.6);}
+.hbtn-info{background:rgba(255,255,255,0.1);color:#fff;border:1px solid rgba(255,255,255,0.1);backdrop-filter:blur(10px);}
+.hbtn-info:hover{background:rgba(255,255,255,0.2);transform:translateY(-2px);}
+
 /* ── SEARCH ── */
-.search-wrap{position:absolute;top:68px;left:22px;z-index:20}
-.search-box{background:var(--glass);backdrop-filter:blur(14px);border:1px solid var(--border);border-radius:40px;padding:9px 18px 9px 40px;width:232px;color:var(--text);font-family:'Outfit',sans-serif;font-size:.82rem;transition:border .2s;box-shadow:0 4px 12px rgba(0,0,0,0.05)}
+.search-wrap{position:absolute;top:90px;left:50%;transform:translateX(-50%);z-index:20;width:95%;max-width:400px;}
+.search-box{background:rgba(15,23,42,0.7);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,0.1);border-radius:40px;padding:12px 20px 12px 45px;width:100%;color:var(--text);font-family:'Outfit',sans-serif;font-size:.9rem;transition:all .3s;box-shadow:0 10px 30px rgba(0,0,0,0.2);font-weight:500}
 .search-box::placeholder{color:var(--text3)}
-.search-box:focus{outline:none;border-color:var(--gold)}
-.search-ico{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--gold-glow);font-size:.8rem;pointer-events:none;color:rgba(255,152,0,.7)}
+.search-box:focus{outline:none;border-color:var(--gold);box-shadow:0 10px 30px rgba(0,0,0,0.4), 0 0 15px rgba(201,168,76,0.3);background:rgba(15,23,42,0.85);}
+.search-ico{position:absolute;left:18px;top:50%;transform:translateY(-50%);color:var(--gold2);font-size:1rem;pointer-events:none;}
+
 /* ── LEGEND ── */
-.legend{position:absolute;top:68px;right:22px;z-index:20;background:var(--glass);backdrop-filter:blur(14px);padding:13px 17px;border-radius:18px;border:1px solid var(--border);box-shadow:0 4px 12px rgba(0,0,0,0.05)}
-.legend-t{font-size:.57rem;text-transform:uppercase;letter-spacing:2.5px;color:var(--gold2);margin-bottom:9px;font-weight:800}
-.legend-row{display:flex;align-items:center;gap:7px;margin-bottom:5px;font-size:.71rem;color:var(--text2);font-weight:600}
-.leg-sw{width:12px;height:12px;border-radius:4px;flex-shrink:0}
+.legend{position:absolute;top:100px;right:22px;z-index:20;background:rgba(15,23,42,0.7);backdrop-filter:blur(14px);padding:15px 20px;border-radius:24px;border:1px solid rgba(255,255,255,0.1);box-shadow:0 10px 30px rgba(0,0,0,0.2)}
+.legend-t{font-size:.6rem;text-transform:uppercase;letter-spacing:2.5px;color:var(--gold2);margin-bottom:12px;font-weight:800}
+.legend-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:.75rem;color:var(--text);font-weight:600}
+.leg-sw{width:14px;height:14px;border-radius:4px;flex-shrink:0}
+
 /* ── FILTERS ── */
-.filters{position:absolute;bottom:88px;left:22px;z-index:20;display:flex;gap:5px;flex-wrap:wrap;background:var(--glass);backdrop-filter:blur(14px);padding:8px 14px;border-radius:40px;border:1px solid var(--border);max-width:94%;box-shadow:0 4px 12px rgba(0,0,0,0.05)}
-.fbtn{background:transparent;border:none;padding:5px 14px;border-radius:30px;color:var(--text2);font-family:'Outfit',sans-serif;font-size:.72rem;font-weight:700;cursor:pointer;transition:all .2s}
-.fbtn:hover{color:var(--text);background:rgba(0,0,0,.04)}
-.fbtn.on{background:var(--gold);color:#fff}
+.filters{position:absolute;bottom:88px;left:50%;transform:translateX(-50%);z-index:20;display:flex;gap:8px;flex-wrap:wrap;justify-content:center;background:rgba(15,23,42,0.7);backdrop-filter:blur(14px);padding:10px 16px;border-radius:40px;border:1px solid rgba(255,255,255,0.1);max-width:94%;box-shadow:0 10px 30px rgba(0,0,0,0.2)}
+.fbtn{background:transparent;border:none;padding:6px 16px;border-radius:30px;color:rgba(255,255,255,0.6);font-family:'Outfit',sans-serif;font-size:.75rem;font-weight:700;cursor:pointer;transition:all .2s}
+.fbtn:hover{color:#fff;background:rgba(255,255,255,0.1)}
+.fbtn.on{background:var(--gold);color:#fff;box-shadow:0 4px 15px rgba(201,168,76,0.4)}
+
 /* ── CONTROLS ── */
-.ctrl-bar{position:absolute;bottom:24px;left:50%;transform:translateX(-50%);z-index:20;display:flex;gap:7px;background:var(--glass);backdrop-filter:blur(14px);padding:7px 18px;border-radius:50px;border:1px solid var(--border);box-shadow:0 4px 12px rgba(0,0,0,0.05)}
-.cbtn{background:rgba(0,0,0,.04);border:none;padding:6px 16px;border-radius:30px;color:var(--text);font-family:'Outfit',sans-serif;font-size:.76rem;font-weight:700;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:5px}
-.cbtn:hover{background:var(--gold);color:#fff}
-/* ── STATS ── */
-.stats{position:absolute;bottom:24px;right:22px;z-index:20;background:var(--glass);backdrop-filter:blur(14px);padding:7px 18px;border-radius:40px;font-size:.74rem;color:var(--text2);border:1px solid var(--border);display:flex;align-items:center;gap:6px;box-shadow:0 4px 12px rgba(0,0,0,0.05);font-weight:600}
-.stats b{color:var(--gold2);font-weight:800}
+.ctrl-bar{position:absolute;bottom:24px;left:50%;transform:translateX(-50%);z-index:20;display:flex;gap:10px;background:rgba(15,23,42,0.7);backdrop-filter:blur(14px);padding:8px 20px;border-radius:50px;border:1px solid rgba(255,255,255,0.1);box-shadow:0 10px 30px rgba(0,0,0,0.2)}
+.cbtn{background:rgba(255,255,255,0.05);border:none;padding:8px 18px;border-radius:30px;color:#fff;font-family:'Outfit',sans-serif;font-size:.8rem;font-weight:700;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:6px}
+.cbtn:hover{background:var(--gold);color:#fff;box-shadow:0 4px 15px rgba(201,168,76,0.4)}
 /* ── TOOLTIP ── */
 .tip{position:fixed;pointer-events:none;z-index:999;background:var(--glass2);border:1px solid var(--border);border-radius:12px;padding:6px 14px;font-size:.78rem;color:var(--text);white-space:nowrap;opacity:0;transition:opacity .12s;font-weight:700;box-shadow:0 6px 16px rgba(0,0,0,.1)}
 
@@ -237,12 +263,19 @@ svg{width:100%;height:100%}
 
 <!-- HEADER -->
 <div class="header">
-  <div>
+  <div class="header-left">
     <div class="logo"><div class="logo-dot"></div> WORLDUNFOLD</div>
-    <div style="font-size:.65rem;color:var(--text3);margin-top:2px;letter-spacing:.5px">Click any country to explore</div>
   </div>
-  <div class="header-btns">
-    <button class="hbtn hbtn-game" id="launchGame"><i class="fas fa-gamepad"></i> GeoMaster Quiz</button>
+  <div class="header-center">
+    <div class="stats-bar">
+      <div class="stats-info"><i class="fas fa-globe-americas"></i> Explored: <b id="discN">0</b> / <b id="totN">0</b></div>
+      <div class="stats-progress">
+        <div class="stats-fill" id="statsFill" style="width:0%"></div>
+      </div>
+    </div>
+  </div>
+  <div class="header-right">
+    <button class="hbtn hbtn-game" id="launchGame"><i class="fas fa-play"></i> Play Quiz</button>
     <button class="hbtn hbtn-info" id="launchStats"><i class="fas fa-chart-bar"></i> Progress</button>
   </div>
 </div>
@@ -250,7 +283,7 @@ svg{width:100%;height:100%}
 <!-- SEARCH -->
 <div class="search-wrap">
   <i class="fas fa-search search-ico"></i>
-  <input class="search-box" id="searchBox" placeholder="Search country…">
+  <input class="search-box" id="searchBox" placeholder="Where do you want to go?">
 </div>
 
 <!-- LEGEND -->
@@ -284,9 +317,6 @@ svg{width:100%;height:100%}
   <button class="cbtn" id="zOut"><i class="fas fa-minus"></i> Zoom</button>
   <button class="cbtn" id="zReset"><i class="fas fa-sync-alt"></i> Reset</button>
 </div>
-
-<!-- STATS -->
-<div class="stats"><i class="fas fa-globe" style="color:var(--gold)"></i> Explored: <b id="discN">0</b> / <b id="totN">0</b></div>
 
 <!-- DISCOVER TOAST -->
 <div class="toast" id="toast">🎉 <span id="toastTxt"></span></div>
@@ -1047,6 +1077,1997 @@ const DB = [
     {url:"", wiki:"Sundarbans", cap:"The Sundarbans Mangrove"},
     {url:"", wiki:"Ahsan Manzil", cap:"Ahsan Manzil Pink Palace"},
     {url:"", wiki:"Cox's Bazar", cap:"Cox's Bazar Beach"}
+  ]},
+{ iso:608, fc:"ph", name:"Philippines", flag:"🇵🇭", capital:"Manila", region:"Asia", lat:14.59, lon:120.98,
+  pop:"113M", area:"300,000 km²", lang:"Filipino, English", currency:"Peso (PHP)",
+  culture:"A vibrant archipelago of 7,641 islands known for extreme hospitality, karaoke, and fiesta culture.",
+  trad:"Simbang Gabi (9-day dawn masses before Christmas), lechon roasting, Sinulog festival.",
+  fact:"The Philippines produces and exports more nurses than any other country in the world.",
+  dyk:"It is home to the Puerto Princesa Subterranean River, one of the longest navigable underground rivers.",
+  travel:"🏝️ Swim in the crystal-clear lagoons of El Nido, Palawan.",
+  photos:[
+    {url:"", wiki:"El Nido, Palawan", cap:"El Nido, Palawan"},
+    {url:"", wiki:"Chocolate Hills", cap:"Chocolate Hills of Bohol"},
+    {url:"", wiki:"Intramuros", cap:"Intramuros, Manila"}
+  ]},
+{ iso:458, fc:"my", name:"Malaysia", flag:"🇲🇾", capital:"Kuala Lumpur", region:"Asia", lat:3.13, lon:101.68,
+  pop:"33M", area:"330,803 km²", lang:"Malay", currency:"Ringgit (MYR)",
+  culture:"A true melting pot of Malay, Chinese, Indian, and indigenous cultures.",
+  trad:"Open houses during Eid and Lunar New Year, vibrant street food markets.",
+  fact:"The Petronas Twin Towers were the tallest buildings in the world from 1998 to 2004.",
+  dyk:"Malaysia is home to the world's largest cave chamber, the Sarawak Chamber in Borneo.",
+  travel:"🍲 Eat your way through the world-class street food stalls of Penang.",
+  photos:[
+    {url:"", wiki:"Petronas Towers", cap:"Petronas Twin Towers"},
+    {url:"", wiki:"Batu Caves", cap:"Batu Caves"},
+    {url:"", wiki:"Mount Kinabalu", cap:"Mount Kinabalu"}
+  ]},
+{ iso:702, fc:"sg", name:"Singapore", flag:"🇸🇬", capital:"Singapore", region:"Asia", lat:1.35, lon:103.81,
+  pop:"5.4M", area:"728 km²", lang:"English, Malay, Mandarin, Tamil", currency:"Dollar (SGD)",
+  culture:"A hyper-modern city-state defined by strict laws, impeccable cleanliness, and world-class hawker food.",
+  trad:"Eating at hawker centres, celebrating Deepavali, Lunar New Year, and Hari Raya.",
+  fact:"Singapore is one of only three surviving sovereign city-states in the world.",
+  dyk:"It has a man-made waterfall indoors at the Jewel Changi Airport that is 40 metres tall.",
+  travel:"🌳 Walk through the futuristic Supertree Grove at Gardens by the Bay.",
+  photos:[
+    {url:"", wiki:"Gardens by the Bay", cap:"Gardens by the Bay"},
+    {url:"", wiki:"Marina Bay Sands", cap:"Marina Bay Sands"},
+    {url:"", wiki:"Merlion Park", cap:"The Merlion"}
+  ]},
+{ iso:372, fc:"ie", name:"Ireland", flag:"🇮🇪", capital:"Dublin", region:"Europe", lat:53.34, lon:-6.26,
+  pop:"5.1M", area:"70,273 km²", lang:"Irish, English", currency:"Euro (€)",
+  culture:"The Emerald Isle, known for its rich literary history, folklore, and warm pub culture.",
+  trad:"St. Patrick's Day parades, playing traditional music (trad sessions) in pubs, hurling.",
+  fact:"Halloween actually originated in Ireland from the ancient Celtic festival of Samhain.",
+  dyk:"There are no snakes in Ireland, allegedly banished by St. Patrick (but really due to the Ice Age).",
+  travel:"⛰️ Stand at the edge of the dramatic Cliffs of Moher over the Atlantic Ocean.",
+  photos:[
+    {url:"", wiki:"Cliffs of Moher", cap:"Cliffs of Moher"},
+    {url:"", wiki:"Trinity College Library", cap:"Trinity College Library"},
+    {url:"", wiki:"Ring of Kerry", cap:"Ring of Kerry"}
+  ]},
+{ iso:40, fc:"at", name:"Austria", flag:"🇦🇹", capital:"Vienna", region:"Europe", lat:48.20, lon:16.37,
+  pop:"9.0M", area:"83,871 km²", lang:"German", currency:"Euro (€)",
+  culture:"The classical music capital of the world, defined by elegant coffee houses and Alpine beauty.",
+  trad:"Viennese balls, eating Sachertorte, spectacular Christmas markets.",
+  fact:"The sewing machine, the slow-motion camera, and the Porsche were all invented by Austrians.",
+  dyk:"About 62% of Austria is covered by the Alps.",
+  travel:"🎶 Attend a classical concert in the historic halls of Vienna.",
+  photos:[
+    {url:"", wiki:"Schönbrunn Palace", cap:"Schönbrunn Palace"},
+    {url:"", wiki:"Hallstatt", cap:"Hallstatt Village"},
+    {url:"", wiki:"Vienna State Opera", cap:"Vienna State Opera"}
+  ]},
+{ iso:616, fc:"pl", name:"Poland", flag:"🇵🇱", capital:"Warsaw", region:"Europe", lat:52.22, lon:21.01,
+  pop:"37.8M", area:"312,696 km²", lang:"Polish", currency:"Zloty (PLN)",
+  culture:"Resilient and proud, with deep Catholic roots, hearty cuisine, and a tragic but heroic history.",
+  trad:"Making pierogi, Śmigus-dyngus (Wet Monday) water fights after Easter.",
+  fact:"Poland boasts 17 Nobel laureates, including Marie Curie (who won twice).",
+  dyk:"The Wieliczka Salt Mine has an entire underground cathedral carved completely out of salt.",
+  travel:"🏰 Walk through the medieval Main Market Square of Kraków.",
+  photos:[
+    {url:"", wiki:"Kraków Old Town", cap:"Kraków Old Town"},
+    {url:"", wiki:"Wieliczka Salt Mine", cap:"Wieliczka Salt Mine"},
+    {url:"", wiki:"Tatra Mountains", cap:"Tatra Mountains"}
+  ]},
+{ iso:188, fc:"cr", name:"Costa Rica", flag:"🇨🇷", capital:"San José", region:"North America", lat:9.92, lon:-84.09,
+  pop:"5.1M", area:"51,100 km²", lang:"Spanish", currency:"Colón (CRC)",
+  culture:"Pura Vida (pure life) philosophy: relaxed, deeply eco-conscious, and pacifist.",
+  trad:"Drinking chorreador coffee, oxcart painting, celebrating Independence Day with lanterns.",
+  fact:"Costa Rica abolished its army permanently in 1948 and reallocated the budget to education and nature.",
+  dyk:"It holds 5% of the world's biodiversity in just 0.03% of the earth's surface.",
+  travel:"🦥 Spot sloths and toucans in the misty Monteverde Cloud Forest.",
+  photos:[
+    {url:"", wiki:"Arenal Volcano", cap:"Arenal Volcano"},
+    {url:"", wiki:"Monteverde Cloud Forest Reserve", cap:"Monteverde Cloud Forest"},
+    {url:"", wiki:"Manuel Antonio National Park", cap:"Manuel Antonio Beach"}
+  ]},
+{ iso:862, fc:"ve", name:"Venezuela", flag:"🇻🇪", capital:"Caracas", region:"South America", lat:10.48, lon:-66.90,
+  pop:"28M", area:"916,445 km²", lang:"Spanish", currency:"Bolívar (VES)",
+  culture:"Caribbean vibes meet Andean peaks; home of the arepa and spectacular natural wonders.",
+  trad:"Dancing joropo, beauty pageants, eating hallacas at Christmas.",
+  fact:"Venezuela is home to Angel Falls, the world's highest uninterrupted waterfall (979m).",
+  dyk:"Lake Maracaibo experiences the Catatumbo lightning, striking up to 280 times an hour for 160 nights a year.",
+  travel:"🏞️ Take a scenic flight over the tepuis (tabletop mountains) to see Angel Falls.",
+  photos:[
+    {url:"", wiki:"Angel Falls", cap:"Angel Falls"},
+    {url:"", wiki:"Mount Roraima", cap:"Mount Roraima"},
+    {url:"", wiki:"Los Roques archipelago", cap:"Los Roques Archipelago"}
+  ]},
+{ iso:288, fc:"gh", name:"Ghana", flag:"🇬🇭", capital:"Accra", region:"Africa", lat:5.60, lon:-0.18,
+  pop:"32.8M", area:"238,533 km²", lang:"English", currency:"Cedi (GHS)",
+  culture:"The 'Gateway to Africa' known for its vibrant kente cloth, highlife music, and Ashanti heritage.",
+  trad:"Wearing intricate Kente cloth, Chale Wote street art festival, eating spicy Jollof rice.",
+  fact:"Ghana was the first sub-Saharan African nation to declare independence from European colonisation in 1957.",
+  dyk:"It is the second-largest producer of cocoa beans in the world.",
+  travel:"🏰 Visit the historic Cape Coast Castle on the beautiful Ghanaian coastline.",
+  photos:[
+    {url:"", wiki:"Cape Coast Castle", cap:"Cape Coast Castle"},
+    {url:"", wiki:"Kakum National Park", cap:"Kakum Canopy Walkway"},
+    {url:"", wiki:"Kwame Nkrumah Mausoleum", cap:"Kwame Nkrumah Mausoleum"}
+  ]},
+{ iso:800, fc:"ug", name:"Uganda", flag:"🇺🇬", capital:"Kampala", region:"Africa", lat:0.34, lon:32.58,
+  pop:"45.8M", area:"241,038 km²", lang:"English, Swahili", currency:"Shilling (UGX)",
+  culture:"Winston Churchill called it the 'Pearl of Africa' due to its lush landscapes and welcoming people.",
+  trad:"Eating matoke (mashed plantain), vibrant traditional drum dances.",
+  fact:"Uganda is home to half of the world's remaining endangered mountain gorillas.",
+  dyk:"Lake Victoria, shared by Uganda, is the largest tropical lake in the world.",
+  travel:"🦍 Trek through the Bwindi Impenetrable Forest to see wild mountain gorillas.",
+  photos:[
+    {url:"", wiki:"Bwindi Impenetrable National Park", cap:"Bwindi Impenetrable Forest"},
+    {url:"", wiki:"Murchison Falls National Park", cap:"Murchison Falls"},
+    {url:"", wiki:"Mountain gorilla", cap:"Mountain Gorillas"}
+  ]},
+{ iso:364, fc:"ir", name:"Iran", flag:"🇮🇷", capital:"Tehran", region:"Asia", lat:35.68, lon:51.38,
+  pop:"87.9M", area:"1,648,195 km²", lang:"Persian", currency:"Rial (IRR)",
+  culture:"Heir to the ancient Persian Empire, known for profound poetry, intricate carpets, and stunning Islamic architecture.",
+  trad:"Nowruz (Persian New Year) celebrated at the spring equinox, Ta'zieh passion plays, rich tea culture.",
+  fact:"Iran is home to 27 UNESCO World Heritage sites, showcasing thousands of years of continuous civilization.",
+  dyk:"Iran is the world's largest producer of saffron and pistachios.",
+  travel:"🕌 Marvel at the mesmerizing tilework of Naqsh-e Jahan Square in Isfahan.",
+  photos:[
+    {url:"", wiki:"Naqsh-e Jahan Square", cap:"Naqsh-e Jahan Square, Isfahan"},
+    {url:"", wiki:"Persepolis", cap:"Ancient Ruins of Persepolis"},
+    {url:"", wiki:"Golestan Palace", cap:"Golestan Palace, Tehran"}
+  ]},
+{ iso:524, fc:"np", name:"Nepal", flag:"🇳🇵", capital:"Kathmandu", region:"Asia", lat:27.71, lon:85.32,
+  pop:"30.5M", area:"147,181 km²", lang:"Nepali", currency:"Rupee (NPR)",
+  culture:"A spiritual highland nation where Hinduism and Buddhism uniquely intertwine.",
+  trad:"Dashain and Tihar festivals, spinning prayer wheels, honoring living goddesses (Kumari).",
+  fact:"Nepal is the only country in the world with a non-quadrilateral flag.",
+  dyk:"Eight of the world's ten tallest mountains, including Mount Everest, are located here.",
+  travel:"🏔️ Trek to Everest Base Camp for unparalleled views of the Himalayas.",
+  photos:[
+    {url:"", wiki:"Mount Everest", cap:"Mount Everest"},
+    {url:"", wiki:"Kathmandu Durbar Square", cap:"Kathmandu Durbar Square"},
+    {url:"", wiki:"Swayambhunath", cap:"Swayambhunath Stupa"}
+  ]},
+{ iso:208, fc:"dk", name:"Denmark", flag:"🇩🇰", capital:"Copenhagen", region:"Europe", lat:55.67, lon:12.56,
+  pop:"5.9M", area:"42,933 km²", lang:"Danish", currency:"Krone (DKK)",
+  culture:"Pioneers of 'hygge' (cozy contentment), world-class design, and a highly egalitarian society.",
+  trad:"Midsummer bonfires (Sankt Hans Aften), lighting advent candles, cycling everywhere.",
+  fact:"The Danish flag (Dannebrog) is the oldest continuously used national flag in the world.",
+  dyk:"Lego was invented in Denmark in 1932, and the name means 'play well' (leg godt).",
+  travel:"🚲 Cycle through Copenhagen to visit the iconic colorful harbor of Nyhavn.",
+  photos:[
+    {url:"", wiki:"Nyhavn", cap:"Nyhavn Harbor, Copenhagen"},
+    {url:"", wiki:"Tivoli Gardens", cap:"Tivoli Gardens"},
+    {url:"", wiki:"Frederiksborg Castle", cap:"Frederiksborg Castle"}
+  ]},
+{ iso:246, fc:"fi", name:"Finland", flag:"🇫🇮", capital:"Helsinki", region:"Europe", lat:60.16, lon:24.93,
+  pop:"5.5M", area:"338,455 km²", lang:"Finnish, Swedish", currency:"Euro (€)",
+  culture:"Deeply connected to nature, famous for resilience (sisu), heavy metal music, and sauna culture.",
+  trad:"Taking hot saunas followed by an icy plunge, celebrating Midsummer at lakeside cottages.",
+  fact:"Finland has been ranked the happiest country in the world for several consecutive years.",
+  dyk:"There are roughly 3.3 million saunas in Finland for a population of 5.5 million.",
+  travel:"🌌 Sleep in a glass igloo in Lapland and watch the Northern Lights.",
+  photos:[
+    {url:"", wiki:"Lapland (Finland)", cap:"Finnish Lapland"},
+    {url:"", wiki:"Suomenlinna", cap:"Suomenlinna Sea Fortress"},
+    {url:"", wiki:"Helsinki Cathedral", cap:"Helsinki Cathedral"}
+  ]},
+{ iso:56, fc:"be", name:"Belgium", flag:"🇧🇪", capital:"Brussels", region:"Europe", lat:50.85, lon:4.35,
+  pop:"11.6M", area:"30,528 km²", lang:"Dutch, French, German", currency:"Euro (€)",
+  culture:"The heart of the European Union, celebrated for surrealist art, comic strips, and gourmet cuisine.",
+  trad:"Making artisanal chocolate, brewing Trappist beers, and the vibrant Tomorrowland festival.",
+  fact:"Belgium produces over 220,000 tons of chocolate every single year.",
+  dyk:"The saxophone was invented by a Belgian, Adolphe Sax, in the 1840s.",
+  travel:"🏰 Walk through the beautifully preserved medieval streets of Bruges.",
+  photos:[
+    {url:"", wiki:"Grand-Place", cap:"Grand-Place, Brussels"},
+    {url:"", wiki:"Bruges", cap:"Medieval Bruges"},
+    {url:"", wiki:"Atomium", cap:"The Atomium"}
+  ]},
+{ iso:203, fc:"cz", name:"Czechia", flag:"🇨🇿", capital:"Prague", region:"Europe", lat:50.07, lon:14.43,
+  pop:"10.5M", area:"78,871 km²", lang:"Czech", currency:"Koruna (CZK)",
+  culture:"A fairy-tale nation known for majestic castles, bohemian history, and a legendary brewing tradition.",
+  trad:"Easter whipping with willow branches (Pomlázka), eating carp for Christmas dinner.",
+  fact:"Czechia has the highest beer consumption per capita in the entire world.",
+  dyk:"The word 'robot' comes from the Czech language, introduced by writer Karel Čapek in 1920.",
+  travel:"🌉 Cross the historic Charles Bridge in Prague at sunrise.",
+  photos:[
+    {url:"", wiki:"Charles Bridge", cap:"Charles Bridge, Prague"},
+    {url:"", wiki:"Prague Castle", cap:"Prague Castle"},
+    {url:"", wiki:"Český Krumlov", cap:"Český Krumlov"}
+  ]},
+{ iso:348, fc:"hu", name:"Hungary", flag:"🇭🇺", capital:"Budapest", region:"Europe", lat:47.49, lon:19.04,
+  pop:"9.7M", area:"93,030 km²", lang:"Hungarian", currency:"Forint (HUF)",
+  culture:"Famous for its complex Finno-Ugric language, paprika-spiced cuisine, and thermal bath culture.",
+  trad:"Bathing in historic thermal spas, Busójárás winter festival to scare away winter.",
+  fact:"Budapest's thermal baths are fed by over 120 natural hot springs.",
+  dyk:"The Rubik's Cube was invented by Hungarian architect Ernő Rubik in 1974.",
+  travel:"♨️ Relax in the sprawling, neo-baroque Széchenyi Thermal Bath in Budapest.",
+  photos:[
+    {url:"", wiki:"Hungarian Parliament Building", cap:"Hungarian Parliament"},
+    {url:"", wiki:"Széchenyi thermal bath", cap:"Széchenyi Thermal Bath"},
+    {url:"", wiki:"Buda Castle", cap:"Buda Castle"}
+  ]},
+{ iso:642, fc:"ro", name:"Romania", flag:"🇷🇴", capital:"Bucharest", region:"Europe", lat:44.42, lon:26.10,
+  pop:"19.1M", area:"238,397 km²", lang:"Romanian", currency:"Leu (RON)",
+  culture:"A Latin island in Eastern Europe, steeped in folklore, striking monasteries, and rural traditions.",
+  trad:"Giving Mărțișor trinkets in spring, painting intricate Easter eggs, ancient bear dances.",
+  fact:"The Palace of the Parliament in Bucharest is the heaviest building in the world.",
+  dyk:"The fictional vampire Dracula was inspired by the real-life 15th-century prince Vlad the Impaler.",
+  travel:"🦇 Explore the dramatic Bran Castle, often referred to as Dracula's Castle, in Transylvania.",
+  photos:[
+    {url:"", wiki:"Bran Castle", cap:"Bran Castle, Transylvania"},
+    {url:"", wiki:"Palace of the Parliament", cap:"Palace of the Parliament"},
+    {url:"", wiki:"Transfăgărășan", cap:"Transfăgărășan Highway"}
+  ]},
+{ iso:191, fc:"hr", name:"Croatia", flag:"🇭🇷", capital:"Zagreb", region:"Europe", lat:45.81, lon:15.98,
+  pop:"3.8M", area:"56,594 km²", lang:"Croatian", currency:"Euro (€)",
+  culture:"A stunning Mediterranean nation known for its rocky coastlines, ancient walled cities, and island hopping.",
+  trad:"Klapa singing, making intricate Pag lace, and celebrating the Feast of St. Blaise.",
+  fact:"The necktie (cravat) originated in Croatia, worn by Croatian mercenaries in the 17th century.",
+  dyk:"Croatia has over 1,200 islands and islets, but only about 50 are inhabited.",
+  travel:"🌊 Walk the ancient city walls of Dubrovnik as the sun sets over the Adriatic Sea.",
+  photos:[
+    {url:"", wiki:"Dubrovnik", cap:"Dubrovnik Old Town"},
+    {url:"", wiki:"Plitvice Lakes National Park", cap:"Plitvice Lakes"},
+    {url:"", wiki:"Diocletian's Palace", cap:"Diocletian's Palace, Split"}
+  ]},
+{ iso:686, fc:"sn", name:"Senegal", flag:"🇸🇳", capital:"Dakar", region:"Africa", lat:14.71, lon:-17.46,
+  pop:"17.3M", area:"196,722 km²", lang:"French, Wolof", currency:"CFA Franc (XOF)",
+  culture:"The land of 'Teranga' (Wolof for hospitality), famous for its vibrant music scene and Sabar dancing.",
+  trad:"Wrestling (Laamb) is the national sport, drinking strong Touba coffee, eating Thieboudienne.",
+  fact:"Senegal is home to Lac Rose (Lake Retba), which appears bright pink due to a unique algae.",
+  dyk:"Goree Island in Dakar was one of the largest slave-trading centers and is now a powerful memorial.",
+  travel:"🌅 Take a boat to the historic and peaceful Goree Island.",
+  photos:[
+    {url:"", wiki:"Gorée", cap:"Gorée Island"},
+    {url:"", wiki:"Lake Retba", cap:"Lake Retba (Pink Lake)"},
+    {url:"", wiki:"African Renaissance Monument", cap:"African Renaissance Monument"}
+  ]},
+{ iso:591, fc:"pa", name:"Panama", flag:"🇵🇦", capital:"Panama City", region:"North America", lat:8.98, lon:-79.52,
+  pop:"4.4M", area:"75,417 km²", lang:"Spanish", currency:"Balboa (PAB)",
+  culture:"A tropical bridge between two continents, blending indigenous, Spanish, and Afro-Caribbean influences.",
+  trad:"Wearing the intricately woven Pollera dress, dancing the Tamborito, celebrating Carnival.",
+  fact:"The Panama Canal generates roughly a third of the country's entire economy.",
+  dyk:"It is the only place in the world where you can see the sun rise on the Pacific and set on the Atlantic.",
+  travel:"🚢 Watch giant cargo ships pass through the engineering marvel of the Panama Canal.",
+  photos:[
+    {url:"", wiki:"Panama Canal", cap:"Panama Canal"},
+    {url:"", wiki:"Casco Viejo, Panama", cap:"Casco Viejo"},
+    {url:"", wiki:"San Blas Islands", cap:"San Blas Islands"}
+  ]},
+{ iso:388, fc:"jm", name:"Jamaica", flag:"🇯🇲", capital:"Kingston", region:"North America", lat:18.01, lon:-76.80,
+  pop:"2.8M", area:"10,991 km²", lang:"English, Jamaican Patois", currency:"Dollar (JMD)",
+  culture:"A cultural powerhouse with an outsized global influence through reggae music and Rastafarianism.",
+  trad:"Eating jerk chicken straight from a pan, playing dominoes, and vibrant dancehall parties.",
+  fact:"Jamaica produces some of the world's most sought-after coffee, grown in the Blue Mountains.",
+  dyk:"Ian Fleming wrote all the James Bond novels at his Goldeneye estate in Jamaica.",
+  travel:"🎵 Visit the Bob Marley Museum in Kingston and feel the heartbeat of reggae.",
+  photos:[
+    {url:"", wiki:"Dunn's River Falls", cap:"Dunn's River Falls"},
+    {url:"", wiki:"Blue Mountains (Jamaica)", cap:"Blue Mountains"},
+    {url:"", wiki:"Seven Mile Beach, Jamaica", cap:"Seven Mile Beach, Negril"}
+  ]},
+{ iso:218, fc:"ec", name:"Ecuador", flag:"🇪🇨", capital:"Quito", region:"South America", lat:-0.18, lon:-78.46,
+  pop:"18M", area:"283,561 km²", lang:"Spanish, Quechua", currency:"Dollar ($)",
+  culture:"Named after the equator, it boasts immense geographic diversity from the Amazon to the Andes.",
+  trad:"Burning effigies on New Year's Eve, colorful Inti Raymi sun festival, eating guinea pig (cuy).",
+  fact:"Mount Chimborazo's peak is the furthest point from the Earth's center due to the equatorial bulge.",
+  dyk:"Ecuador was the first country to officially recognize the Rights of Nature in its constitution.",
+  travel:"🐢 Explore the Galápagos Islands, the living laboratory of evolution.",
+  photos:[
+    {url:"", wiki:"Galápagos Islands", cap:"Galápagos Islands"},
+    {url:"", wiki:"Quito", cap:"Historic Center of Quito"},
+    {url:"", wiki:"Cotopaxi", cap:"Cotopaxi Volcano"}
+  ]},
+{ iso:68, fc:"bo", name:"Bolivia", flag:"🇧🇴", capital:"Sucre", region:"South America", lat:-19.03, lon:-65.26,
+  pop:"12.2M", area:"1,098,581 km²", lang:"Spanish, Quechua, Aymara", currency:"Boliviano (BOB)",
+  culture:"The 'Tibet of the Americas,' incredibly high in altitude and deeply indigenous.",
+  trad:"Worshipping Pachamama (Mother Earth), the spectacular Oruro Carnival, chewing coca leaves.",
+  fact:"Bolivia holds the record for the highest capital city in the world (La Paz, at 3,640m).",
+  dyk:"The Salar de Uyuni is the world's largest salt flat, turning into a giant mirror when it rains.",
+  travel:"🧂 Take surreal perspective photos on the seemingly infinite Salar de Uyuni salt flats.",
+  photos:[
+    {url:"", wiki:"Salar de Uyuni", cap:"Salar de Uyuni"},
+    {url:"", wiki:"Lake Titicaca", cap:"Lake Titicaca"},
+    {url:"", wiki:"La Paz", cap:"La Paz Skyline"}
+  ]},
+{ iso:858, fc:"uy", name:"Uruguay", flag:"🇺🇾", capital:"Montevideo", region:"South America", lat:-34.90, lon:-56.16,
+  pop:"3.4M", area:"176,215 km²", lang:"Spanish", currency:"Peso (UYU)",
+  culture:"A progressive, stable, and laid-back nation known for vast pampas and an intense love for football.",
+  trad:"Carrying a thermos everywhere for mate, the longest Carnival in the world (40 days), massive Sunday asados.",
+  fact:"Uruguay hosted and won the very first FIFA World Cup in 1930.",
+  dyk:"There are roughly four times as many cows as there are people in Uruguay.",
+  travel:"🏖️ Relax in the glamorous coastal resort city of Punta del Este.",
+  photos:[
+    {url:"", wiki:"Montevideo", cap:"Montevideo Ciudad Vieja"},
+    {url:"", wiki:"Casapueblo", cap:"Casapueblo"},
+    {url:"", wiki:"Punta del Este", cap:"Punta del Este Beach"}
+  ]},
+{ iso:4, fc:"af", name:"Afghanistan", flag:"🇦🇫", capital:"Kabul", region:"Asia", lat:33.93, lon:67.70,
+  pop:"40M", area:"652,864 km²", lang:"Pashto, Dari", currency:"Afghani (AFN)",
+  culture:"A rugged, mountainous nation at the crossroads of Central and South Asia, with a deep poetic tradition.",
+  trad:"Buzkashi (a fierce traditional sport played on horseback), Nowruz celebrations, intricate carpet weaving.",
+  fact:"Afghanistan is home to the stunning Band-e Amir, a series of deep blue mountain lakes.",
+  dyk:"It was historically a crucial hub along the ancient Silk Road.",
+  travel:"🏔️ Witness the stark beauty of the Hindu Kush mountain range.",
+  photos:[
+    {url:"", wiki:"Band-e Amir National Park", cap:"Band-e Amir Lakes"},
+    {url:"", wiki:"Minaret of Jam", cap:"Minaret of Jam"},
+    {url:"", wiki:"Hindu Kush", cap:"Hindu Kush Mountains"}
+  ]},
+{ iso:116, fc:"kh", name:"Cambodia", flag:"🇰🇭", capital:"Phnom Penh", region:"Asia", lat:12.56, lon:104.99,
+  pop:"16.7M", area:"181,035 km²", lang:"Khmer", currency:"Riel (KHR)",
+  culture:"The heart of the ancient Khmer Empire, deeply influenced by Theravada Buddhism.",
+  trad:"Chaul Chnam Thmey (Khmer New Year), Bon Om Touk (Water Festival) boat races.",
+  fact:"The Cambodian flag is the only national flag in the world to feature a building (Angkor Wat).",
+  dyk:"Angkor Wat is the largest religious monument in the world by land area.",
+  travel:"🛕 Wander through the giant, root-strangled ruins of Ta Prohm at dawn.",
+  photos:[
+    {url:"", wiki:"Angkor Wat", cap:"Angkor Wat"},
+    {url:"", wiki:"Bayon", cap:"Bayon Temple"},
+    {url:"", wiki:"Tonlé Sap", cap:"Tonlé Sap Lake"}
+  ]},
+{ iso:104, fc:"mm", name:"Myanmar", flag:"🇲🇲", capital:"Naypyidaw", region:"Asia", lat:21.91, lon:95.95,
+  pop:"54M", area:"676,578 km²", lang:"Burmese", currency:"Kyat (MMK)",
+  culture:"The 'Golden Land', renowned for its thousands of gilded pagodas and traditional thanaka face paste.",
+  trad:"Thingyan water festival to wash away bad luck, wearing the traditional longyi.",
+  fact:"Bagan features over 2,000 ancient Buddhist temples scattered across a single dusty plain.",
+  dyk:"Myanmar is one of only three countries in the world not to officially use the metric system.",
+  travel:"🌅 Take a hot air balloon ride over the temple plains of Bagan at sunrise.",
+  photos:[
+    {url:"", wiki:"Bagan", cap:"Temples of Bagan"},
+    {url:"", wiki:"Shwedagon Pagoda", cap:"Shwedagon Pagoda"},
+    {url:"", wiki:"Inle Lake", cap:"Inle Lake"}
+  ]},
+{ iso:760, fc:"sy", name:"Syria", flag:"🇸🇾", capital:"Damascus", region:"Asia", lat:34.80, lon:38.99,
+  pop:"21M", area:"185,180 km²", lang:"Arabic", currency:"Pound (SYP)",
+  culture:"A cradle of civilization, home to some of the world's most ancient and historically significant cities.",
+  trad:"Drinking strong Arabic coffee, making elaborate Aleppo soap, rich storytelling traditions.",
+  fact:"Damascus is widely considered to be one of the oldest continuously inhabited cities in the world.",
+  dyk:"The ancient city of Palmyra was a wealthy caravan oasis known as the 'Bride of the Desert.'",
+  travel:"🏛️ Explore the towering columns and monumental ruins of Palmyra.",
+  photos:[
+    {url:"", wiki:"Palmyra", cap:"Ruins of Palmyra"},
+    {url:"", wiki:"Umayyad Mosque", cap:"Umayyad Mosque, Damascus"},
+    {url:"", wiki:"Krak des Chevaliers", cap:"Krak des Chevaliers"}
+  ]},
+{ iso:440, fc:"lt", name:"Lithuania", flag:"🇱🇹", capital:"Vilnius", region:"Europe", lat:55.16, lon:23.88,
+  pop:"2.8M", area:"65,300 km²", lang:"Lithuanian", currency:"Euro (€)",
+  culture:"The southernmost Baltic state, fiercely proud of its language, basketball, and amber craft.",
+  trad:"Užgavėnės (winter send-off festival) with wooden masks, Midsummer (Joninės) bonfires.",
+  fact:"The Lithuanian language is one of the oldest living languages and is incredibly close to ancient Sanskrit.",
+  dyk:"The Hill of Crosses holds over 100,000 crosses placed there by pilgrims despite Soviet bulldozing.",
+  travel:"⛪ Walk through the baroque, winding streets of Vilnius Old Town.",
+  photos:[
+    {url:"", wiki:"Vilnius", cap:"Vilnius Old Town"},
+    {url:"", wiki:"Trakai Island Castle", cap:"Trakai Castle"},
+    {url:"", wiki:"Hill of Crosses", cap:"Hill of Crosses"}
+  ]},
+{ iso:428, fc:"lv", name:"Latvia", flag:"🇱🇻", capital:"Riga", region:"Europe", lat:56.87, lon:24.60,
+  pop:"1.9M", area:"64,589 km²", lang:"Latvian", currency:"Euro (€)",
+  culture:"A Baltic nation known for deep forests, Art Nouveau architecture, and immense choral music festivals.",
+  trad:"Jāņi (Midsummer) celebrations with flower crowns and cheese, massive nationwide song and dance festivals.",
+  fact:"Over half of Latvia's territory is covered by dense forests.",
+  dyk:"Riga has the highest concentration of Art Nouveau architecture anywhere in the world.",
+  travel:"🌲 Escape to the pristine pine forests and beaches of Jūrmala.",
+  photos:[
+    {url:"", wiki:"Riga", cap:"Art Nouveau in Riga"},
+    {url:"", wiki:"Gauja National Park", cap:"Gauja National Park"},
+    {url:"", wiki:"Rundāle Palace", cap:"Rundāle Palace"}
+  ]},
+{ iso:233, fc:"ee", name:"Estonia", flag:"🇪🇪", capital:"Tallinn", region:"Europe", lat:58.59, lon:25.01,
+  pop:"1.3M", area:"45,227 km²", lang:"Estonian", currency:"Euro (€)",
+  culture:"A highly digital society deeply connected to nature, with a language related only to Finnish and Hungarian.",
+  trad:"Going to the sauna, foraging for mushrooms and berries, and enormous choral singing festivals.",
+  fact:"Estonia was the first country in the world to adopt online voting for national elections.",
+  dyk:"Skype was developed by Estonian software engineers in 2003.",
+  travel:"🏰 Stroll through Tallinn, one of the best-preserved medieval cities in Northern Europe.",
+  photos:[
+    {url:"", wiki:"Tallinn", cap:"Medieval Tallinn"},
+    {url:"", wiki:"Lahemaa National Park", cap:"Lahemaa Forests"},
+    {url:"", wiki:"Saaremaa", cap:"Kuressaare Castle"}
+  ]},
+{ iso:24, fc:"ao", name:"Angola", flag:"🇦🇴", capital:"Luanda", region:"Africa", lat:-11.20, lon:17.87,
+  pop:"35M", area:"1,246,700 km²", lang:"Portuguese", currency:"Kwanza (AOA)",
+  culture:"A dynamic Southern African nation known for semba music, Kizomba dance, and rich natural resources.",
+  trad:"Kizomba social dancing, eating Moamba de Galinha (chicken stew), Capoeira origins.",
+  fact:"Angola is home to the Giant Sable Antelope, which is found nowhere else on Earth.",
+  dyk:"Luanda is consistently ranked as one of the most expensive cities in the world for expatriates.",
+  travel:"🏜️ Visit the surreal and breathtaking Miradouro da Lua (Valley of the Moon).",
+  photos:[
+    {url:"", wiki:"Miradouro da Lua", cap:"Miradouro da Lua"},
+    {url:"", wiki:"Luanda", cap:"Luanda Skyline"},
+    {url:"", wiki:"Kalandula Falls", cap:"Kalandula Falls"}
+  ]},
+{ iso:894, fc:"zm", name:"Zambia", flag:"🇿🇲", capital:"Lusaka", region:"Africa", lat:-13.13, lon:27.84,
+  pop:"19.5M", area:"752,618 km²", lang:"English", currency:"Kwacha (ZMW)",
+  culture:"Renowned for its vast wildlife, friendly communities, and shared custodianship of Victoria Falls.",
+  trad:"The Kuomboka ceremony of the Lozi people moving to higher ground, traditional basket weaving.",
+  fact:"Zambia is one of the most water-rich countries in Africa, holding five massive lakes and numerous rivers.",
+  dyk:"The termite mounds in Zambia can reach the size of a small house.",
+  travel:"🌊 Take a micro-light flight directly over the massive, thunderous Victoria Falls.",
+  photos:[
+    {url:"", wiki:"Victoria Falls", cap:"Victoria Falls (Mosi-oa-Tunya)"},
+    {url:"", wiki:"South Luangwa National Park", cap:"South Luangwa Wildlife"},
+    {url:"", wiki:"Lake Kariba", cap:"Lake Kariba"}
+  ]},
+{ iso:466, fc:"ml", name:"Mali", flag:"🇲🇱", capital:"Bamako", region:"Africa", lat:17.57, lon:-3.99,
+  pop:"21.9M", area:"1,240,192 km²", lang:"French, Bambara", currency:"CFA Franc (XOF)",
+  culture:"Home to the ancient trading empire of Timbuktu, famous for its griots (storytellers) and desert blues music.",
+  trad:"Drinking three rounds of strong, sweet tea, elaborate mud-cloth (bògòlanfini) weaving.",
+  fact:"The Great Mosque of Djenné is the largest mud-brick building in the entire world.",
+  dyk:"Mansa Musa, the 14th-century ruler of the Mali Empire, is considered by some to be the wealthiest person in history.",
+  travel:"🕌 Gaze upon the spectacular, massive mud architecture of the Great Mosque of Djenné.",
+  photos:[
+    {url:"", wiki:"Great Mosque of Djenné", cap:"Great Mosque of Djenné"},
+    {url:"", wiki:"Timbuktu", cap:"Ancient Timbuktu"},
+    {url:"", wiki:"Bandiagara Escarpment", cap:"Dogon Country"}
+  ]},
+{ iso:72, fc:"bw", name:"Botswana", flag:"🇧🇼", capital:"Gaborone", region:"Africa", lat:-22.32, lon:24.68,
+  pop:"2.6M", area:"581,730 km²", lang:"English, Setswana", currency:"Pula (BWP)",
+  culture:"A peaceful, prosperous nation deeply committed to wildlife conservation and vast, unspoiled wilderness.",
+  trad:"Basket weaving in the Okavango, traditional San (Bushmen) tracking techniques.",
+  fact:"Botswana is home to the world's largest concentration of African elephants.",
+  dyk:"The Okavango Delta is an inland delta that paradoxically empties into the Kalahari Desert, not the sea.",
+  travel:"🛶 Glide silently through the Okavango Delta in a traditional mokoro canoe.",
+  photos:[
+    {url:"", wiki:"Okavango Delta", cap:"Okavango Delta"},
+    {url:"", wiki:"Chobe National Park", cap:"Elephants in Chobe"},
+    {url:"", wiki:"Makgadikgadi Pan", cap:"Makgadikgadi Salt Pans"}
+  ]},
+{ iso:516, fc:"na", name:"Namibia", flag:"🇳🇦", capital:"Windhoek", region:"Africa", lat:-22.56, lon:17.06,
+  pop:"2.6M", area:"825,615 km²", lang:"English", currency:"Dollar (NAD)",
+  culture:"A land of immense spaces, striking deserts, and resilient indigenous cultures like the Himba.",
+  trad:"Himba women using otjize (red ochre paste) on their skin and hair, eating biltong.",
+  fact:"Namibia boasts the highest sand dunes in the world in the Namib Desert.",
+  dyk:"The Namib is considered the oldest desert on Earth, existing for at least 55 million years.",
+  travel:"🏜️ Watch the sunrise turn the towering dunes of Sossusvlei a brilliant, fiery red.",
+  photos:[
+    {url:"", wiki:"Sossusvlei", cap:"Dunes of Sossusvlei"},
+    {url:"", wiki:"Etosha National Park", cap:"Wildlife in Etosha"},
+    {url:"", wiki:"Deadvlei", cap:"Trees of Deadvlei"}
+  ]},
+{ iso:320, fc:"gt", name:"Guatemala", flag:"🇬🇹", capital:"Guatemala City", region:"North America", lat:15.78, lon:-90.23,
+  pop:"17.6M", area:"108,889 km²", lang:"Spanish, Mayan languages", currency:"Quetzal (GTQ)",
+  culture:"The heartland of the Maya world, characterized by colorful textiles, volcanic landscapes, and ancient ruins.",
+  trad:"Flying massive kites on the Day of the Dead, making intricate sawdust carpets during Semana Santa.",
+  fact:"Tikal was once one of the most powerful kingdoms of the ancient Maya civilization.",
+  dyk:"The quetzal is the national bird of Guatemala, and its currency is also named after it.",
+  travel:"🛕 Climb to the top of Temple IV at Tikal to watch the sun rise over the jungle canopy.",
+  photos:[
+    {url:"", wiki:"Tikal", cap:"Tikal Maya Ruins"},
+    {url:"", wiki:"Lake Atitlán", cap:"Lake Atitlán"},
+    {url:"", wiki:"Antigua Guatemala", cap:"Antigua Guatemala"}
+  ]},
+{ iso:340, fc:"hn", name:"Honduras", flag:"🇭🇳", capital:"Tegucigalpa", region:"North America", lat:15.19, lon:-86.24,
+  pop:"10.4M", area:"112,492 km²", lang:"Spanish", currency:"Lempira (HNL)",
+  culture:"A rugged Central American nation rich with pristine coral reefs, coffee farms, and Mayan archaeology.",
+  trad:"Eating baleadas (folded tortillas with beans), Garifuna drumming and dancing on the coast.",
+  fact:"The Bay Islands sit on the Mesoamerican Barrier Reef, the second-largest coral reef system in the world.",
+  dyk:"Copán features the Hieroglyphic Stairway, the longest known Mayan text in existence.",
+  travel:"🤿 Scuba dive with whale sharks in the crystal-clear waters of Utila.",
+  photos:[
+    {url:"", wiki:"Copán", cap:"Copán Ruins"},
+    {url:"", wiki:"Roatán", cap:"Roatán Beaches"},
+    {url:"", wiki:"Pico Bonito National Park", cap:"Pico Bonito"}
+  ]},
+{ iso:420, fc:"ni", name:"Nicaragua", flag:"🇳🇮", capital:"Managua", region:"North America", lat:12.86, lon:-85.20,
+  pop:"6.9M", area:"130,375 km²", lang:"Spanish", currency:"Córdoba (NIO)",
+  culture:"The 'Land of Lakes and Volcanoes,' known for colonial cities, poetic traditions, and fierce independence.",
+  trad:"La Gritería celebration on December 7th, eating gallo pinto, reading poetry (home of Rubén Darío).",
+  fact:"Lake Nicaragua is the only freshwater lake in the world containing oceanic animal life, including sharks.",
+  dyk:"You can actually go 'volcano boarding' down the black ash slopes of the active Cerro Negro volcano.",
+  travel:"🌋 Slide down the ash slopes of Cerro Negro on a wooden board.",
+  photos:[
+    {url:"", wiki:"Granada, Nicaragua", cap:"Colonial Granada"},
+    {url:"", wiki:"Ometepe", cap:"Ometepe Island"},
+    {url:"", wiki:"Cerro Negro", cap:"Cerro Negro Volcano"}
+  ]},
+{ iso:268, fc:"ge", name:"Georgia", flag:"🇬🇪", capital:"Tbilisi", region:"Asia", lat:41.71, lon:44.82,
+  pop:"3.7M", area:"69,700 km²", lang:"Georgian", currency:"Lari (GEL)",
+  culture:"A Caucasus nation famed for ancient wine-making, polyphonic singing, and supreme hospitality (the 'supra' feast).",
+  trad:"Toasting led by a Tamada (toastmaster) at feasts, making Churchkhela (walnut candy), Orthodox Easter.",
+  fact:"Georgia is considered the birthplace of wine, with evidence of winemaking dating back 8,000 years.",
+  dyk:"The Georgian alphabet (Mkhedruli) is unique in the world and has no capital letters.",
+  travel:"🍷 Taste wine fermented in traditional clay qvevri buried underground in the Kakheti region.",
+  photos:[
+    {url:"", wiki:"Tbilisi", cap:"Tbilisi Old Town"},
+    {url:"", wiki:"Ushguli", cap:"Ushguli Village in Svaneti"},
+    {url:"", wiki:"Gergeti Trinity Church", cap:"Gergeti Trinity Church"}
+  ]},
+{ iso:51, fc:"am", name:"Armenia", flag:"🇦🇲", capital:"Yerevan", region:"Asia", lat:40.18, lon:44.51,
+  pop:"2.8M", area:"29,743 km²", lang:"Armenian", currency:"Dram (AMD)",
+  culture:"A resilient ancient culture set against dramatic mountains, renowned for its stone churches and apricot orchards.",
+  trad:"Vardavar (a nationwide summer water fight), baking lavash bread in a tonir oven.",
+  fact:"Armenia was the first country in the world to officially adopt Christianity as a state religion in 301 AD.",
+  dyk:"Yerevan, the capital, is often called the 'Pink City' because of the distinct rosy volcanic tuff stone used in its buildings.",
+  travel:"⛪ Visit the spectacular Geghard Monastery, partially carved directly out of an adjacent mountain.",
+  photos:[
+    {url:"", wiki:"Mount Ararat", cap:"Mount Ararat (view from Armenia)"},
+    {url:"", wiki:"Geghard", cap:"Geghard Monastery"},
+    {url:"", wiki:"Yerevan", cap:"Yerevan City"}
+  ]},
+{ iso:31, fc:"az", name:"Azerbaijan", flag:"🇦🇿", capital:"Baku", region:"Asia", lat:40.40, lon:49.86,
+  pop:"10.1M", area:"86,600 km²", lang:"Azerbaijani", currency:"Manat (AZN)",
+  culture:"The 'Land of Fire,' where modern architectural marvels meet ancient Zoroastrian history along the Caspian Sea.",
+  trad:"Nowruz celebrations with bonfires, drinking black tea with jam, intricate carpet weaving.",
+  fact:"Azerbaijan has more mud volcanoes than any other country in the world—nearly 400 of them.",
+  dyk:"Yanar Dag is a natural gas fire that blazes continuously on a hillside near Baku.",
+  travel:"🏙️ Admire the futuristic Flame Towers illuminating the Baku skyline at night.",
+  photos:[
+    {url:"", wiki:"Baku", cap:"Flame Towers, Baku"},
+    {url:"", wiki:"Gobustan National Park", cap:"Gobustan Rock Art"},
+    {url:"", wiki:"Yanar Dag", cap:"Yanar Dag (Burning Mountain)"}
+  ]},
+{ iso:512, fc:"om", name:"Oman", flag:"🇴🇲", capital:"Muscat", region:"Asia", lat:23.58, lon:58.38,
+  pop:"4.5M", area:"309,500 km²", lang:"Arabic", currency:"Rial (OMR)",
+  culture:"A fiercely independent sultanate that preserves deep traditional Bedouin values while resisting over-commercialization.",
+  trad:"Burning frankincense daily, wearing the traditional dishdasha and intricately folded kuma cap.",
+  fact:"Oman is the oldest continuously independent state in the Arab world.",
+  dyk:"The nation is renowned for its incredible wadis (lush canyon oases) hidden within harsh, arid mountains.",
+  travel:"🏞️ Swim in the emerald green pools of Wadi Shab.",
+  photos:[
+    {url:"", wiki:"Muscat", cap:"Sultan Qaboos Grand Mosque"},
+    {url:"", wiki:"Wahiba Sands", cap:"Wahiba Sands"},
+    {url:"", wiki:"Wadi Shab", cap:"Wadi Shab"}
+  ]},
+{ iso:634, fc:"qa", name:"Qatar", flag:"🇶🇦", capital:"Doha", region:"Asia", lat:25.28, lon:51.53,
+  pop:"2.9M", area:"11,586 km²", lang:"Arabic", currency:"Riyal (QAR)",
+  culture:"A wealthy, ultra-modern peninsula where traditional falconry and pearl-diving heritage meet staggering skylines.",
+  trad:"Falconry, camel racing, and immense hospitality featuring Dallah (Arabic coffee).",
+  fact:"Qatar hosted the 2022 FIFA World Cup, the first ever to be held in the Middle East.",
+  dyk:"Qatar Airways' hub, Hamad International Airport, is frequently ranked as the best airport in the world.",
+  travel:"🐪 Walk through the bustling alleys of Souq Waqif at night to experience traditional Qatari life.",
+  photos:[
+    {url:"", wiki:"Doha", cap:"Doha Skyline"},
+    {url:"", wiki:"Souq Waqif", cap:"Souq Waqif"},
+    {url:"", wiki:"Museum of Islamic Art, Doha", cap:"Museum of Islamic Art"}
+  ]},
+{ iso:414, fc:"kw", name:"Kuwait", flag:"🇰🇼", capital:"Kuwait City", region:"Asia", lat:29.37, lon:47.97,
+  pop:"4.3M", area:"17,818 km²", lang:"Arabic", currency:"Dinar (KWD)",
+  culture:"A small but wealthy nation with a vibrant theatrical tradition, robust press, and deep merchant history.",
+  trad:"Gathering in 'Diwaniyas' (traditional reception halls) to discuss politics and life over tea.",
+  fact:"The Kuwaiti Dinar is the highest valued currency in the world.",
+  dyk:"Kuwait's iconic Kuwait Towers serve a dual purpose: they are beautiful landmarks and massive water towers.",
+  travel:"🗼 View the city from the observation deck of the iconic Kuwait Towers.",
+  photos:[
+    {url:"", wiki:"Kuwait Towers", cap:"Kuwait Towers"},
+    {url:"", wiki:"Kuwait City", cap:"Kuwait City"},
+    {url:"", wiki:"Grand Mosque (Kuwait)", cap:"Grand Mosque"}
+  ]},
+{ iso:48, fc:"bh", name:"Bahrain", flag:"🇧🇭", capital:"Manama", region:"Asia", lat:26.22, lon:50.58,
+  pop:"1.5M", area:"765 km²", lang:"Arabic", currency:"Dinar (BHD)",
+  culture:"An archipelago nation that was the heart of the ancient Dilmun civilization and historic pearl trade.",
+  trad:"Traditional dhow building, pottery making in A'ali, and weekend desert camping.",
+  fact:"Bahrain was the first country on the Arabian side of the Persian Gulf to discover crude oil (in 1932).",
+  dyk:"The 'Tree of Life' is a 400-year-old mesquite tree standing completely alone in the barren Arabian desert.",
+  travel:"🌳 Visit the solitary, mystical Tree of Life in the southern desert.",
+  photos:[
+    {url:"", wiki:"Tree of Life (Bahrain)", cap:"Tree of Life"},
+    {url:"", wiki:"Qal'at al-Bahrain", cap:"Bahrain Fort"},
+    {url:"", wiki:"Manama", cap:"Manama Skyline"}
+  ]},
+{ iso:196, fc:"cy", name:"Cyprus", flag:"🇨🇾", capital:"Nicosia", region:"Europe", lat:35.18, lon:33.38,
+  pop:"1.2M", area:"9,251 km²", lang:"Greek, Turkish", currency:"Euro (€)",
+  culture:"A sun-drenched Mediterranean island divided by history, famous for Halloumi cheese and ancient mythology.",
+  trad:"Grilling Halloumi, celebrating the Kataklysmos (Festival of the Flood) at the sea.",
+  fact:"According to Greek mythology, Cyprus is the birthplace of Aphrodite, the goddess of love.",
+  dyk:"Nicosia is the last divided capital city in the world, split between the Greek Cypriot south and Turkish Cypriot north.",
+  travel:"🏖️ Swim around Aphrodite's Rock, where the goddess is said to have emerged from the sea foam.",
+  photos:[
+    {url:"", wiki:"Paphos", cap:"Paphos Archaeological Park"},
+    {url:"", wiki:"Nicosia", cap:"Nicosia City"},
+    {url:"", wiki:"Petra tou Romiou", cap:"Aphrodite's Rock"}
+  ]},
+{ iso:470, fc:"mt", name:"Malta", flag:"🇲🇹", capital:"Valletta", region:"Europe", lat:35.89, lon:14.51,
+  pop:"0.5M", area:"316 km²", lang:"Maltese, English", currency:"Euro (€)",
+  culture:"A tiny, densely populated archipelago packed with megalithic temples, knights' fortresses, and crystal coves.",
+  trad:"Intense village festas celebrating patron saints with brass bands and spectacular fireworks.",
+  fact:"Malta has three UNESCO World Heritage Sites, including the entire capital city of Valletta.",
+  dyk:"The Megalithic Temples of Malta are some of the oldest free-standing structures on Earth, older than Stonehenge.",
+  travel:"🏰 Walk the golden-hued, fortified streets of the ancient city of Mdina.",
+  photos:[
+    {url:"", wiki:"Valletta", cap:"Valletta"},
+    {url:"", wiki:"Mdina", cap:"Mdina"},
+    {url:"", wiki:"Comino", cap:"Blue Lagoon, Comino"}
+  ]},
+{ iso:705, fc:"si", name:"Slovenia", flag:"🇸🇮", capital:"Ljubljana", region:"Europe", lat:46.05, lon:14.50,
+  pop:"2.1M", area:"20,273 km²", lang:"Slovenian", currency:"Euro (€)",
+  culture:"A pristine Alpine nation deeply committed to sustainability, beekeeping, and outdoor living.",
+  trad:"Kurentovanje spring festival with sheepskin-clad figures, celebrating World Bee Day (which Slovenia initiated).",
+  fact:"Over half of Slovenia's territory is covered by forests.",
+  dyk:"The Postojna Cave system is so massive it has an underground railway for visitors.",
+  travel:"🚣 Row a traditional pletna boat to the island church in the middle of Lake Bled.",
+  photos:[
+    {url:"", wiki:"Lake Bled", cap:"Lake Bled"},
+    {url:"", wiki:"Ljubljana", cap:"Ljubljana"},
+    {url:"", wiki:"Postojna Cave", cap:"Postojna Cave"}
+  ]},
+{ iso:70, fc:"ba", name:"Bosnia and Herzegovina", flag:"🇧🇦", capital:"Sarajevo", region:"Europe", lat:43.85, lon:18.41,
+  pop:"3.2M", area:"51,129 km²", lang:"Bosnian, Croatian, Serbian", currency:"Marka (BAM)",
+  culture:"The intersection where East meets West in the Balkans, known for Ottoman bazaars, stunning rivers, and immense resilience.",
+  trad:"Drinking strong Bosnian coffee from a dzezva, eating cevapi, diving off the Stari Most bridge.",
+  fact:"Sarajevo hosted the 1984 Winter Olympics.",
+  dyk:"The Stari Most (Old Bridge) in Mostar stood for 427 years before being destroyed in 1993, and was meticulously rebuilt in 2004.",
+  travel:"🌉 Watch daring locals dive 24 meters from the apex of the Stari Most into the freezing river below.",
+  photos:[
+    {url:"", wiki:"Stari Most", cap:"Stari Most, Mostar"},
+    {url:"", wiki:"Sarajevo", cap:"Baščaršija, Sarajevo"},
+    {url:"", wiki:"Kravica", cap:"Kravice Waterfalls"}
+  ]},
+{ iso:499, fc:"me", name:"Montenegro", flag:"🇲🇪", capital:"Podgorica", region:"Europe", lat:42.44, lon:19.26,
+  pop:"0.6M", area:"13,812 km²", lang:"Montenegrin", currency:"Euro (€)",
+  culture:"A tiny, spectacular country of 'Black Mountains', deep canyons, and Venetian-style coastal towns.",
+  trad:"Slava celebrations, eating Njeguški pršut (dry-cured ham), Orthodox Christmas Eve yule log burning.",
+  fact:"The Tara River Canyon is the deepest canyon in Europe and the second deepest in the world after the Grand Canyon.",
+  dyk:"Montenegro uses the Euro as its de facto currency, despite not formally being in the Eurozone.",
+  travel:"⛵ Sail through the breathtaking, fjord-like Bay of Kotor.",
+  photos:[
+    {url:"", wiki:"Bay of Kotor", cap:"Bay of Kotor"},
+    {url:"", wiki:"Sveti Stefan", cap:"Sveti Stefan"},
+    {url:"", wiki:"Durmitor", cap:"Durmitor National Park"}
+  ]},
+{ iso:807, fc:"mk", name:"North Macedonia", flag:"🇲🇰", capital:"Skopje", region:"Europe", lat:42.00, lon:21.42,
+  pop:"1.8M", area:"25,713 km²", lang:"Macedonian, Albanian", currency:"Denar (MKD)",
+  culture:"A Balkan nation rich in Byzantine frescoes, dramatic mountains, and a capital city famously filled with monumental statues.",
+  trad:"Galicnik Wedding Festival (a massive multi-day traditional wedding), eating Tavče Gravče (baked beans).",
+  fact:"Lake Ohrid is one of Europe's deepest and oldest lakes, boasting a unique, ancient ecosystem.",
+  dyk:"The capital, Skopje, was almost completely destroyed by an earthquake in 1963.",
+  travel:"⛪ Visit the ancient, incredibly scenic Church of St. John at Kaneo overlooking Lake Ohrid.",
+  photos:[
+    {url:"", wiki:"Lake Ohrid", cap:"Lake Ohrid"},
+    {url:"", wiki:"Skopje", cap:"Skopje Statues"},
+    {url:"", wiki:"Matka Canyon", cap:"Matka Canyon"}
+  ]},
+{ iso:8, fc:"al", name:"Albania", flag:"🇦🇱", capital:"Tirana", region:"Europe", lat:41.32, lon:19.81,
+  pop:"2.8M", area:"28,748 km²", lang:"Albanian", currency:"Lek (ALL)",
+  culture:"A beautiful, long-isolated Mediterranean country known for its code of honor (Besa) and stunning riviera.",
+  trad:"Evening xhiro (stroll) where the whole town walks the main streets, drinking raki.",
+  fact:"Albania is famous for having over 170,000 concrete military bunkers scattered across its landscape from the Cold War era.",
+  dyk:"Mother Teresa was born in Skopje to ethnic Albanian parents and is highly revered in Albania.",
+  travel:"🏖️ Relax on the spectacular, pristine white beaches of the Albanian Riviera in Ksamil.",
+  photos:[
+    {url:"", wiki:"Albanian Riviera", cap:"Albanian Riviera"},
+    {url:"", wiki:"Tirana", cap:"Skanderbeg Square, Tirana"},
+    {url:"", wiki:"Berat", cap:"Berat (City of a Thousand Windows)"}
+  ]},
+{ iso:498, fc:"md", name:"Moldova", flag:"🇲🇩", capital:"Chișinău", region:"Europe", lat:47.01, lon:28.86,
+  pop:"2.6M", area:"33,846 km²", lang:"Romanian", currency:"Leu (MDL)",
+  culture:"One of Europe's least visited but most hospitable countries, famous for rolling hills and epic underground wine cellars.",
+  trad:"Mărțișor spring festival, making massive batches of homemade wine.",
+  fact:"Mileștii Mici in Moldova holds the Guinness World Record for the largest wine cellar in the world, holding over 2 million bottles.",
+  dyk:"Moldova's underground wine cellars are so vast you actually drive cars through their 'streets'.",
+  travel:"🍇 Take a tour through the subterranean wine city of Cricova.",
+  photos:[
+    {url:"", wiki:"Cricova (winery)", cap:"Cricova Wine Cellars"},
+    {url:"", wiki:"Chișinău", cap:"Chișinău"},
+    {url:"", wiki:"Orheiul Vechi", cap:"Old Orhei Monastery"}
+  ]},
+{ iso:328, fc:"gy", name:"Guyana", flag:"🇬🇾", capital:"Georgetown", region:"South America", lat:4.86, lon:-58.93,
+  pop:"0.8M", area:"214,969 km²", lang:"English", currency:"Dollar (GYD)",
+  culture:"The only English-speaking country in South America, blending Caribbean and Amazonian influences.",
+  trad:"Mashramani festival (Republic Day), playing cricket, eating pepperpot (meat stew).",
+  fact:"Nearly 80% of Guyana is covered by pristine, untouched Amazonian rainforest.",
+  dyk:"Kaieteur Falls in Guyana is the world's largest single-drop waterfall by volume.",
+  travel:"🌊 Fly over the dense jungle to witness the roaring, immense power of Kaieteur Falls.",
+  photos:[
+    {url:"", wiki:"Kaieteur Falls", cap:"Kaieteur Falls"},
+    {url:"", wiki:"Georgetown, Guyana", cap:"Georgetown"},
+    {url:"", wiki:"Iwokrama Forest", cap:"Iwokrama Canopy Walkway"}
+  ]},
+{ iso:740, fc:"sr", name:"Suriname", flag:"🇸🇷", capital:"Paramaribo", region:"South America", lat:3.91, lon:-56.02,
+  pop:"0.6M", area:"163,820 km²", lang:"Dutch", currency:"Dollar (SRD)",
+  culture:"A highly diverse nation with strong Dutch, Javanese, Hindustani, and Maroon heritage.",
+  trad:"Owru Yari (New Year's Eve) massive street parties with red firecrackers (Pagara), eating Pom.",
+  fact:"Suriname is one of the most heavily forested countries in the world (over 90%).",
+  dyk:"Paramaribo's inner city is a UNESCO site due to its unique Dutch-colonial wooden architecture.",
+  travel:"🏛️ Walk among the distinct black-and-white wooden colonial buildings in Paramaribo.",
+  photos:[
+    {url:"", wiki:"Paramaribo", cap:"Historic Paramaribo"},
+    {url:"", wiki:"Central Suriname Nature Reserve", cap:"Central Suriname Reserve"},
+    {url:"", wiki:"Brokopondo Reservoir", cap:"Brokopondo Reservoir"}
+  ]},
+{ iso:84, fc:"bz", name:"Belize", flag:"🇧🇿", capital:"Belmopan", region:"North America", lat:17.18, lon:-88.49,
+  pop:"0.4M", area:"22,966 km²", lang:"English, Kriol, Spanish", currency:"Dollar (BZD)",
+  culture:"A Caribbean enclave in Central America known for its barrier reef and deep Mayan history.",
+  trad:"Garifuna Settlement Day featuring intense drumming, eating fry jacks, Punta music.",
+  fact:"The Belize Barrier Reef is the second-largest coral reef system in the world after Australia's.",
+  dyk:"The Great Blue Hole is a giant marine sinkhole famously explored by Jacques Cousteau.",
+  travel:"🤿 Scuba dive into the dark, mysterious depths of the Great Blue Hole.",
+  photos:[
+    {url:"", wiki:"Great Blue Hole", cap:"Great Blue Hole"},
+    {url:"", wiki:"Xunantunich", cap:"Xunantunich Ruins"},
+    {url:"", wiki:"Caye Caulker", cap:"Caye Caulker"}
+  ]},
+{ iso:44, fc:"bs", name:"Bahamas", flag:"🇧🇸", capital:"Nassau", region:"North America", lat:25.03, lon:-77.39,
+  pop:"0.4M", area:"13,878 km²", lang:"English", currency:"Dollar (BSD)",
+  culture:"An archipelago of 700 islands known for vibrant Junkanoo music and pristine, shallow turquoise waters.",
+  trad:"Rushing in the vibrant Junkanoo street parades on Boxing Day, eating cracked conch.",
+  fact:"The water in the Bahamas is so clear that you can see the ocean floor from space.",
+  dyk:"The Exumas are famously home to the 'swimming pigs' that paddle out to greet incoming boats.",
+  travel:"🐖 Swim alongside the famous feral pigs at Big Major Cay.",
+  photos:[
+    {url:"", wiki:"Exuma", cap:"Swimming Pigs, Exuma"},
+    {url:"", wiki:"Nassau, Bahamas", cap:"Nassau"},
+    {url:"", wiki:"Atlantis Paradise Island", cap:"Atlantis Resort"}
+  ]},
+{ iso:332, fc:"ht", name:"Haiti", flag:"🇭🇹", capital:"Port-au-Prince", region:"North America", lat:18.97, lon:-72.28,
+  pop:"11.5M", area:"27,750 km²", lang:"French, Haitian Creole", currency:"Gourde (HTG)",
+  culture:"The first independent nation in Latin America, deeply rooted in African heritage and vibrant artistry.",
+  trad:"Celebrating Carnival (Kanaval) with Rara bands, cooking soup joumou on New Year's Day (Independence Day).",
+  fact:"Haiti was the world's first black-led republic, gaining independence in 1804.",
+  dyk:"The massive Citadelle Laferrière is the largest fortress in the Americas, built to repel French attacks.",
+  travel:"🏰 Hike up a steep mountain to reach the breathtaking Citadelle Laferrière.",
+  photos:[
+    {url:"", wiki:"Citadelle Laferrière", cap:"Citadelle Laferrière"},
+    {url:"", wiki:"Bassin-Bleu", cap:"Bassin-Bleu"},
+    {url:"", wiki:"Palais Sans Souci", cap:"Sans-Souci Palace"}
+  ]},
+{ iso:780, fc:"tt", name:"Trinidad and Tobago", flag:"🇹🇹", capital:"Port of Spain", region:"North America", lat:10.65, lon:-61.51,
+  pop:"1.5M", area:"5,128 km²", lang:"English", currency:"Dollar (TTD)",
+  culture:"A vibrant dual-island nation famously known as the birthplace of the steelpan and calypso music.",
+  trad:"Playing the steelpan (steel drum), dancing 'winin' at the massive Carnival, eating doubles (curried chickpeas).",
+  fact:"Trinidad's Carnival is widely considered one of the greatest street parties on Earth.",
+  dyk:"The steelpan is the only acoustic musical instrument invented in the 20th century.",
+  travel:"🎭 Experience the explosive color and rhythm of the Trinidad Carnival.",
+  photos:[
+    {url:"", wiki:"Pitch Lake", cap:"Pitch Lake"},
+    {url:"", wiki:"Maracas Beach", cap:"Maracas Beach"},
+    {url:"", wiki:"Queen's Park Savannah", cap:"Queen's Park Savannah"}
+  ]},
+{ iso:52, fc:"bb", name:"Barbados", flag:"🇧🇧", capital:"Bridgetown", region:"North America", lat:13.19, lon:-59.54,
+  pop:"0.3M", area:"430 km²", lang:"English", currency:"Dollar (BBD)",
+  culture:"A highly developed Caribbean island blending British traditions with lively Bajan culture.",
+  trad:"Crop Over festival celebrating the end of the sugar cane harvest, eating flying fish and cou-cou.",
+  fact:"Barbados produces some of the oldest and finest rums in the world, dating back to 1703.",
+  dyk:"The grapefruit actually originated in Barbados as a natural cross between a sweet orange and a pomelo.",
+  travel:"🏖️ Relax on the pink-tinged sands of Crane Beach.",
+  photos:[
+    {url:"", wiki:"Harrison's Cave", cap:"Harrison's Cave"},
+    {url:"", wiki:"Bridgetown", cap:"Bridgetown"},
+    {url:"", wiki:"Bathsheba, Barbados", cap:"Bathsheba Beach"}
+  ]},
+{ iso:646, fc:"rw", name:"Rwanda", flag:"🇷🇼", capital:"Kigali", region:"Africa", lat:-1.94, lon:30.05,
+  pop:"13.2M", area:"26,338 km²", lang:"Kinyarwanda, French, English", currency:"Franc (RWF)",
+  culture:"The 'Land of a Thousand Hills', celebrated for its remarkable recovery, cleanliness, and mountain gorillas.",
+  trad:"Umuganda (mandatory national community cleanup day), Intore dancing, Kwita Izina (gorilla naming ceremony).",
+  fact:"Rwanda has one of the highest percentages of women in parliament in the world.",
+  dyk:"Plastic bags have been strictly banned in Rwanda since 2008.",
+  travel:"🦍 Trek through the misty bamboo forests of Volcanoes National Park to see silverback gorillas.",
+  photos:[
+    {url:"", wiki:"Volcanoes National Park", cap:"Volcanoes National Park"},
+    {url:"", wiki:"Kigali", cap:"Kigali City"},
+    {url:"", wiki:"Lake Kivu", cap:"Lake Kivu"}
+  ]},
+{ iso:108, fc:"bi", name:"Burundi", flag:"🇧🇮", capital:"Gitega", region:"Africa", lat:-3.37, lon:29.91,
+  pop:"12.5M", area:"27,834 km²", lang:"Kirundi, French", currency:"Franc (BIF)",
+  culture:"A deeply musical East African nation known for its incredibly acrobatic and powerful traditional drummers.",
+  trad:"The hypnotic performance of the Royal Drummers of Burundi, drinking sorghum beer.",
+  fact:"The Royal Drummers of Burundi are so revered their performances are listed by UNESCO.",
+  dyk:"Burundi is home to the southernmost source of the Nile River.",
+  travel:"🥁 Watch the earth-shaking, acrobatic performance of the Royal Drummers of Burundi.",
+  photos:[
+    {url:"", wiki:"Lake Tanganyika", cap:"Lake Tanganyika"},
+    {url:"", wiki:"Bujumbura", cap:"Bujumbura"},
+    {url:"", wiki:"Kibira National Park", cap:"Kibira Forest"}
+  ]},
+{ iso:454, fc:"mw", name:"Malawi", flag:"🇲🇼", capital:"Lilongwe", region:"Africa", lat:-13.96, lon:33.77,
+  pop:"20.4M", area:"118,484 km²", lang:"English, Chichewa", currency:"Kwacha (MWK)",
+  culture:"Known as the 'Warm Heart of Africa' due to the extreme friendliness and hospitality of its people.",
+  trad:"Eating nsima (thick maize porridge), playing bawo (a traditional board game).",
+  fact:"Lake Malawi contains more species of fish than any other lake in the world, especially cichlids.",
+  dyk:"Lake Malawi takes up roughly one-third of the country's entire landmass.",
+  travel:"🐠 Snorkel among hundreds of brightly colored endemic cichlid fish in Lake Malawi.",
+  photos:[
+    {url:"", wiki:"Lake Malawi", cap:"Lake Malawi"},
+    {url:"", wiki:"Mount Mulanje", cap:"Mount Mulanje"},
+    {url:"", wiki:"Liwonde National Park", cap:"Liwonde Safari"}
+  ]},
+{ iso:508, fc:"mz", name:"Mozambique", flag:"🇲🇿", capital:"Maputo", region:"Africa", lat:-25.96, lon:32.58,
+  pop:"33M", area:"801,590 km²", lang:"Portuguese", currency:"Metical (MZN)",
+  culture:"A stunning coastal nation where Afro-Portuguese heritage blends with incredible marine biodiversity.",
+  trad:"Eating spicy peri-peri chicken, dancing the Marrabenta, making intricate Makonde wood carvings.",
+  fact:"The Island of Mozambique was the capital of Portuguese East Africa for nearly four centuries.",
+  dyk:"Mozambique is the only country in the Commonwealth that was never part of the British Empire.",
+  travel:"🐋 Swim alongside massive, gentle whale sharks in the Bazaruto Archipelago.",
+  photos:[
+    {url:"", wiki:"Bazaruto Archipelago", cap:"Bazaruto Archipelago"},
+    {url:"", wiki:"Island of Mozambique", cap:"Island of Mozambique"},
+    {url:"", wiki:"Maputo", cap:"Maputo Railway Station"}
+  ]},
+{ iso:716, fc:"zw", name:"Zimbabwe", flag:"🇿🇼", capital:"Harare", region:"Africa", lat:-19.01, lon:29.15,
+  pop:"16M", area:"390,757 km²", lang:"English, Shona, Ndebele", currency:"Dollar (ZWL)",
+  culture:"A nation of legendary stone ruins, world-class wildlife, and deeply resilient people.",
+  trad:"Playing the mbira (thumb piano), sculpting intricate stone art, eating sadza.",
+  fact:"Zimbabwe is named after Great Zimbabwe, the ancient ruined city built entirely without mortar.",
+  dyk:"The nation holds 16 official languages, the highest number of any country in the Guinness World Records.",
+  travel:"🌊 Stand before the thunderous, awe-inspiring curtain of water at Victoria Falls.",
+  photos:[
+    {url:"", wiki:"Victoria Falls", cap:"Victoria Falls"},
+    {url:"", wiki:"Great Zimbabwe", cap:"Great Zimbabwe Ruins"},
+    {url:"", wiki:"Hwange National Park", cap:"Elephants in Hwange"}
+  ]},
+{ iso:748, fc:"sz", name:"Eswatini", flag:"🇸🇿", capital:"Mbabane", region:"Africa", lat:-26.30, lon:31.13,
+  pop:"1.2M", area:"17,364 km²", lang:"Swazi, English", currency:"Lilangeni (SZL)",
+  culture:"Africa's last absolute monarchy, deeply committed to preserving its vibrant traditional ceremonies.",
+  trad:"The massive Umhlanga (Reed Dance) festival, the sacred Incwala kingship ceremony.",
+  fact:"Eswatini was formerly known as Swaziland until the king changed it in 2018.",
+  dyk:"The country has one of the highest concentrations of rhinos in Africa, rigorously protected in sanctuaries.",
+  travel:"🦏 Spot rare black and white rhinos up close in the Mkhaya Game Reserve.",
+  photos:[
+    {url:"", wiki:"Hlane Royal National Park", cap:"Hlane National Park"},
+    {url:"", wiki:"Ezulwini Valley", cap:"Ezulwini Valley"},
+    {url:"", wiki:"Mbabane", cap:"Mbabane"}
+  ]},
+{ iso:426, fc:"ls", name:"Lesotho", flag:"🇱🇸", capital:"Maseru", region:"Africa", lat:-29.31, lon:27.48,
+  pop:"2.3M", area:"30,355 km²", lang:"Sesotho, English", currency:"Loti (LSL)",
+  culture:"The 'Kingdom in the Sky', an enclaved alpine nation entirely surrounded by South Africa.",
+  trad:"Wearing colorful Basotho blankets to stay warm, traveling via sure-footed Basotho ponies.",
+  fact:"Lesotho has the highest 'lowest point' of any country in the world, sitting entirely above 1,400 meters.",
+  dyk:"It is one of the very few places in Africa that frequently sees snow and has a ski resort.",
+  travel:"🏇 Ride a hardy Basotho pony through the breathtaking, high-altitude Maloti Mountains.",
+  photos:[
+    {url:"", wiki:"Sani Pass", cap:"Sani Pass"},
+    {url:"", wiki:"Maletsunyane Falls", cap:"Maletsunyane Falls"},
+    {url:"", wiki:"Thabana Ntlenyana", cap:"High Mountains of Lesotho"}
+  ]},
+{ iso:480, fc:"mu", name:"Mauritius", flag:"🇲🇺", capital:"Port Louis", region:"Africa", lat:-20.16, lon:57.50,
+  pop:"1.3M", area:"2,040 km²", lang:"English, French, Mauritian Creole", currency:"Rupee (MUR)",
+  culture:"A spectacular Indian Ocean island mixing Indian, African, French, and Chinese cultures in perfect harmony.",
+  trad:"Dancing the Sega on the beach, celebrating Diwali alongside Chinese New Year and Christmas.",
+  fact:"Mauritius was the only known home of the Dodo bird before it went extinct in the 17th century.",
+  dyk:"The 'Seven Colored Earths' in Chamarel are dunes of multi-colored sand that miraculously never mix.",
+  travel:"🌈 Marvel at the surreal, rainbow-hued dunes of the Seven Colored Earths.",
+  photos:[
+    {url:"", wiki:"Seven Coloured Earths", cap:"Seven Colored Earths"},
+    {url:"", wiki:"Le Morne Brabant", cap:"Le Morne Brabant"},
+    {url:"", wiki:"Port Louis", cap:"Port Louis Market"}
+  ]},
+{ iso:788, fc:"tn", name:"Tunisia", flag:"🇹🇳", capital:"Tunis", region:"Africa", lat:33.88, lon:9.53,
+  pop:"12M", area:"163,610 km²", lang:"Arabic", currency:"Dinar (TND)",
+  culture:"A sun-drenched North African nation containing the ancient ruins of Carthage and sweeping Saharan dunes.",
+  trad:"Drinking mint tea with pine nuts, visiting the hammam, eating spicy harissa with almost everything.",
+  fact:"Tunisia is home to El Djem, one of the largest and best-preserved Roman amphitheaters in the world.",
+  dyk:"Several iconic scenes from the original Star Wars movies (like Tatooine) were filmed in the Tunisian desert.",
+  travel:"🌌 Wander the subterranean troglodyte dwellings of Matmata, famously used as a Star Wars filming location.",
+  photos:[
+    {url:"", wiki:"Carthage", cap:"Ruins of Carthage"},
+    {url:"", wiki:"Amphitheatre of El Jem", cap:"El Djem Amphitheater"},
+    {url:"", wiki:"Sidi Bou Said", cap:"Sidi Bou Said"}
+  ]},
+{ iso:434, fc:"ly", name:"Libya", flag:"🇱🇾", capital:"Tripoli", region:"Africa", lat:26.33, lon:17.22,
+  pop:"6.9M", area:"1,759,540 km²", lang:"Arabic", currency:"Dinar (LYD)",
+  culture:"A vast desert nation steeped in Roman and Greek antiquity, heavily influenced by Bedouin tribal heritage.",
+  trad:"Drinking strong, frothy green tea, serving Bazeen (a barley dough dish) during large family gatherings.",
+  fact:"Roughly 90% of Libya's massive land area is covered by the Sahara Desert.",
+  dyk:"Leptis Magna is considered one of the most spectacular and unspoiled Roman ruins in the Mediterranean.",
+  travel:"🏛️ Marvel at the massive, perfectly preserved Roman arches and columns of Leptis Magna.",
+  photos:[
+    {url:"", wiki:"Leptis Magna", cap:"Leptis Magna"},
+    {url:"", wiki:"Cyrene, Libya", cap:"Cyrene"},
+    {url:"", wiki:"Tripoli, Libya", cap:"Tripoli Skyline"}
+  ]},
+{ iso:478, fc:"mr", name:"Mauritania", flag:"🇲🇷", capital:"Nouakchott", region:"Africa", lat:21.00, lon:-10.94,
+  pop:"4.8M", area:"1,030,700 km²", lang:"Arabic", currency:"Ouguiya (MRU)",
+  culture:"A starkly beautiful desert republic bridging the Maghreb and West Africa, known for deep nomadic roots.",
+  trad:"Drinking zrig (camel milk), resting in Khaimas (traditional nomadic tents), intricate silver jewelry making.",
+  fact:"The 'Eye of the Sahara' (Richat Structure) in Mauritania is a geological dome so massive it is used as a landmark by astronauts.",
+  dyk:"Mauritania was the last country in the world to officially abolish slavery, doing so in 1981.",
+  travel:"👁️ Fly over the otherworldly, giant rings of the Eye of the Sahara.",
+  photos:[
+    {url:"", wiki:"Richat Structure", cap:"Eye of the Sahara"},
+    {url:"", wiki:"Chinguetti", cap:"Ancient Chinguetti"},
+    {url:"", wiki:"Banc d'Arguin National Park", cap:"Banc d'Arguin"}
+  ]},
+{ iso:562, fc:"ne", name:"Niger", flag:"🇳🇪", capital:"Niamey", region:"Africa", lat:17.60, lon:8.08,
+  pop:"25M", area:"1,267,000 km²", lang:"French", currency:"CFA Franc (XOF)",
+  culture:"A sprawling Sahelian nation named after the Niger River, renowned for vibrant nomadic festivals.",
+  trad:"The spectacular Wodaabe Gerewol festival where men wear elaborate makeup to compete in beauty and dance.",
+  fact:"Niger is home to one of the largest protected reserves in Africa, the Aïr and Ténéré National Nature Reserve.",
+  dyk:"The country holds some of the world's highest grade uranium deposits.",
+  travel:"🏜️ Experience the intense, vibrant dancing and singing at the Cure Salée gathering of nomads.",
+  photos:[
+    {url:"", wiki:"Aïr Mountains", cap:"Aïr Mountains"},
+    {url:"", wiki:"Niamey", cap:"Grand Mosque of Niamey"},
+    {url:"", wiki:"W National Park", cap:"W National Park"}
+  ]},
+{ iso:148, fc:"td", name:"Chad", flag:"🇹🇩", capital:"N'Djamena", region:"Africa", lat:15.45, lon:18.73,
+  pop:"17M", area:"1,284,000 km²", lang:"French, Arabic", currency:"CFA Franc (XAF)",
+  culture:"The 'Babel of Africa,' featuring over 200 ethnic groups and an incredible mix of desert, savanna, and lake environments.",
+  trad:"Camel racing among the Toubou nomads, intense tribal wrestling competitions.",
+  fact:"Lake Chad was once one of the largest lakes in the world, though it has shrunk dramatically over the last 50 years.",
+  dyk:"The Tibesti Mountains in northern Chad hold Emi Koussi, the highest peak in the entire Sahara.",
+  travel:"🐪 Explore the stunning, otherworldly sandstone arches of the Ennedi Plateau.",
+  photos:[
+    {url:"", wiki:"Ennedi Plateau", cap:"Ennedi Plateau"},
+    {url:"", wiki:"Lake Chad", cap:"Lake Chad"},
+    {url:"", wiki:"Zakouma National Park", cap:"Zakouma Wildlife"}
+  ]},
+{ iso:729, fc:"sd", name:"Sudan", flag:"🇸🇩", capital:"Khartoum", region:"Africa", lat:12.86, lon:30.21,
+  pop:"45M", area:"1,886,068 km²", lang:"Arabic, English", currency:"Pound (SDG)",
+  culture:"A historically rich nation where the Blue and White Nile rivers merge, home to ancient Nubian civilizations.",
+  trad:"Whirling dervish ceremonies on Fridays, intense hospitality, elaborate henna designs for brides.",
+  fact:"Sudan actually contains more ancient pyramids than Egypt (over 200 of them in Meroë).",
+  dyk:"The confluence of the Blue and White Nile occurs directly in the capital city, Khartoum.",
+  travel:"🔺 Wander completely alone among the steep, ancient Nubian pyramids of Meroë.",
+  photos:[
+    {url:"", wiki:"Meroë", cap:"Nubian Pyramids of Meroë"},
+    {url:"", wiki:"Khartoum", cap:"Confluence of the Nile"},
+    {url:"", wiki:"Sanganeb National Park", cap:"Sanganeb Marine Park"}
+  ]},
+{ iso:706, fc:"so", name:"Somalia", flag:"🇸🇴", capital:"Mogadishu", region:"Africa", lat:5.15, lon:46.19,
+  pop:"17M", area:"637,657 km²", lang:"Somali, Arabic", currency:"Shilling (SOS)",
+  culture:"A 'Nation of Poets' boasting the longest coastline on mainland Africa, with a deep pastoral and maritime history.",
+  trad:"Reciting intricate oral poetry, drinking camel milk, eating bariis iskukaris (spiced rice).",
+  fact:"Somalia is incredibly homogeneous culturally; almost the entire population speaks the same language and shares the same faith.",
+  dyk:"The ancient rock art complex at Laas Geel is considered some of the best-preserved and oldest in Africa.",
+  travel:"🎨 View the incredibly vibrant, ancient rock paintings at Laas Geel (Somaliland).",
+  photos:[
+    {url:"", wiki:"Laas Geel", cap:"Laas Geel Rock Art"},
+    {url:"", wiki:"Mogadishu", cap:"Mogadishu Coastline"},
+    {url:"", wiki:"Lido Beach (Mogadishu)", cap:"Lido Beach"}
+  ]},
+{ iso:140, fc:"cf", name:"Central African Republic", flag:"🇨🇫", capital:"Bangui", region:"Africa", lat:6.61, lon:20.93,
+  pop:"5M", area:"622,984 km²", lang:"French, Sango", currency:"CFA Franc (XAF)",
+  culture:"A profoundly wild and remote country located exactly at the geographic center of the African continent.",
+  trad:"Intricate polyphonic singing by the BaAka people, deep forest foraging.",
+  fact:"The Dzanga-Sangha Special Reserve is one of the best places in the world to see rare forest elephants.",
+  dyk:"The country is immensely rich in diamonds and gold, yet remains one of the world's least developed nations.",
+  travel:"🐘 Trek into the Dzanga Bai clearing to watch hundreds of elusive forest elephants gather at once.",
+  photos:[
+    {url:"", wiki:"Dzanga-Sangha Special Reserve", cap:"Dzanga-Sangha Reserve"},
+    {url:"", wiki:"Bangui", cap:"Bangui"},
+    {url:"", wiki:"Manovo-Gounda St. Floris National Park", cap:"Manovo-Gounda Park"}
+  ]},
+{ iso:180, fc:"cd", name:"Democratic Republic of the Congo", flag:"🇨🇩", capital:"Kinshasa", region:"Africa", lat:-4.03, lon:21.75,
+  pop:"95M", area:"2,344,858 km²", lang:"French, Lingala", currency:"Franc (CDF)",
+  culture:"A gargantuan nation vibrating with the sounds of Congolese rumba and immense, impenetrable rainforests.",
+  trad:"Dressing up as 'Sapeurs' (Society of Ambiance-Makers and Elegant People) in incredibly sharp, colorful suits.",
+  fact:"It is the second-largest country in Africa and holds half of the continent's forests.",
+  dyk:"The DRC is the only place on Earth where you can find both bonobos and Eastern lowland gorillas in the wild.",
+  travel:"🌋 Hike up Mount Nyiragongo to peer into the world's largest bubbling lava lake.",
+  photos:[
+    {url:"", wiki:"Mount Nyiragongo", cap:"Nyiragongo Lava Lake"},
+    {url:"", wiki:"Virunga National Park", cap:"Virunga National Park"},
+    {url:"", wiki:"Kinshasa", cap:"Kinshasa"}
+  ]},
+{ iso:178, fc:"cg", name:"Republic of the Congo", flag:"🇨🇬", capital:"Brazzaville", region:"Africa", lat:-0.22, lon:15.82,
+  pop:"5.6M", area:"342,000 km²", lang:"French, Lingala", currency:"CFA Franc (XAF)",
+  culture:"Often overshadowed by its giant neighbor, it boasts pristine lowland jungles and a deeply relaxed capital.",
+  trad:"The original birthplace of the 'Sapeur' subculture, intense drum circles.",
+  fact:"Odzala-Kokoua National Park is one of the oldest national parks in Africa, founded in 1935.",
+  dyk:"The capitals Brazzaville and Kinshasa are the closest capital cities in the world, separated only by the Congo River.",
+  travel:"🦍 Track western lowland gorillas in the ancient, pristine forests of Odzala.",
+  photos:[
+    {url:"", wiki:"Odzala-Kokoua National Park", cap:"Odzala-Kokoua National Park"},
+    {url:"", wiki:"Brazzaville", cap:"Basilique Sainte-Anne, Brazzaville"},
+    {url:"", wiki:"Nouabalé-Ndoki National Park", cap:"Nouabalé-Ndoki"}
+  ]},
+{ iso:266, fc:"ga", name:"Gabon", flag:"🇬🇦", capital:"Libreville", region:"Africa", lat:-0.80, lon:11.60,
+  pop:"2.3M", area:"267,668 km²", lang:"French", currency:"CFA Franc (XAF)",
+  culture:"A highly forested, oil-rich coastal nation with a strong commitment to massive national parks and conservation.",
+  trad:"The spiritual Bwiti religion which utilizes the psychedelic Iboga root, intricate Fang masks.",
+  fact:"Almost 90% of Gabon is covered by dense equatorial rainforest.",
+  dyk:"Gabon is famous for 'surfing hippos'—hippopotamuses that literally swim in the ocean surf at Loango National Park.",
+  travel:"🦛 Visit Loango National Park to see elephants walking on the beach and hippos in the ocean.",
+  photos:[
+    {url:"", wiki:"Loango National Park", cap:"Loango National Park"},
+    {url:"", wiki:"Libreville", cap:"Libreville Coast"},
+    {url:"", wiki:"Lopé National Park", cap:"Lopé National Park"}
+  ]},
+{ iso:226, fc:"gq", name:"Equatorial Guinea", flag:"🇬🇶", capital:"Malabo", region:"Africa", lat:1.62, lon:10.27,
+  pop:"1.5M", area:"28,051 km²", lang:"Spanish, French, Portuguese", currency:"CFA Franc (XAF)",
+  culture:"The only Spanish-speaking country in Africa, physically split between the mainland and several volcanic islands.",
+  trad:"Balélé dancing, playing the mvet (a stringed instrument), rich storytelling.",
+  fact:"The capital city, Malabo, is actually located on an island (Bioko), not on the African mainland.",
+  dyk:"The country is currently building a massive, futuristic new capital city completely from scratch deep in the jungle (Ciudad de la Paz).",
+  travel:"🐒 Trek through the dense, cloud-covered jungles of Bioko Island to spot rare drill monkeys.",
+  photos:[
+    {url:"", wiki:"Malabo", cap:"Malabo, Bioko Island"},
+    {url:"", wiki:"Monte Alén National Park", cap:"Monte Alén National Park"},
+    {url:"", wiki:"Bioko", cap:"Bioko Island Coastline"}
+  ]},
+{ iso:324, fc:"gn", name:"Guinea", flag:"🇬🇳", capital:"Conakry", region:"Africa", lat:9.94, lon:-9.69,
+  pop:"13.5M", area:"245,857 km²", lang:"French", currency:"Franc (GNF)",
+  culture:"The vibrant heart of West African music, particularly renowned for the djembe drum and the kora.",
+  trad:"Masterful djembe drumming, vibrant Susu and Malinke mask dances.",
+  fact:"Guinea holds some of the world's largest reserves of bauxite, the main ore used to make aluminum.",
+  dyk:"The Fouta Djallon highland region is known as the 'Water Tower of West Africa' because it is the source of several major rivers, including the Niger.",
+  travel:"🥾 Hike through the lush, misty mountains and spectacular waterfalls of the Fouta Djallon.",
+  photos:[
+    {url:"", wiki:"Fouta Djallon", cap:"Fouta Djallon Highlands"},
+    {url:"", wiki:"Conakry", cap:"Conakry"},
+    {url:"", wiki:"Mount Nimba Strict Nature Reserve", cap:"Mount Nimba"}
+  ]},
+{ iso:694, fc:"sl", name:"Sierra Leone", flag:"🇸🇱", capital:"Freetown", region:"Africa", lat:8.46, lon:-13.23,
+  pop:"8.4M", area:"71,740 km²", lang:"English", currency:"Leone (SLL)",
+  culture:"A remarkably resilient nation known for its incredibly beautiful, untouched beaches and welcoming people.",
+  trad:"Eating massive bowls of cassava leaf stew, the vibrant Poro and Sande secret society dances.",
+  fact:"The capital, Freetown, was founded in 1792 by freed African American and West Indian slaves.",
+  dyk:"Freetown surrounds the 'Cotton Tree,' a massive, centuries-old tree that serves as the historical symbol of the city.",
+  travel:"🏖️ Relax on the spectacular white sands of River Number Two Beach.",
+  photos:[
+    {url:"", wiki:"Freetown", cap:"Freetown"},
+    {url:"", wiki:"Banana Islands", cap:"Banana Islands"},
+    {url:"", wiki:"Tacugama Chimpanzee Sanctuary", cap:"Tacugama Sanctuary"}
+  ]},
+{ iso:430, fc:"lr", name:"Liberia", flag:"🇱🇷", capital:"Monrovia", region:"Africa", lat:6.31, lon:-10.79,
+  pop:"5.2M", area:"111,369 km²", lang:"English", currency:"Dollar (LRD)",
+  culture:"Africa's oldest republic, retaining strong cultural and historical ties to the United States.",
+  trad:"The mysterious, stilt-walking 'Devil' dancers of the traditional secret societies, eating jollof rice.",
+  fact:"Liberia and Ethiopia were the only two African nations that were never formally colonized by European powers.",
+  dyk:"The Liberian flag is modeled heavily after the US flag, featuring a single star representing the only independent republic in Africa at the time.",
+  travel:"🏄 Surf incredible, uncrowded waves in the laid-back coastal town of Robertsport.",
+  photos:[
+    {url:"", wiki:"Sapo National Park", cap:"Sapo National Park"},
+    {url:"", wiki:"Robertsport", cap:"Beaches of Robertsport"}
+  ]},
+{ iso:682, fc:"sa", name:"Saudi Arabia", flag:"🇸🇦", capital:"Riyadh", region:"Asia", lat:23.88, lon:45.07,
+  pop:"36M", area:"2,149,690 km²", lang:"Arabic", currency:"Riyal (SAR)",
+  culture:"The birthplace of Islam, rapidly modernizing while maintaining deep-rooted Bedouin traditions.",
+  trad:"Drinking gahwa (Arabic coffee) with dates, traditional sword dancing (Ardah).",
+  fact:"Saudi Arabia is the largest country in the world without a single river.",
+  dyk:"The country is currently building 'The Line', a futuristic 170-kilometer long linear city in the desert.",
+  travel:"🐪 Sleep under a blanket of stars in the breathtaking, vast dunes of the Empty Quarter.",
+  photos:[
+    {url:"", wiki:"Al-Ula", cap:"Ancient Al-Ula"},
+    {url:"", wiki:"Riyadh", cap:"Riyadh Skyline"},
+    {url:"", wiki:"Mecca", cap:"The Grand Mosque"}
+  ]},
+{ iso:784, fc:"ae", name:"United Arab Emirates", flag:"🇦🇪", capital:"Abu Dhabi", region:"Asia", lat:23.42, lon:53.84,
+  pop:"9.4M", area:"83,600 km²", lang:"Arabic", currency:"Dirham (AED)",
+  culture:"A hyper-modern federation of seven emirates that rose from the desert in just a few decades.",
+  trad:"Falconry, camel racing, pearl diving history.",
+  fact:"The Burj Khalifa in Dubai is the tallest building in the world at 828 meters.",
+  dyk:"Police in Dubai actually drive supercars, including Bugattis and Lamborghinis, to catch speeding drivers.",
+  travel:"🏙️ Look down upon the clouds from the incredible observation deck of the Burj Khalifa.",
+  photos:[
+    {url:"", wiki:"Burj Khalifa", cap:"Burj Khalifa"},
+    {url:"", wiki:"Sheikh Zayed Mosque", cap:"Sheikh Zayed Mosque"},
+    {url:"", wiki:"Palm Jumeirah", cap:"Palm Jumeirah"}
+  ]},
+{ iso:887, fc:"ye", name:"Yemen", flag:"🇾🇪", capital:"Sana'a", region:"Asia", lat:15.55, lon:48.51,
+  pop:"33M", area:"527,968 km²", lang:"Arabic", currency:"Rial (YER)",
+  culture:"One of the oldest centers of civilization in the Near East, famous for its unique 'gingerbread' architecture.",
+  trad:"Chewing qat leaves, carrying the ornate curved jambiya dagger.",
+  fact:"The city of Shibam is famously known as the 'Manhattan of the Desert' due to its ancient 500-year-old mudbrick skyscrapers.",
+  dyk:"Mocha coffee gets its name from the Yemeni port city of Mocha.",
+  travel:"🏰 Wander through the mesmerizing, gingerbread-like ancient mudbrick towers of Shibam.",
+  photos:[
+    {url:"", wiki:"Shibam", cap:"Shibam Mudbrick Skyscrapers"},
+    {url:"", wiki:"Socotra", cap:"Dragon Blood Trees of Socotra"},
+    {url:"", wiki:"Sana'a", cap:"Old City of Sana'a"}
+  ]},
+{ iso:400, fc:"jo", name:"Jordan", flag:"🇯🇴", capital:"Amman", region:"Asia", lat:31.24, lon:36.51,
+  pop:"11M", area:"89,342 km²", lang:"Arabic", currency:"Dinar (JOD)",
+  culture:"A peaceful haven in the Middle East, boasting profound biblical history and legendary Bedouin hospitality.",
+  trad:"Sharing immense platters of Mansaf (lamb cooked in fermented yogurt), drinking extremely sweet tea.",
+  fact:"The ancient city of Petra was carved directly into vibrant red sandstone rock faces by the Nabataeans.",
+  dyk:"The Dead Sea in Jordan is the lowest point on Earth and is so salty that you physically cannot sink in it.",
+  travel:"⛰️ Walk through the narrow, towering Siq to suddenly reveal the magnificent Treasury of Petra.",
+  photos:[
+    {url:"", wiki:"Petra", cap:"The Treasury, Petra"},
+    {url:"", wiki:"Dead Sea", cap:"Floating in the Dead Sea"},
+    {url:"", wiki:"Wadi Rum", cap:"Wadi Rum Desert"}
+  ]},
+{ iso:422, fc:"lb", name:"Lebanon", flag:"🇱🇧", capital:"Beirut", region:"Asia", lat:33.85, lon:35.86,
+  pop:"5.5M", area:"10,452 km²", lang:"Arabic", currency:"Pound (LBP)",
+  culture:"The 'Paris of the Middle East', a tiny, resilient nation known for legendary nightlife and world-class cuisine.",
+  trad:"Eating mezze spreads, dancing the Dabke, taking long Sunday family lunches.",
+  fact:"Lebanon is one of the few countries in the Middle East with no desert—it actually has ski resorts.",
+  dyk:"The majestic Cedar of Lebanon tree, featured on their flag, can live for over 1,000 years.",
+  travel:"🌲 Hike among the ancient, towering 'Cedars of God' in the snowy Lebanese mountains.",
+  photos:[
+    {url:"", wiki:"Cedars of God", cap:"Cedars of God"},
+    {url:"", wiki:"Baalbek", cap:"Ruins of Baalbek"},
+    {url:"", wiki:"Beirut", cap:"Beirut Coastline"}
+  ]},
+{ iso:368, fc:"iq", name:"Iraq", flag:"🇮🇶", capital:"Baghdad", region:"Asia", lat:33.22, lon:43.67,
+  pop:"43M", area:"438,317 km²", lang:"Arabic, Kurdish", currency:"Dinar (IQD)",
+  culture:"The 'Cradle of Civilization', where ancient Mesopotamia invented writing, the wheel, and early law.",
+  trad:"Drinking incredibly strong, sweet cardamom tea, baking samoon bread in clay ovens.",
+  fact:"The epic of Gilgamesh, one of the oldest known pieces of literature in the world, originated here.",
+  dyk:"The ancient city of Babylon with its legendary Hanging Gardens was located in modern-day Iraq.",
+  travel:"🏛️ Stand before the towering, partially restored ancient Ziggurat of Ur.",
+  photos:[
+    {url:"", wiki:"Ziggurat of Ur", cap:"Ziggurat of Ur"},
+    {url:"", wiki:"Babylon", cap:"Ruins of Babylon"},
+    {url:"", wiki:"Baghdad", cap:"Baghdad"}
+  ]},
+{ iso:398, fc:"kz", name:"Kazakhstan", flag:"🇰🇿", capital:"Astana", region:"Asia", lat:48.01, lon:66.92,
+  pop:"19.6M", area:"2,724,900 km²", lang:"Kazakh, Russian", currency:"Tenge (KZT)",
+  culture:"A colossal nation of vast steppes, blending deep nomadic traditions with futuristic, wealthy modern cities.",
+  trad:"Drinking kumis (fermented mare's milk), playing kokpar (a fierce horseback game).",
+  fact:"Kazakhstan is the largest landlocked country in the entire world.",
+  dyk:"Apples actually originated in Kazakhstan, specifically in the mountains near Almaty.",
+  travel:"🦅 Watch skilled hunters practice the ancient art of Golden Eagle hunting in the snow.",
+  photos:[
+    {url:"", wiki:"Almaty", cap:"Mountains near Almaty"},
+    {url:"", wiki:"Astana", cap:"Futuristic Astana"},
+    {url:"", wiki:"Charyn Canyon", cap:"Charyn Canyon"}
+  ]},
+{ iso:860, fc:"uz", name:"Uzbekistan", flag:"🇺🇿", capital:"Tashkent", region:"Asia", lat:41.37, lon:64.58,
+  pop:"35.6M", area:"447,400 km²", lang:"Uzbek", currency:"Som (UZS)",
+  culture:"The beating heart of the ancient Silk Road, legendary for its mesmerizing, intricate blue-tiled mosques.",
+  trad:"Serving massive, communal plates of Plov (rice pilaf), intricate silk weaving.",
+  fact:"It is one of only two 'doubly landlocked' countries in the world (surrounded entirely by other landlocked countries).",
+  dyk:"The Registan in Samarkand was essentially the center of the world for scholars and traders in the 15th century.",
+  travel:"🕌 Stand in absolute awe in the center of the magnificent Registan square in Samarkand.",
+  photos:[
+    {url:"", wiki:"Registan", cap:"Registan, Samarkand"},
+    {url:"", wiki:"Bukhara", cap:"Old City of Bukhara"},
+    {url:"", wiki:"Khiva", cap:"Itchan Kala, Khiva"}
+  ]},
+{ iso:795, fc:"tm", name:"Turkmenistan", flag:"🇹🇲", capital:"Ashgabat", region:"Asia", lat:38.96, lon:59.55,
+  pop:"6.4M", area:"491,210 km²", lang:"Turkmen", currency:"Manat (TMT)",
+  culture:"A highly secretive, desert-covered nation famous for its prized horses and eccentric architecture.",
+  trad:"Weaving world-renowned carpets, breeding the legendary Akhal-Teke horses.",
+  fact:"Over 70% of the country is covered by the harsh, expansive Karakum Desert.",
+  dyk:"The 'Darvaza Gas Crater' has been burning continuously in the desert for over 50 years and is known as the 'Gates of Hell'.",
+  travel:"🔥 Camp near the roaring flames of the massive, apocalyptic Darvaza Gas Crater at night.",
+  photos:[
+    {url:"", wiki:"Darvaza gas crater", cap:"Gates of Hell"},
+    {url:"", wiki:"Ashgabat", cap:"White Marble City of Ashgabat"},
+    {url:"", wiki:"Merv", cap:"Ancient Merv"}
+  ]},
+{ iso:762, fc:"tj", name:"Tajikistan", flag:"🇹🇯", capital:"Dushanbe", region:"Asia", lat:38.86, lon:71.27,
+  pop:"10M", area:"143,100 km²", lang:"Tajik", currency:"Somoni (TJS)",
+  culture:"A rugged, incredibly mountainous nation deeply rooted in Persian culture and Soviet history.",
+  trad:"Serving food on a dastarkhan (tablecloth on the floor), deep hospitality for mountain trekkers.",
+  fact:"Over 90% of Tajikistan is mountainous, with the Pamir range featuring some of the highest peaks on Earth.",
+  dyk:"The Pamir Highway is the second highest altitude international highway in the world.",
+  travel:"🚙 Drive the treacherous, breathtakingly high passes of the remote Pamir Highway.",
+  photos:[
+    {url:"", wiki:"Pamir Mountains", cap:"Pamir Mountains"},
+    {url:"", wiki:"Iskanderkul", cap:"Lake Iskanderkul"},
+    {url:"", wiki:"Dushanbe", cap:"Dushanbe"}
+  ]},
+{ iso:417, fc:"kg", name:"Kyrgyzstan", flag:"🇰🇬", capital:"Bishkek", region:"Asia", lat:41.20, lon:74.76,
+  pop:"6.7M", area:"199,951 km²", lang:"Kyrgyz, Russian", currency:"Som (KGS)",
+  culture:"A nation of fiercely independent mountain nomads, renowned for epic horseback riding and stunning alpine lakes.",
+  trad:"Living in yurts during the summer, reciting the Epic of Manas (the world's longest epic poem).",
+  fact:"The traditional yurt is so central to their culture that the top of a yurt is depicted on the national flag.",
+  dyk:"Issyk-Kul is the second-largest alpine lake in the world, and miraculously never freezes despite the freezing winters.",
+  travel:"🐎 Ride a horse across the high alpine pastures and sleep in a traditional nomadic yurt.",
+  photos:[
+    {url:"", wiki:"Issyk-Kul", cap:"Lake Issyk-Kul"},
+    {url:"", wiki:"Tian Shan", cap:"Tian Shan Mountains"},
+    {url:"", wiki:"Bishkek", cap:"Bishkek"}
+  ]},
+{ iso:586, fc:"pk", name:"Pakistan", flag:"🇵🇰", capital:"Islamabad", region:"Asia", lat:30.37, lon:69.34,
+  pop:"241M", area:"881,913 km²", lang:"Urdu, English", currency:"Rupee (PKR)",
+  culture:"A vibrant, diverse nation blending South Asian and Central Asian influences with epic, dramatic landscapes.",
+  trad:"Drinking intensely sweet chai, playing cricket everywhere, vibrant and incredibly loud truck art.",
+  fact:"Pakistan is home to K2, the second-highest mountain in the world and notoriously the deadliest to climb.",
+  dyk:"The country produces over 50% of the world's footballs (soccer balls) in the single city of Sialkot.",
+  travel:"🏔️ Journey up the perilous, winding roads of the breathtaking Karakoram Highway.",
+  photos:[
+    {url:"", wiki:"K2", cap:"K2 Mountain"},
+    {url:"", wiki:"Badshahi Mosque", cap:"Badshahi Mosque"},
+    {url:"", wiki:"Hunza Valley", cap:"Hunza Valley"}
+  ]},
+{ iso:50, fc:"bd", name:"Bangladesh", flag:"🇧🇩", capital:"Dhaka", region:"Asia", lat:23.68, lon:90.35,
+  pop:"172M", area:"148,460 km²", lang:"Bengali", currency:"Taka (BDT)",
+  culture:"A densely populated, lush delta nation defined by massive rivers and incredibly resilient people.",
+  trad:"Riding colorful rickshaws, celebrating Pohela Boishakh (Bengali New Year) with massive parades.",
+  fact:"Bangladesh is home to the Sundarbans, the largest single block of tidal halophytic mangrove forest in the world.",
+  dyk:"Cox's Bazar in Bangladesh is the longest uninterrupted natural sea beach on the planet.",
+  travel:"🐅 Take a boat deep into the massive Sundarbans mangrove forest to spot wild Bengal tigers.",
+  photos:[
+    {url:"", wiki:"Sundarbans", cap:"Sundarbans Mangrove"},
+    {url:"", wiki:"Cox's Bazar", cap:"Cox's Bazar Beach"},
+    {url:"", wiki:"Dhaka", cap:"Ahsan Manzil, Dhaka"}
+  ]},
+{ iso:144, fc:"lk", name:"Sri Lanka", flag:"🇱🇰", capital:"Colombo", region:"Asia", lat:7.87, lon:80.77,
+  pop:"22M", area:"65,610 km²", lang:"Sinhala, Tamil", currency:"Rupee (LKR)",
+  culture:"The 'Pearl of the Indian Ocean', famous for endless tea plantations, wild elephants, and ancient Buddhist ruins.",
+  trad:"Eating massive portions of rice and fiery curry, playing cricket, traditional Kandyan dancing.",
+  fact:"Sri Lanka is the world's leading exporter of true cinnamon, which originated on the island.",
+  dyk:"Sigiriya is an ancient palace carved directly into a massive, 200-meter-high sheer rock column.",
+  travel:"🚂 Take the incredibly scenic, slow train ride from Kandy to Ella through the misty tea fields.",
+  photos:[
+    {url:"", wiki:"Sigiriya", cap:"Sigiriya Rock Fortress"},
+    {url:"", wiki:"Nine Arch Bridge", cap:"Nine Arch Bridge, Ella"},
+    {url:"", wiki:"Yala National Park", cap:"Leopard in Yala"}
+  ]},
+{ iso:462, fc:"mv", name:"Maldives", flag:"🇲🇻", capital:"Malé", region:"Asia", lat:3.20, lon:73.22,
+  pop:"0.5M", area:"300 km²", lang:"Dhivehi", currency:"Rufiyaa (MVR)",
+  culture:"An archipelago nation intrinsically tied to the ocean, representing the ultimate tropical paradise.",
+  trad:"Fishing from traditional dhoni boats, eating Mas Huni (tuna and coconut) for breakfast.",
+  fact:"It is the lowest, flattest country in the world, with an average ground level of just 1.5 meters.",
+  dyk:"The Maldives consists of 1,192 coral islands grouped in a double chain of 26 atolls.",
+  travel:"🤿 Scuba dive alongside massive, elegant manta rays in the crystal-clear atolls.",
+  photos:[
+    {url:"", wiki:"Maldives", cap:"Maldivian Atoll"},
+    {url:"", wiki:"Malé", cap:"Malé City"},
+    {url:"", wiki:"Baa Atoll", cap:"Manta Rays in Baa Atoll"}
+  ]},
+{ iso:496, fc:"mn", name:"Mongolia", flag:"🇲🇳", capital:"Ulaanbaatar", region:"Asia", lat:46.86, lon:103.84,
+  pop:"3.4M", area:"1,564,110 km²", lang:"Mongolian", currency:"Tögrög (MNT)",
+  culture:"The 'Land of the Eternal Blue Sky', honoring the epic legacy of Genghis Khan and nomadic herding.",
+  trad:"Throat singing, living in gers (yurts), the massive Naadam festival of wrestling, archery, and horse racing.",
+  fact:"Mongolia is the most sparsely populated sovereign country in the world.",
+  dyk:"In Mongolia, horses outnumber humans by a significant margin.",
+  travel:"🐴 Ride wildly across the endless, empty green steppes and sleep in a traditional ger.",
+  photos:[
+    {url:"", wiki:"Gobi Desert", cap:"Gobi Desert"},
+    {url:"", wiki:"Ulaanbaatar", cap:"Genghis Khan Statue"},
+    {url:"", wiki:"Khuvsgul Lake", cap:"Lake Khövsgöl"}
+  ]},
+{ iso:608, fc:"ph", name:"Philippines", flag:"🇵🇭", capital:"Manila", region:"Asia", lat:12.87, lon:121.77,
+  pop:"115M", area:"300,000 km²", lang:"Filipino, English", currency:"Peso (PHP)",
+  culture:"A fiercely joyful archipelago of 7,641 islands known for extreme hospitality, vibrant fiestas, and singing.",
+  trad:"Singing karaoke everywhere, riding colorful Jeepneys, eating Lechon (roast pig) at parties.",
+  fact:"The Philippines is the text messaging capital of the world, sending hundreds of millions of texts daily.",
+  dyk:"The Puerto Princesa Underground River is one of the longest navigable underground rivers on the planet.",
+  travel:"🛶 Paddle through the eerie, echoing limestone caves of the Puerto Princesa Underground River.",
+  photos:[
+    {url:"", wiki:"Palawan", cap:"El Nido, Palawan"},
+    {url:"", wiki:"Chocolate Hills", cap:"Chocolate Hills"},
+    {url:"", wiki:"Banaue Rice Terraces", cap:"Banaue Rice Terraces"}
+  ]},
+{ iso:458, fc:"my", name:"Malaysia", flag:"🇲🇾", capital:"Kuala Lumpur", region:"Asia", lat:4.21, lon:101.97,
+  pop:"34M", area:"330,803 km²", lang:"Malay", currency:"Ringgit (MYR)",
+  culture:"'Truly Asia'—a peaceful, harmonious blend of Malay, Chinese, and Indian cultures surrounded by ancient rainforests.",
+  trad:"Eating incredible street food at open-air mamak stalls, celebrating Hari Raya, Diwali, and Chinese New Year.",
+  fact:"The Petronas Twin Towers in Kuala Lumpur were the tallest buildings in the world from 1998 to 2004.",
+  dyk:"The incredibly foul-smelling but beloved Durian fruit is practically a national obsession.",
+  travel:"🦧 Venture into the ancient jungles of Borneo to see wild orangutans swinging through the canopy.",
+  photos:[
+    {url:"", wiki:"Petronas Towers", cap:"Petronas Twin Towers"},
+    {url:"", wiki:"Mount Kinabalu", cap:"Mount Kinabalu"},
+    {url:"", wiki:"Batu Caves", cap:"Batu Caves"}
+  ]},
+{ iso:360, fc:"id", name:"Indonesia", flag:"🇮🇩", capital:"Jakarta", region:"Asia", lat:-0.78, lon:113.92,
+  pop:"277M", area:"1,904,569 km²", lang:"Indonesian", currency:"Rupiah (IDR)",
+  culture:"The world's largest island country, featuring hundreds of distinct ethnic groups and a highly active volcanic landscape.",
+  trad:"Making intricate Batik textiles, playing Gamelan music, performing ancient shadow puppet theater (Wayang).",
+  fact:"Indonesia consists of over 17,000 islands and holds the world's fourth-largest population.",
+  dyk:"The massive Komodo Dragon, the largest lizard on Earth, is found only on five Indonesian islands.",
+  travel:"🌋 Hike up Mount Bromo at sunrise to watch a highly active volcano vent steam into the sky.",
+  photos:[
+    {url:"", wiki:"Bali", cap:"Rice Terraces in Bali"},
+    {url:"", wiki:"Mount Bromo", cap:"Mount Bromo"},
+    {url:"", wiki:"Komodo National Park", cap:"Komodo Dragon"}
+  ]},
+{ iso:702, fc:"sg", name:"Singapore", flag:"🇸🇬", capital:"Singapore", region:"Asia", lat:1.35, lon:103.81,
+  pop:"5.6M", area:"728 km²", lang:"English, Malay, Mandarin, Tamil", currency:"Dollar (SGD)",
+  culture:"A hyper-efficient, incredibly clean island city-state famous for futuristic architecture and hawker center food.",
+  trad:"Eating incredibly cheap, Michelin-starred chicken rice at hawker centers, aggressive chewing gum bans.",
+  fact:"Singapore is one of only three surviving true city-states in the world (along with Monaco and Vatican City).",
+  dyk:"The massive 'Supertrees' at Gardens by the Bay actually generate solar power and collect rainwater.",
+  travel:"🌳 Walk the skyway suspended between the towering, glowing artificial Supertrees at night.",
+  photos:[
+    {url:"", wiki:"Marina Bay Sands", cap:"Marina Bay Sands"},
+    {url:"", wiki:"Gardens by the Bay", cap:"Gardens by the Bay"},
+    {url:"", wiki:"Jewel Changi Airport", cap:"Jewel Changi Waterfall"}
+  ]},
+{ iso:96, fc:"bn", name:"Brunei", flag:"🇧🇳", capital:"Bandar Seri Begawan", region:"Asia", lat:4.53, lon:114.72,
+  pop:"0.4M", area:"5,765 km²", lang:"Malay", currency:"Dollar (BND)",
+  culture:"A tiny, vastly wealthy Islamic sultanate situated entirely on the island of Borneo, surrounded by dense jungle.",
+  trad:"Strict adherence to Islamic law, living in stilt villages over the water.",
+  fact:"The Sultan of Brunei lives in the largest residential palace in the world, featuring 1,788 rooms.",
+  dyk:"Citizens of Brunei pay zero personal income tax due to the country's immense oil wealth.",
+  travel:"🕌 View the spectacular, pure-gold domes of the Sultan Omar Ali Saifuddien Mosque.",
+  photos:[
+    {url:"", wiki:"Omar Ali Saifuddien Mosque", cap:"Omar Ali Mosque"},
+    {url:"", wiki:"Kampong Ayer", cap:"Kampong Ayer Water Village"},
+    {url:"", wiki:"Ulu Temburong National Park", cap:"Ulu Temburong Jungle"}
+  ]},
+{ iso:626, fc:"tl", name:"Timor-Leste", flag:"🇹🇱", capital:"Dili", region:"Asia", lat:-8.55, lon:125.56,
+  pop:"1.3M", area:"14,874 km²", lang:"Tetum, Portuguese", currency:"Dollar (USD)",
+  culture:"One of the youngest countries in the world, possessing rugged mountains, incredible reefs, and a Portuguese Catholic heritage.",
+  trad:"Weaving Tais (traditional colorful textiles), drinking locally grown organic coffee.",
+  fact:"Timor-Leste was the first new sovereign state of the 21st century, gaining independence in 2002.",
+  dyk:"The waters surrounding Atauro Island possess some of the highest marine biodiversity found anywhere on Earth.",
+  travel:"🐠 Dive off Atauro Island to explore completely untouched, vibrantly colorful coral reefs.",
+  photos:[
+    {url:"", wiki:"Dili", cap:"Cristo Rei of Dili"},
+    {url:"", wiki:"Atauro Island", cap:"Atauro Island"},
+    {url:"", wiki:"Mount Ramelau", cap:"Mount Ramelau"}
+  ]},
+{ iso:418, fc:"la", name:"Laos", flag:"🇱🇦", capital:"Vientiane", region:"Asia", lat:19.85, lon:102.49,
+  pop:"7.5M", area:"236,800 km²", lang:"Lao", currency:"Kip (LAK)",
+  culture:"A deeply relaxed, landlocked nation centered entirely around the flow of the mighty Mekong River.",
+  trad:"Giving morning alms (sticky rice) to hundreds of barefoot monks, weaving intricate silk.",
+  fact:"Laos holds the tragic record of being the most heavily bombed country per capita in history.",
+  dyk:"The Plain of Jars is a massive archaeological mystery containing thousands of giant stone jars scattered across valleys.",
+  travel:"💦 Swim in the perfectly terraced, turquoise pools of the Kuang Si Falls deep in the jungle.",
+  photos:[
+    {url:"", wiki:"Luang Prabang", cap:"Luang Prabang"},
+    {url:"", wiki:"Kuang Si Falls", cap:"Kuang Si Falls"},
+    {url:"", wiki:"Plain of Jars", cap:"Plain of Jars"}
+  ]},
+{ iso:554, fc:"nz", name:"New Zealand", flag:"🇳🇿", capital:"Wellington", region:"Oceania", lat:-40.90, lon:174.88,
+  pop:"5.2M", area:"268,021 km²", lang:"English, Māori", currency:"Dollar (NZD)",
+  culture:"'Aotearoa'—a breathtakingly scenic nation known for extreme sports, deep Māori heritage, and sheep.",
+  trad:"Performing the intimidating Haka dance, eating the Hangi (food cooked underground), extreme bungee jumping.",
+  fact:"New Zealand was the very first country in the world to give women the right to vote in 1893.",
+  dyk:"The entire Lord of the Rings movie trilogy was filmed entirely in New Zealand.",
+  travel:"🏔️ Hike across a live volcano on the Tongariro Alpine Crossing (famously known as Mount Doom).",
+  photos:[
+    {url:"", wiki:"Milford Sound", cap:"Milford Sound"},
+    {url:"", wiki:"Hobbiton Movie Set", cap:"Hobbiton"},
+    {url:"", wiki:"Tongariro National Park", cap:"Tongariro Alpine Crossing"}
+  ]},
+{ iso:598, fc:"pg", name:"Papua New Guinea", flag:"🇵🇬", capital:"Port Moresby", region:"Oceania", lat:-6.31, lon:143.95,
+  pop:"10M", area:"462,840 km²", lang:"Tok Pisin, English, Hiri Motu", currency:"Kina (PGK)",
+  culture:"One of the most culturally diverse and wildly untamed places on Earth, home to uncontacted tribes.",
+  trad:"Sing-sing festivals where tribes wear elaborate, towering feather headdresses and body paint.",
+  fact:"There are over 800 distinct languages spoken in PNG—more than any other country in the world.",
+  dyk:"Many species of the incredibly ornate 'Birds of Paradise' are found exclusively in the deep jungles here.",
+  travel:"🦅 Trek deep into the Highland jungles to witness the spectacular, otherworldly courtship dance of the Bird of Paradise.",
+  photos:[
+    {url:"", wiki:"Mount Wilhelm", cap:"Mount Wilhelm"},
+    {url:"", wiki:"Kokoda Track", cap:"The Kokoda Track"},
+    {url:"", wiki:"Tari, Papua New Guinea", cap:"Huli Wigmen of Tari"}
+  ]},
+{ iso:242, fc:"fj", name:"Fiji", flag:"🇫🇯", capital:"Suva", region:"Oceania", lat:-17.71, lon:178.06,
+  pop:"0.9M", area:"18,274 km²", lang:"English, Fijian, Fiji Hindi", currency:"Dollar (FJD)",
+  culture:"The heart of the South Pacific, universally famous for its incredibly warm, welcoming people and crystal waters.",
+  trad:"Drinking Kava (a slightly narcotic root drink) in a massive communal circle, shouting 'Bula!' to greet everyone.",
+  fact:"Fiji consists of 333 tropical islands, but only about 110 of them are actually inhabited.",
+  dyk:"The international dateline bends around Fiji so that the entire country stays in the exact same time zone.",
+  travel:"🥥 Share a traditional bowl of Kava with the extremely friendly locals in a remote island village.",
+  photos:[
+    {url:"", wiki:"Mamanuca Islands", cap:"Mamanuca Islands"},
+    {url:"", wiki:"Viti Levu", cap:"Viti Levu Coast"},
+    {url:"", wiki:"Taveuni", cap:"Bouma Waterfalls, Taveuni"}
+  ]},
+{ iso:882, fc:"ws", name:"Samoa", flag:"🇼🇸", capital:"Apia", region:"Oceania", lat:-13.75, lon:-172.10,
+  pop:"0.2M", area:"2,842 km²", lang:"Samoan, English", currency:"Tala (WST)",
+  culture:"A deeply traditional Polynesian society governed by 'Fa'a Samoa' (The Samoan Way), emphasizing extreme respect for elders.",
+  trad:"Getting full-body Pe'a tattoos using traditional tapping tools, eating taro, spectacular fire knife dancing.",
+  fact:"Samoa famously skipped an entire day (December 30, 2011) to jump across the International Date Line and align with Australia.",
+  dyk:"The incredible To-Sua Ocean Trench is a giant, perfectly circular sinkhole filled with crystal clear seawater.",
+  travel:"🌊 Climb down a steep wooden ladder to swim in the magical To-Sua Ocean Trench.",
+  photos:[
+    {url:"", wiki:"To-Sua Ocean Trench", cap:"To-Sua Ocean Trench"},
+    {url:"", wiki:"Savai'i", cap:"Alofaaga Blowholes"},
+    {url:"", wiki:"Apia", cap:"Apia City"}
+  ]},
+{ iso:776, fc:"to", name:"Tonga", flag:"🇹🇴", capital:"Nukuʻalofa", region:"Oceania", lat:-21.17, lon:-175.20,
+  pop:"0.1M", area:"747 km²", lang:"Tongan, English", currency:"Paʻanga (TOP)",
+  culture:"The only remaining monarchy in the Pacific, a deeply religious and fiercely independent island nation.",
+  trad:"Wearing ta'ovala (woven mats) tied around the waist as a sign of extreme respect, colossal Sunday feasts.",
+  fact:"Tonga is the only Pacific island nation that completely avoided formal colonization by a foreign power.",
+  dyk:"Every year, massive humpback whales migrate to the warm waters of Tonga to mate and give birth.",
+  travel:"🐋 Swim carefully alongside giant, graceful humpback whales and their newborn calves.",
+  photos:[
+    {url:"", wiki:"Vavaʻu", cap:"Vava'u Islands"},
+    {url:"", wiki:"Haʻamonga ʻa Maui", cap:"Ha'amonga 'a Maui Trilithon"},
+    {url:"", wiki:"Nukuʻalofa", cap:"Royal Palace, Nukuʻalofa"}
+  ]},
+{ iso:548, fc:"vu", name:"Vanuatu", flag:"🇻🇺", capital:"Port Vila", region:"Oceania", lat:-15.37, lon:166.95,
+  pop:"0.3M", area:"12,189 km²", lang:"Bislama, French, English", currency:"Vatu (VUV)",
+  culture:"A wild, extremely volcanic archipelago known for dense jungles, massive WWII wrecks, and ancient tribal magic.",
+  trad:"Land diving (the original bungee jumping using vines), drinking extremely potent Kava, drawing intricate sand art.",
+  fact:"Vanuatu is the birthplace of bungee jumping, where men leap from tall wooden towers with only vines tied to their ankles.",
+  dyk:"Mount Yasur on Tanna Island is one of the most accessible, constantly erupting active volcanoes in the world.",
+  travel:"🌋 Stand right on the rim of Mount Yasur and feel the earth shake as it violently erupts lava into the sky.",
+  photos:[
+    {url:"", wiki:"Mount Yasur", cap:"Mount Yasur Volcano"},
+    {url:"", wiki:"Espiritu Santo", cap:"Blue Hole, Espiritu Santo"},
+    {url:"", wiki:"Pentecost Island", cap:"Land Diving"}
+  ]},
+{ iso:90, fc:"sb", name:"Solomon Islands", flag:"🇸🇧", capital:"Honiara", region:"Oceania", lat:-9.64, lon:160.15,
+  pop:"0.7M", area:"28,896 km²", lang:"English", currency:"Dollar (SBD)",
+  culture:"A rugged, entirely unspoiled chain of islands covered in jungle, possessing a deep and violent World War II history.",
+  trad:"Chewing betel nut, carving intricate wooden canoes, playing panpipes.",
+  fact:"The Solomon Islands contain some of the highest concentrations of sunken WWII ships and airplanes anywhere on Earth.",
+  dyk:"About 10% of the indigenous population uniquely has naturally blond hair despite having extremely dark skin.",
+  travel:"🤿 Scuba dive into the crystal clear waters of 'Ironbottom Sound' to explore massive, untouched sunken WWII warships.",
+  photos:[
+    {url:"", wiki:"Guadalcanal", cap:"Guadalcanal WWII Relics"},
+    {url:"", wiki:"Marovo Lagoon", cap:"Marovo Lagoon"},
+    {url:"", wiki:"Honiara", cap:"Honiara"}
+  ]},
+{ iso:724, fc:"es", name:"Spain", flag:"🇪🇸", capital:"Madrid", region:"Europe", lat:40.41, lon:-3.70,
+  pop:"48M", area:"505,990 km²", lang:"Spanish", currency:"Euro (€)",
+  culture:"A vibrant, passionate Mediterranean nation famous for its late-night lifestyle, fiery flamenco, and incredible regional diversity.",
+  trad:"Eating late tapas, the afternoon siesta, running with the bulls in Pamplona, throwing tomatoes at La Tomatina.",
+  fact:"Spain produces nearly half of the entire world's olive oil.",
+  dyk:"The Sagrada Familia in Barcelona has been under construction for over 140 years and is still not finished.",
+  travel:"💃 Watch an intense, emotional, and fiery flamenco performance in a small, hidden cave in Andalusia.",
+  photos:[
+    {url:"", wiki:"Sagrada Família", cap:"Sagrada Família"},
+    {url:"", wiki:"Alhambra", cap:"The Alhambra"},
+    {url:"", wiki:"Park Güell", cap:"Park Güell"}
+  ]},
+{ iso:620, fc:"pt", name:"Portugal", flag:"🇵🇹", capital:"Lisbon", region:"Europe", lat:38.72, lon:-9.13,
+  pop:"10M", area:"92,212 km²", lang:"Portuguese", currency:"Euro (€)",
+  culture:"A seafaring nation with a melancholic soul, famous for dramatic coastlines, ancient castles, and Fado music.",
+  trad:"Listening to soulful Fado singers, eating Pastel de Nata (custard tarts), beautifully hand-painted Azulejo tiles.",
+  fact:"Portugal is the oldest nation-state on the Iberian Peninsula and one of the oldest in Europe.",
+  dyk:"Portugal produces over 50% of the world's cork supply, used in wine bottles globally.",
+  travel:"🌊 Stand at Cabo da Roca, the absolute westernmost point of the entire European continent.",
+  photos:[
+    {url:"", wiki:"Belém Tower", cap:"Belém Tower"},
+    {url:"", wiki:"Pena Palace", cap:"Pena Palace, Sintra"},
+    {url:"", wiki:"Douro", cap:"Douro Valley"}
+  ]},
+{ iso:756, fc:"ch", name:"Switzerland", flag:"🇨🇭", capital:"Bern", region:"Europe", lat:46.81, lon:8.22,
+  pop:"8.7M", area:"41,290 km²", lang:"German, French, Italian, Romansh", currency:"Franc (CHF)",
+  culture:"An immensely wealthy, pristine alpine nation known for extreme precision, absolute neutrality, and stunning landscapes.",
+  trad:"Eating communal cheese fondue, blowing the massive Alphorn in the mountains, making the world's finest watches.",
+  fact:"Switzerland has enough nuclear fallout shelters to theoretically accommodate its entire human population.",
+  dyk:"The iconic Toblerone chocolate bar is shaped specifically to mimic the Matterhorn mountain.",
+  travel:"🚞 Take the incredibly scenic Glacier Express train through the snow-capped, towering Swiss Alps.",
+  photos:[
+    {url:"", wiki:"Matterhorn", cap:"The Matterhorn"},
+    {url:"", wiki:"Lake Geneva", cap:"Lake Geneva"},
+    {url:"", wiki:"Jungfraujoch", cap:"Top of Europe, Jungfraujoch"}
+  ]},
+{ iso:40, fc:"at", name:"Austria", flag:"🇦🇹", capital:"Vienna", region:"Europe", lat:48.20, lon:16.37,
+  pop:"9M", area:"83,871 km²", lang:"German", currency:"Euro (€)",
+  culture:"The historical center of classical music and opulent empires, nestled deeply within the Alps.",
+  trad:"Attending elegant Viennese waltz balls, eating massive Wiener Schnitzels, drinking rich coffee in historic cafes.",
+  fact:"Vienna is widely considered the classical music capital of the world, home to Mozart, Beethoven, and Strauss.",
+  dyk:"The sewing machine, the snow globe, and the psychoanalysis of Sigmund Freud all originated in Austria.",
+  travel:"🎼 Walk the opulent halls of the massive Schönbrunn Palace, the summer residence of the Habsburgs.",
+  photos:[
+    {url:"", wiki:"Schönbrunn Palace", cap:"Schönbrunn Palace"},
+    {url:"", wiki:"Hallstatt", cap:"Hallstatt Village"},
+    {url:"", wiki:"Hofburg Palace", cap:"The Hofburg"}
+  ]},
+{ iso:528, fc:"nl", name:"Netherlands", flag:"🇳🇱", capital:"Amsterdam", region:"Europe", lat:52.36, lon:4.90,
+  pop:"17.8M", area:"41,865 km²", lang:"Dutch", currency:"Euro (€)",
+  culture:"A hyper-efficient, progressive, entirely flat nation built mostly on land painstakingly reclaimed from the sea.",
+  trad:"Cycling absolutely everywhere, eating raw herring with onions, massive celebrations on King's Day.",
+  fact:"More than a quarter of the Netherlands is physically situated completely below sea level.",
+  dyk:"There are more bicycles in the Netherlands than there are people, by a margin of several million.",
+  travel:"🌷 Cycle past beautifully preserved historic windmills and endless, vibrant fields of colorful tulips.",
+  photos:[
+    {url:"", wiki:"Keukenhof", cap:"Keukenhof Tulip Gardens"},
+    {url:"", wiki:"Kinderdijk", cap:"Windmills of Kinderdijk"},
+    {url:"", wiki:"Amsterdam", cap:"Amsterdam Canals"}
+  ]},
+{ iso:300, fc:"gr", name:"Greece", flag:"🇬🇷", capital:"Athens", region:"Europe", lat:37.98, lon:23.72,
+  pop:"10.4M", area:"131,957 km²", lang:"Greek", currency:"Euro (€)",
+  culture:"The literal cradle of Western civilization and democracy, blessed with thousands of stunning, sun-baked islands.",
+  trad:"Smashing plates at celebrations, eating Gyros and Feta, taking hours to drink a single Frappé coffee.",
+  fact:"Greece features thousands of islands, but only about 227 of them are actually inhabited by humans.",
+  dyk:"Voting is technically compulsory in Greece, as it is the very birthplace of the democratic system.",
+  travel:"🏛️ Stand before the towering, ancient marble columns of the iconic Parthenon at sunset.",
+  photos:[
+    {url:"", wiki:"Parthenon", cap:"The Parthenon, Athens"},
+    {url:"", wiki:"Santorini", cap:"Oia, Santorini"},
+    {url:"", wiki:"Meteora", cap:"Monasteries of Meteora"}
+  ]},
+{ iso:578, fc:"no", name:"Norway", flag:"🇳🇴", capital:"Oslo", region:"Europe", lat:59.91, lon:10.75,
+  pop:"5.4M", area:"385,207 km²", lang:"Norwegian", currency:"Krone (NOK)",
+  culture:"A pristine, immensely wealthy Nordic nation defined by its dramatic, towering fjords and strong Viking history.",
+  trad:"Cross-country skiing immediately after work, eating brown cheese (Brunost), embracing 'Koselig' (coziness).",
+  fact:"Norway introduced the idea of using raw salmon in sushi to the Japanese in the 1980s.",
+  dyk:"The country gets so much of its power from waterfalls and rivers that it runs on 98% renewable energy.",
+  travel:"🚢 Sail deep into the Geirangerfjord to see massive waterfalls plunging directly into the dark ocean.",
+  photos:[
+    {url:"", wiki:"Geirangerfjord", cap:"Geirangerfjord"},
+    {url:"", wiki:"Lofoten", cap:"Lofoten Islands"},
+    {url:"", wiki:"Preikestolen", cap:"Pulpit Rock"}
+  ]},
+{ iso:752, fc:"se", name:"Sweden", flag:"🇸🇪", capital:"Stockholm", region:"Europe", lat:59.32, lon:18.06,
+  pop:"10.5M", area:"450,295 km²", lang:"Swedish", currency:"Krona (SEK)",
+  culture:"A highly innovative, deeply egalitarian Nordic country known for minimalist design, pop music, and vast forests.",
+  trad:"Fika (daily coffee and pastry break), dancing around the Maypole during Midsummer, eating meatballs.",
+  fact:"Sweden actually pays high school students roughly $120 a month purely for attending their classes.",
+  dyk:"Two-thirds of Sweden's land area is completely covered by thick, pristine forests.",
+  travel:"🌌 Sleep on a bed made entirely of solid, carved ice at the world-famous Icehotel in Jukkasjärvi.",
+  photos:[
+    {url:"", wiki:"Stockholm", cap:"Gamla Stan, Stockholm"},
+    {url:"", wiki:"Icehotel (Jukkasjärvi)", cap:"The Icehotel"},
+    {url:"", wiki:"Vasa (ship)", cap:"The Vasa Museum"}
+  ]},
+{ iso:352, fc:"is", name:"Iceland", flag:"🇮🇸", capital:"Reykjavík", region:"Europe", lat:64.14, lon:-21.89,
+  pop:"0.3M", area:"103,000 km²", lang:"Icelandic", currency:"Króna (ISK)",
+  culture:"The 'Land of Fire and Ice', a remote, wildly volcanic island populated by descendants of fierce Vikings.",
+  trad:"Bathing outside in geothermal hot springs in the freezing winter, eating fermented shark (Hákarl).",
+  fact:"Iceland is entirely devoid of mosquitoes, and it does not have a standing army.",
+  dyk:"Because of the midnight sun, you can actually play a full round of golf at 2:00 AM in the middle of summer.",
+  travel:"🧊 Walk completely inside the stunning, crystal-blue tunnels of a massive, ancient glacier.",
+  photos:[
+    {url:"", wiki:"Blue Lagoon (geothermal spa)", cap:"The Blue Lagoon"},
+    {url:"", wiki:"Gullfoss", cap:"Gullfoss Waterfall"},
+    {url:"", wiki:"Vatnajökull", cap:"Vatnajökull Glacier"}
+  ]},
+{ iso:616, fc:"pl", name:"Poland", flag:"🇵🇱", capital:"Warsaw", region:"Europe", lat:52.22, lon:21.01,
+  pop:"37M", area:"312,696 km²", lang:"Polish", currency:"Złoty (PLN)",
+  culture:"A fiercely resilient, rapidly growing nation in Central Europe with a deeply tragic but heroic history.",
+  trad:"Eating massive amounts of Pierogi (dumplings), foraging for mushrooms in the autumn forest.",
+  fact:"Poland boasts 17 Nobel Prize laureates, notably including Marie Curie.",
+  dyk:"The Wieliczka Salt Mine contains a massive, incredibly ornate cathedral carved entirely out of solid salt underground.",
+  travel:"🏰 Explore the massive, red-brick fortress of Malbork, the largest castle in the world by land area.",
+  photos:[
+    {url:"", wiki:"Wawel Castle", cap:"Wawel Castle, Kraków"},
+    {url:"", wiki:"Wieliczka Salt Mine", cap:"Underground Salt Cathedral"},
+    {url:"", wiki:"Białowieża Forest", cap:"Białowieża Primeval Forest"}
+  ]},
+{ iso:804, fc:"ua", name:"Ukraine", flag:"🇺🇦", capital:"Kyiv", region:"Europe", lat:50.45, lon:30.52,
+  pop:"41M", area:"603,628 km²", lang:"Ukrainian", currency:"Hryvnia (UAH)",
+  culture:"The 'Breadbasket of Europe', a sprawling nation of incredibly fertile plains, sunflower fields, and fierce independence.",
+  trad:"Painting incredibly intricate Easter eggs (Pysanky), eating hot Borscht with garlic pampushky.",
+  fact:"It is physically the largest country located entirely within the European continent.",
+  dyk:"The deepest metro station in the world is Arsenalna in Kyiv, located a staggering 105.5 meters underground.",
+  travel:"⛪ Marvel at the golden, shining onion domes of the massive Kyiv Pechersk Lavra monastery complex.",
+  photos:[
+    {url:"", wiki:"Kyiv Pechersk Lavra", cap:"Kyiv Pechersk Lavra"},
+    {url:"", wiki:"Carpathian Mountains", cap:"Carpathian Mountains"},
+    {url:"", wiki:"Odesa", cap:"Odesa Opera House"}
+  ]},
+{ iso:643, fc:"ru", name:"Russia", flag:"🇷🇺", capital:"Moscow", region:"Europe", lat:55.75, lon:37.61,
+  pop:"143M", area:"17,098,242 km²", lang:"Russian", currency:"Ruble (RUB)",
+  culture:"A colossal, culturally immense transcontinental empire known for ballet, literature, and extremely harsh winters.",
+  trad:"Bathing in the searing heat of a Banya (sauna) and then diving directly into freezing snow.",
+  fact:"Russia is so unimaginably massive that it spans across 11 entirely different time zones.",
+  dyk:"Lake Baikal contains about 20% of the entire world's unfrozen freshwater and is the deepest lake on Earth.",
+  travel:"🚂 Ride the epic, legendary Trans-Siberian Railway all the way from Moscow to Vladivostok.",
+  photos:[
+    {url:"", wiki:"Saint Basil's Cathedral", cap:"Saint Basil's Cathedral"},
+    {url:"", wiki:"Lake Baikal", cap:"Lake Baikal in Winter"},
+    {url:"", wiki:"Hermitage Museum", cap:"The Hermitage, St. Petersburg"}
+  ]},
+{ iso:100, fc:"bg", name:"Bulgaria", flag:"🇧🇬", capital:"Sofia", region:"Europe", lat:42.69, lon:23.32,
+  pop:"6.4M", area:"110,994 km²", lang:"Bulgarian", currency:"Lev (BGN)",
+  culture:"One of Europe's oldest states, boasting deep Thracian roots, massive mountains, and the Black Sea coast.",
+  trad:"Nodding the head to mean 'No' and shaking it to mean 'Yes', wearing the Baba Marta red-and-white spring strings.",
+  fact:"Bulgaria is the world's leading producer of rose oil, used in almost all luxury perfumes.",
+  dyk:"The Cyrillic alphabet, currently used by Russia and many others, was actually invented in the First Bulgarian Empire.",
+  travel:"🌹 Wander through the heavily scented, vibrant fields of the Rose Valley during the spring harvest.",
+  photos:[
+    {url:"", wiki:"Rila Monastery", cap:"Rila Monastery"},
+    {url:"", wiki:"Seven Rila Lakes", cap:"Seven Rila Lakes"},
+    {url:"", wiki:"Plovdiv", cap:"Roman Theatre of Plovdiv"}
+  ]},
+{ iso:688, fc:"rs", name:"Serbia", flag:"🇷🇸", capital:"Belgrade", region:"Europe", lat:44.81, lon:20.45,
+  pop:"6.8M", area:"88,361 km²", lang:"Serbian", currency:"Dinar (RSD)",
+  culture:"A proud, passionate Balkan nation known for its incredibly intense nightlife, hospitality, and sporting dominance.",
+  trad:"Drinking immensely strong Rakija fruit brandy, eating massive meat platters (Cevapi).",
+  fact:"Belgrade, the capital, is one of the oldest continuously inhabited cities in all of Europe.",
+  dyk:"The legendary inventor Nikola Tesla was a proud ethnic Serb.",
+  travel:"🏰 Explore the massive, imposing Belgrade Fortress overlooking the confluence of the Sava and Danube rivers.",
+  photos:[
+    {url:"", wiki:"Belgrade Fortress", cap:"Belgrade Fortress"},
+    {url:"", wiki:"Church of Saint Sava", cap:"Church of Saint Sava"},
+    {url:"", wiki:"Đavolja Varoš", cap:"Devil's Town (Đavolja Varoš)"}
+  ]},
+{ iso:112, fc:"by", name:"Belarus", flag:"🇧🇾", capital:"Minsk", region:"Europe", lat:53.90, lon:27.56,
+  pop:"9.2M", area:"207,595 km²", lang:"Belarusian, Russian", currency:"Ruble (BYN)",
+  culture:"The 'Lungs of Europe', covered heavily by dense primeval forests and stark, imposing Soviet-era architecture.",
+  trad:"Cooking potatoes in hundreds of different ways (especially Draniki), foraging for mushrooms.",
+  fact:"It is the only country in Europe that still officially retains the death penalty.",
+  dyk:"The Białowieża Forest, shared with Poland, is the very last and largest remaining part of the immense primeval forest that once covered Europe.",
+  travel:"🦬 Spot the massive, critically endangered European Bison roaming freely in the deep primeval forest.",
+  photos:[
+    {url:"", wiki:"Mir Castle Complex", cap:"Mir Castle"},
+    {url:"", wiki:"Nesvizh Castle", cap:"Nesvizh Palace"},
+    {url:"", wiki:"Belovezhskaya Pushcha National Park", cap:"European Bison in the Forest"}
+  ]},
+{ iso:214, fc:"do", name:"Dominican Republic", flag:"🇩🇴", capital:"Santo Domingo", region:"North America", lat:18.73, lon:-70.16,
+  pop:"11.3M", area:"48,671 km²", lang:"Spanish", currency:"Peso (DOP)",
+  culture:"A vibrant Caribbean nation sharing the island of Hispaniola, known for pristine beaches and Merengue music.",
+  trad:"Dancing Merengue and Bachata, playing dominoes in the street, eating Sancocho (hearty meat stew).",
+  fact:"Santo Domingo is the oldest continuously inhabited European settlement in the Americas.",
+  dyk:"The Dominican Republic is the only country in the world to have an image of the Holy Bible on its national flag.",
+  travel:"🏖️ Relax on the spectacular white sands and turquoise waters of Punta Cana.",
+  photos:[
+    {url:"", wiki:"Punta Cana", cap:"Punta Cana Beaches"},
+    {url:"", wiki:"Ciudad Colonial (Santo Domingo)", cap:"Ciudad Colonial"},
+    {url:"", wiki:"Pico Duarte", cap:"Pico Duarte"}
+  ]},
+{ iso:222, fc:"sv", name:"El Salvador", flag:"🇸🇻", capital:"San Salvador", region:"North America", lat:13.79, lon:-88.89,
+  pop:"6.3M", area:"21,041 km²", lang:"Spanish", currency:"US Dollar (USD), Bitcoin (BTC)",
+  culture:"The smallest but most densely populated country in Central America, known as the 'Land of Volcanoes'.",
+  trad:"Eating Pupusas (thick stuffed corn tortillas), surfing world-class breaks, vibrant Catholic festivals.",
+  fact:"It is the only country in Central America that does not have a coastline on the Caribbean Sea.",
+  dyk:"In 2021, El Salvador became the first country in the world to adopt Bitcoin as official legal tender.",
+  travel:"🏄 Catch some of the best, most consistent surfing waves on the planet at El Tunco beach.",
+  photos:[
+    {url:"", wiki:"Santa Ana Volcano", cap:"Santa Ana Volcano"},
+    {url:"", wiki:"Joya de Cerén", cap:"Joya de Cerén Ruins"},
+    {url:"", wiki:"Lake Coatepeque", cap:"Lake Coatepeque"}
+  ]},
+{ iso:600, fc:"py", name:"Paraguay", flag:"🇵🇾", capital:"Asunción", region:"South America", lat:-23.44, lon:-58.44,
+  pop:"7.3M", area:"406,752 km²", lang:"Spanish, Guaraní", currency:"Guaraní (PYG)",
+  culture:"A deeply bilingual, landlocked South American nation where indigenous Guaraní culture blends heavily with Spanish traditions.",
+  trad:"Drinking tereré (ice-cold yerba mate) from a shared guampa, intricate Ñandutí (spiderweb) lacemaking.",
+  fact:"Paraguay's flag is entirely unique in the world because it has different emblems on the front and the back.",
+  dyk:"The massive Itaipu Dam, shared with Brazil, generates almost 100% of the country's electricity.",
+  travel:"🐆 Explore the vast, wild, and incredibly remote thorn forests of the Gran Chaco region.",
+  photos:[
+    {url:"", wiki:"Itaipu Dam", cap:"Itaipu Dam"},
+    {url:"", wiki:"Asunción", cap:"Asunción City"},
+    {url:"", wiki:"Jesuit Missions of La Santísima Trinidad de Paraná and Jesús de Tavarangue", cap:"Jesuit Missions"}
+  ]},
+{ iso:120, fc:"cm", name:"Cameroon", flag:"🇨🇲", capital:"Yaoundé", region:"Africa", lat:3.84, lon:11.50,
+  pop:"28M", area:"475,442 km²", lang:"French, English", currency:"CFA Franc (XAF)",
+  culture:"Known as 'Africa in miniature' because it features all of the continent's major climates and landscapes.",
+  trad:"Playing Makossa music, eating Ndolé (stewed bitterleaves and nuts), vibrant football culture.",
+  fact:"Cameroon has over 250 different native languages spoken by various ethnic groups.",
+  dyk:"Mount Cameroon is one of Africa's largest and most active volcanoes.",
+  travel:"🦍 Trek deep into the ancient Dja Faunal Reserve to observe wild lowland gorillas.",
+  photos:[
+    {url:"", wiki:"Mount Cameroon", cap:"Mount Cameroon"},
+    {url:"", wiki:"Waza National Park", cap:"Waza National Park"},
+    {url:"", wiki:"Dja Faunal Reserve", cap:"Dja Faunal Reserve"}
+  ]},
+{ iso:384, fc:"ci", name:"Côte d'Ivoire", flag:"🇨🇮", capital:"Yamoussoukro", region:"Africa", lat:7.54, lon:-5.54,
+  pop:"28M", area:"322,463 km²", lang:"French", currency:"CFA Franc (XOF)",
+  culture:"A vibrant West African economic powerhouse, deeply tied to agriculture and renowned for its music (Coupé-Décalé).",
+  trad:"Eating Garba (cassava and tuna), vibrant Zaouli mask dancing.",
+  fact:"Côte d'Ivoire is by far the largest producer and exporter of cocoa beans in the entire world.",
+  dyk:"The Basilica of Our Lady of Peace in Yamoussoukro is acknowledged by Guinness World Records as the largest church in the world.",
+  travel:"⛪ Stand in awe inside the colossal, towering dome of the Basilica of Our Lady of Peace.",
+  photos:[
+    {url:"", wiki:"Basilica of Our Lady of Peace", cap:"Basilica of Our Lady of Peace"},
+    {url:"", wiki:"Abidjan", cap:"Abidjan Skyline"},
+    {url:"", wiki:"Taï National Park", cap:"Taï National Park"}
+  ]},
+{ iso:262, fc:"dj", name:"Djibouti", flag:"🇩🇯", capital:"Djibouti", region:"Africa", lat:11.82, lon:42.59,
+  pop:"1M", area:"23,200 km²", lang:"French, Arabic", currency:"Franc (DJF)",
+  culture:"A tiny, strategically vital nation on the Horn of Africa, defined by massive salt lakes and volcanic landscapes.",
+  trad:"Chewing khat, nomadic camel herding across the harsh desert.",
+  fact:"Lake Assal in Djibouti is the lowest point in Africa and the third lowest point on Earth.",
+  dyk:"Because of its critical location near the Red Sea, it hosts military bases for the US, China, France, and Japan simultaneously.",
+  travel:"👽 Walk across the bizarre, alien-like limestone chimneys of the steaming Lake Abbe.",
+  photos:[
+    {url:"", wiki:"Lake Assal (Djibouti)", cap:"Lake Assal Salt Flats"},
+    {url:"", wiki:"Lake Abbe", cap:"Chimneys of Lake Abbe"},
+    {url:"", wiki:"Djibouti (city)", cap:"Djibouti City"}
+  ]},
+{ iso:232, fc:"er", name:"Eritrea", flag:"🇪🇷", capital:"Asmara", region:"Africa", lat:15.17, lon:38.92,
+  pop:"3.6M", area:"117,600 km²", lang:"Tigrinya, Arabic, English", currency:"Nakfa (ERN)",
+  culture:"A highly secretive, fiercely independent nation on the Red Sea with an incredible wealth of preserved modernist architecture.",
+  trad:"Drinking elaborate coffee ceremonies, eating injera flatbread.",
+  fact:"The capital, Asmara, is known as 'Little Rome' due to its perfectly preserved 1930s Italian modernist architecture.",
+  dyk:"Eritrea is one of the only countries in the world without privately owned media.",
+  travel:"🏛️ Stroll through Asmara to see stunning, perfectly preserved Art Deco cinemas and cafes.",
+  photos:[
+    {url:"", wiki:"Asmara", cap:"Art Deco Asmara"},
+    {url:"", wiki:"Dahlak Archipelago", cap:"Dahlak Archipelago"},
+    {url:"", wiki:"Massawa", cap:"Massawa Old Town"}
+  ]},
+{ iso:728, fc:"ss", name:"South Sudan", flag:"🇸🇸", capital:"Juba", region:"Africa", lat:4.85, lon:31.58,
+  pop:"11M", area:"619,745 km²", lang:"English", currency:"Pound (SSP)",
+  culture:"The youngest country in the world, fiercely independent and deeply rooted in the pastoral traditions of the Nilotic peoples.",
+  trad:"Cattle herding (where cows represent ultimate wealth and status), traditional wrestling matches.",
+  fact:"South Sudan gained its independence from Sudan very recently, on July 9, 2011.",
+  dyk:"The Sudd is one of the largest wetlands in the world, an immense, impenetrable swamp that totally transforms during the wet season.",
+  travel:"🛶 Navigate the immense, floating papyrus islands of the massive Sudd wetland.",
+  photos:[
+    {url:"", wiki:"Sudd", cap:"The Sudd Wetlands"},
+    {url:"", wiki:"Juba", cap:"Juba City"},
+    {url:"", wiki:"Boma National Park", cap:"Boma National Park"}
+  ]},
+{ iso:703, fc:"sk", name:"Slovakia", flag:"🇸🇰", capital:"Bratislava", region:"Europe", lat:48.14, lon:17.10,
+  pop:"5.4M", area:"49,035 km²", lang:"Slovak", currency:"Euro (€)",
+  culture:"A mountainous Central European nation famous for massive castles, thermal springs, and deep folk traditions.",
+  trad:"Eating Bryndzové halušky (potato dumplings with sheep cheese), intricate wood carving.",
+  fact:"Slovakia has the highest number of castles and chateaux per capita in the entire world.",
+  dyk:"The capital, Bratislava, is the only national capital in the world that directly borders two other independent countries (Austria and Hungary).",
+  travel:"⛰️ Hike the spectacular, dramatic peaks of the High Tatras mountains.",
+  photos:[
+    {url:"", wiki:"High Tatras", cap:"High Tatras"},
+    {url:"", wiki:"Bratislava", cap:"Bratislava Old Town"},
+    {url:"", wiki:"Spiš Castle", cap:"Spiš Castle"}
+  ]},
+{ iso:20, fc:"ad", name:"Andorra", flag:"🇦🇩", capital:"Andorra la Vella", region:"Europe", lat:42.50, lon:1.52,
+  pop:"79k", area:"468 km²", lang:"Catalan", currency:"Euro (€)",
+  culture:"A tiny, high-altitude microstate entirely nestled within the Pyrenees mountains between Spain and France.",
+  trad:"Skiing, eating hearty mountain stews (Escudella).",
+  fact:"Andorra is the only country in the world where Catalan is the sole official language.",
+  dyk:"It is technically a co-principality, meaning its heads of state are the President of France and the Bishop of Urgell (Spain).",
+  travel:"🎿 Ski down world-class, pristine slopes high up in the snow-capped Pyrenees.",
+  photos:[
+    {url:"", wiki:"Andorra la Vella", cap:"Andorra la Vella"},
+    {url:"", wiki:"Vallnord", cap:"Vallnord Ski Resort"},
+    {url:"", wiki:"Madriu-Perafita-Claror Valley", cap:"Madriu Valley"}
+  ]},
+{ iso:492, fc:"mc", name:"Monaco", flag:"🇲🇨", capital:"Monaco", region:"Europe", lat:43.73, lon:7.42,
+  pop:"39k", area:"2 km²", lang:"French", currency:"Euro (€)",
+  culture:"A dazzlingly wealthy, glamorous Mediterranean microstate famous for its casino, yachts, and the Grand Prix.",
+  trad:"Attending the Monte Carlo Casino, watching Formula 1 racing right through the city streets.",
+  fact:"Monaco is the second-smallest independent state in the world (after Vatican City).",
+  dyk:"Monaco does not levy any personal income tax on its residents, attracting the ultra-rich from around the world.",
+  travel:"🏎️ Walk the exact, winding streets that make up the legendary Monaco Grand Prix circuit.",
+  photos:[
+    {url:"", wiki:"Monte Carlo Casino", cap:"Monte Carlo Casino"},
+    {url:"", wiki:"Prince's Palace of Monaco", cap:"Prince's Palace"},
+    {url:"", wiki:"Port Hercules", cap:"Port Hercules"}
+  ]},
+{ iso:438, fc:"li", name:"Liechtenstein", flag:"🇱🇮", capital:"Vaduz", region:"Europe", lat:47.14, lon:9.52,
+  pop:"39k", area:"160 km²", lang:"German", currency:"Franc (CHF)",
+  culture:"A tiny, wealthy alpine principality nestled directly between Switzerland and Austria.",
+  trad:"Hiking alpine trails, celebrating the National Day with fireworks near the Prince's castle.",
+  fact:"It is the world's leading manufacturer of false teeth.",
+  dyk:"Liechtenstein is one of only two 'doubly landlocked' countries in the world (the other is Uzbekistan).",
+  travel:"🏰 Hike up to the iconic Vaduz Castle, which overlooks the tiny capital from a steep hill.",
+  photos:[
+    {url:"", wiki:"Vaduz Castle", cap:"Vaduz Castle"},
+    {url:"", wiki:"Vaduz", cap:"Vaduz"},
+    {url:"", wiki:"Malbun", cap:"Malbun Ski Resort"}
+  ]},
+{ iso:64, fc:"bt", name:"Bhutan", flag:"🇧🇹", capital:"Thimphu", region:"Asia", lat:27.47, lon:89.63,
+  pop:"0.7M", area:"38,394 km²", lang:"Dzongkha", currency:"Ngultrum (BTN)",
+  culture:"The deeply spiritual 'Land of the Thunder Dragon', totally dedicated to Buddhism and environmental preservation.",
+  trad:"Archery (the national sport) with intense singing and dancing, wearing the traditional Gho and Kira.",
+  fact:"Bhutan famously measures its success not by GDP, but by 'Gross National Happiness'.",
+  dyk:"It is the only carbon-negative country in the entire world, absorbing more CO2 than it produces.",
+  travel:"🧗 Hike up the sheer cliff face to the breathtaking, sacred Tiger's Nest Monastery.",
+  photos:[
+    {url:"", wiki:"Paro Taktsang", cap:"Tiger's Nest Monastery"},
+    {url:"", wiki:"Punakha Dzong", cap:"Punakha Dzong"},
+    {url:"", wiki:"Thimphu", cap:"Thimphu City"}
+  ]},
+{ iso:408, fc:"kp", name:"North Korea", flag:"🇰🇵", capital:"Pyongyang", region:"Asia", lat:39.03, lon:125.75,
+  pop:"26M", area:"120,540 km²", lang:"Korean", currency:"Won (KPW)",
+  culture:"An extremely isolated, highly militarized state functioning under a strict dynastic totalitarian regime.",
+  trad:"Mass gymnastics and synchronized artistic performances, extreme devotion to the Supreme Leader.",
+  fact:"North Korea uses its own calendar (the Juche calendar), which starts from the birth year of its founder, Kim Il-sung (1912).",
+  dyk:"The Rungrado 1st of May Stadium in Pyongyang is technically the largest stadium in the world by seating capacity.",
+  travel:"🏟️ View the colossal, highly synchronized Mass Games held in the world's largest stadium.",
+  photos:[
+    {url:"", wiki:"Pyongyang", cap:"Pyongyang Skyline"},
+    {url:"", wiki:"Juche Tower", cap:"Juche Tower"},
+    {url:"", wiki:"Mount Paektu", cap:"Mount Paektu"}
+  ]},
+{ iso:158, fc:"tw", name:"Taiwan", flag:"🇹🇼", capital:"Taipei", region:"Asia", lat:25.03, lon:121.56,
+  pop:"23.5M", area:"35,980 km²", lang:"Mandarin", currency:"Dollar (TWD)",
+  culture:"A bustling, high-tech island democracy known for its incredible street food and towering mountains.",
+  trad:"Eating stinky tofu at lively night markets, releasing glowing paper lanterns into the sky.",
+  fact:"Taiwan produces over 60% of the entire world's semiconductor microchips.",
+  dyk:"Taipei 101 was the tallest building in the world from 2004 until the Burj Khalifa opened in 2010.",
+  travel:"🍜 Eat your way through the incredibly vibrant, neon-lit Shilin Night Market.",
+  photos:[
+    {url:"", wiki:"Taipei 101", cap:"Taipei 101"},
+    {url:"", wiki:"Taroko National Park", cap:"Taroko Gorge"},
+    {url:"", wiki:"Jiufen", cap:"Jiufen Village"}
+  ]},
+{ iso:28, fc:"ag", name:"Antigua and Barbuda", flag:"🇦🇬", capital:"St. John's", region:"North America", lat:17.06, lon:-61.79,
+  pop:"93k", area:"442 km²", lang:"English", currency:"Dollar (XCD)",
+  culture:"A stunning twin-island nation in the Caribbean known for having 365 beaches—one for every day of the year.",
+  trad:"Sailing, celebrating the massive summer Carnival with Calypso and Soca music.",
+  fact:"Barbuda was entirely evacuated in 2017 due to Hurricane Irma, leaving it unpopulated for the first time in 300 years.",
+  dyk:"Antigua hosts one of the world's premier sailing regattas, Antigua Sailing Week.",
+  travel:"⛵ Sail across the incredibly clear, turquoise waters surrounding English Harbour.",
+  photos:[
+    {url:"", wiki:"English Harbour", cap:"English Harbour"},
+    {url:"", wiki:"Barbuda", cap:"Barbuda Beaches"},
+    {url:"", wiki:"St. John's, Antigua and Barbuda", cap:"St. John's"}
+  ]},
+{ iso:659, fc:"kn", name:"Saint Kitts and Nevis", flag:"🇰🇳", capital:"Basseterre", region:"North America", lat:17.30, lon:-62.73,
+  pop:"47k", area:"261 km²", lang:"English", currency:"Dollar (XCD)",
+  culture:"The smallest sovereign state in the Western Hemisphere, defined by lush volcanic mountains and colonial history.",
+  trad:"Dancing the Masquerade during Carnival, deeply rooted cricket culture.",
+  fact:"It is the smallest country in the Americas in both land area and population.",
+  dyk:"Alexander Hamilton, one of the founding fathers of the United States, was actually born on the island of Nevis.",
+  travel:"🚂 Ride the incredibly scenic, narrow-gauge Sugar Train around the volcanic coastline.",
+  photos:[
+    {url:"", wiki:"Brimstone Hill Fortress National Park", cap:"Brimstone Hill Fortress"},
+    {url:"", wiki:"Nevis Peak", cap:"Nevis Peak"},
+    {url:"", wiki:"Basseterre", cap:"Basseterre"}
+  ]},
+{ iso:662, fc:"lc", name:"Saint Lucia", flag:"🇱🇨", capital:"Castries", region:"North America", lat:13.90, lon:-60.97,
+  pop:"184k", area:"617 km²", lang:"English", currency:"Dollar (XCD)",
+  culture:"A lush, dramatic Caribbean island famous for the iconic, towering Piton mountains.",
+  trad:"The weekly Friday night Gros Islet street party, eating green figs and saltfish.",
+  fact:"Saint Lucia boasts the world's only 'drive-in volcano' (Soufrière Volcanic Centre).",
+  dyk:"It has more Nobel Prize laureates per capita than any other sovereign country in the world.",
+  travel:"⛰️ Hike up the steep, jungle-covered slopes of the magnificent Gros Piton.",
+  photos:[
+    {url:"", wiki:"Pitons", cap:"The Pitons"},
+    {url:"", wiki:"Soufrière, Saint Lucia", cap:"Soufrière Volcanic Centre"},
+    {url:"", wiki:"Castries", cap:"Castries"}
+  ]},
+{ iso:670, fc:"vc", name:"Saint Vincent and the Grenadines", flag:"🇻🇨", capital:"Kingstown", region:"North America", lat:13.25, lon:-61.22,
+  pop:"110k", area:"389 km²", lang:"English", currency:"Dollar (XCD)",
+  culture:"A chain of 32 spectacularly beautiful, largely untouched Caribbean islands.",
+  trad:"Sailing traditional wooden boats, celebrating the vibrant Vincy Mas carnival.",
+  fact:"The active volcano La Soufrière dominates the main island and recently erupted in 2021.",
+  dyk:"The original Pirates of the Caribbean movies were extensively filmed in this country.",
+  travel:"⛵ Charter a yacht and sail through the crystal-clear waters of the stunning Tobago Cays.",
+  photos:[
+    {url:"", wiki:"Tobago Cays", cap:"Tobago Cays"},
+    {url:"", wiki:"La Soufrière (volcano)", cap:"La Soufrière Volcano"},
+    {url:"", wiki:"Bequia", cap:"Bequia Island"}
+  ]},
+{ iso:308, fc:"gd", name:"Grenada", flag:"🇬🇩", capital:"St. George's", region:"North America", lat:12.11, lon:-61.67,
+  pop:"113k", area:"344 km²", lang:"English", currency:"Dollar (XCD)",
+  culture:"The 'Isle of Spice', incredibly fragrant with nutmeg, cinnamon, and cloves growing everywhere.",
+  trad:"Celebrating Spicemas (Carnival) covered entirely in black oil (Jab Jab).",
+  fact:"Grenada produces nearly 20% of the entire world's nutmeg supply.",
+  dyk:"The country features an incredible Underwater Sculpture Park completely submerged in the ocean.",
+  travel:"🤿 Snorkel through the mysterious, beautiful Molinere Underwater Sculpture Park.",
+  photos:[
+    {url:"", wiki:"St. George's, Grenada", cap:"St. George's Harbour"},
+    {url:"", wiki:"Grand Etang National Park", cap:"Grand Etang Lake"},
+    {url:"", wiki:"Molinere Underwater Sculpture Park", cap:"Underwater Sculptures"}
+  ]},
+{ iso:212, fc:"dm", name:"Dominica", flag:"🇩🇲", capital:"Roseau", region:"North America", lat:15.41, lon:-61.37,
+  pop:"72k", area:"751 km²", lang:"English", currency:"Dollar (XCD)",
+  culture:"The 'Nature Island of the Caribbean', mostly covered by vast, untouched, boiling geothermal rainforests.",
+  trad:"Eating Callaloo soup, speaking uniquely Creole French despite being English-speaking.",
+  fact:"It is home to the world's second-largest volcanically heated, continuously boiling lake.",
+  dyk:"Dominica is one of the only places in the world where sperm whales live continuously year-round.",
+  travel:"🌋 Hike an incredibly strenuous, muddy trail deep into the jungle to see the massive Boiling Lake.",
+  photos:[
+    {url:"", wiki:"Boiling Lake", cap:"Boiling Lake"},
+    {url:"", wiki:"Morne Trois Pitons National Park", cap:"Morne Trois Pitons"},
+    {url:"", wiki:"Roseau", cap:"Roseau"}
+  ]},
+{ iso:132, fc:"cv", name:"Cape Verde", flag:"🇨🇻", capital:"Praia", region:"Africa", lat:16.53, lon:-23.04,
+  pop:"0.5M", area:"4,033 km²", lang:"Portuguese", currency:"Escudo (CVE)",
+  culture:"A dramatic, volcanic archipelago blending West African and Portuguese influences, famous for Morna music.",
+  trad:"Listening to the soulful, melancholic Morna music (made famous by Cesária Évora), eating Cachupa.",
+  fact:"Cape Verde has virtually zero natural resources and frequently suffers from severe droughts.",
+  dyk:"Charles Darwin visited the islands during his famous voyage on the HMS Beagle in 1832.",
+  travel:"🌋 Hike up the active Pico do Fogo volcano, which rises dramatically out of a massive caldera.",
+  photos:[
+    {url:"", wiki:"Pico do Fogo", cap:"Pico do Fogo Volcano"},
+    {url:"", wiki:"Sal, Cape Verde", cap:"Beaches of Sal"},
+    {url:"", wiki:"Mindelo", cap:"Mindelo City"}
+  ]},
+{ iso:678, fc:"st", name:"Sao Tome and Principe", flag:"🇸🇹", capital:"São Tomé", region:"Africa", lat:0.18, lon:6.61,
+  pop:"0.2M", area:"1,001 km²", lang:"Portuguese", currency:"Dobra (STN)",
+  culture:"A tiny, forgotten tropical paradise spanning the equator, consisting of dramatic volcanic peaks and dense jungle.",
+  trad:"Tchiloli (a deeply traditional, hours-long theatrical performance), incredibly relaxed island pacing.",
+  fact:"It is the second-smallest African country by population after Seychelles.",
+  dyk:"The islands are famous for spectacular, needle-like volcanic plugs shooting straight out of the jungle, like Cão Grande.",
+  travel:"⛰️ Stare in awe at the impossibly steep, towering volcanic spire of Pico Cão Grande.",
+  photos:[
+    {url:"", wiki:"Pico Cão Grande", cap:"Pico Cão Grande"},
+    {url:"", wiki:"São Tomé", cap:"São Tomé"},
+    {url:"", wiki:"Príncipe", cap:"Jungle Coast of Príncipe"}
+  ]},
+{ iso:624, fc:"gw", name:"Guinea-Bissau", flag:"🇬🇼", capital:"Bissau", region:"Africa", lat:11.80, lon:-15.18,
+  pop:"2M", area:"36,125 km²", lang:"Portuguese", currency:"CFA Franc (XOF)",
+  culture:"A highly diverse West African nation defined by an intricate, sprawling labyrinth of coastal islands and mangroves.",
+  trad:"The massive, vibrant Carnaval de Bissau, deeply rooted animist religious practices in the islands.",
+  fact:"The Bijagós Archipelago consists of 88 islands, of which only about 20 are permanently inhabited.",
+  dyk:"In the Bijagós culture, society is heavily matriarchal, with women holding immense power and organizing the economy.",
+  travel:"🦛 Explore the extremely remote Bijagós Archipelago to see unique, saltwater-adapted hippopotamuses.",
+  photos:[
+    {url:"", wiki:"Bissagos Islands", cap:"Bijagós Archipelago"},
+    {url:"", wiki:"Bissau", cap:"Bissau"},
+    {url:"", wiki:"Orango", cap:"Saltwater Hippos"}
+  ]},
+{ iso:270, fc:"gm", name:"Gambia", flag:"🇬🇲", capital:"Banjul", region:"Africa", lat:13.44, lon:-15.31,
+  pop:"2.6M", area:"11,295 km²", lang:"English", currency:"Dalasi (GMD)",
+  culture:"The 'Smiling Coast of Africa', the smallest country on mainland Africa, entirely built around the Gambia River.",
+  trad:"Drinking incredibly sweet Ataya tea, intense traditional Senegambian wrestling.",
+  fact:"The entire country's borders roughly match the shape and path of the Gambia River, surrounded entirely by Senegal.",
+  dyk:"Kunta Kinteh Island was a major, heavily fortified center of the tragic transatlantic slave trade.",
+  travel:"🛶 Take a boat completely up the massive Gambia River, spotting crocodiles, hippos, and hundreds of bird species.",
+  photos:[
+    {url:"", wiki:"Gambia River", cap:"The Gambia River"},
+    {url:"", wiki:"Kunta Kinteh Island", cap:"Kunta Kinteh Island"},
+    {url:"", wiki:"Banjul", cap:"Banjul"}
+  ]},
+{ iso:854, fc:"bf", name:"Burkina Faso", flag:"🇧🇫", capital:"Ouagadougou", region:"Africa", lat:12.23, lon:-1.56,
+  pop:"22M", area:"274,200 km²", lang:"French", currency:"CFA Franc (XOF)",
+  culture:"The 'Land of Honest Men', known globally as a major cultural center for West African art, film, and music.",
+  trad:"Hosting the immense FESPACO (the largest film festival in Africa), incredible bronze and wood crafts.",
+  fact:"Burkina Faso is heavily involved in gold mining, which accounts for the vast majority of its exports.",
+  dyk:"The village of Tiébélé is universally famous for its incredibly intricate, hand-painted geometric mud houses.",
+  travel:"🎨 Walk through the utterly mesmerizing, geometric, hand-painted mud houses of Tiébélé.",
+  photos:[
+    {url:"", wiki:"Ouagadougou", cap:"Ouagadougou"},
+    {url:"", wiki:"Tiébélé", cap:"Tiébélé Painted Houses"},
+    {url:"", wiki:"Sindou peaks", cap:"Sindou Peaks"}
+  ]},
+{ iso:768, fc:"tg", name:"Togo", flag:"🇹🇬", capital:"Lomé", region:"Africa", lat:8.61, lon:0.82,
+  pop:"8.8M", area:"56,785 km²", lang:"French", currency:"CFA Franc (XOF)",
+  culture:"A narrow, elongated West African nation serving as the vibrant epicenter of Voodoo religion and culture.",
+  trad:"Practicing traditional Voodoo ceremonies, eating Fufu (pounded yams) with rich peanut soup.",
+  fact:"Lomé hosts the Akodessewa Fetish Market, the absolute largest Voodoo market in the entire world.",
+  dyk:"Voodoo (Vodun) is officially recognized as a religion in Togo, completely parallel to Christianity and Islam.",
+  travel:"💀 Bravely visit the sprawling, mystical Akodessewa Fetish Market filled with skulls and talismans.",
+  photos:[
+    {url:"", wiki:"Lomé", cap:"Lomé"},
+    {url:"", wiki:"Koutammakou", cap:"Mud Tower Houses of Koutammakou"},
+    {url:"", wiki:"Lake Togo", cap:"Lake Togo"}
+  ]},
+{ iso:204, fc:"bj", name:"Benin", flag:"🇧🇯", capital:"Porto-Novo", region:"Africa", lat:9.30, lon:2.31,
+  pop:"13.3M", area:"114,763 km²", lang:"French", currency:"CFA Franc (XOF)",
+  culture:"The historical birthplace of the mighty Dahomey Kingdom, heavily influenced by Voodoo and a deep, complex past.",
+  trad:"The massive, extremely intense annual Voodoo festival in Ouidah.",
+  fact:"The Agojie (often called the Dahomey Amazons) were a legendary, entirely all-female military regiment.",
+  dyk:"The city of Ganvié is often called the 'Venice of Africa' because it is built entirely on stilts over Lake Nokoué.",
+  travel:"🛶 Paddle through the massive, sprawling, entirely stilted lake village of Ganvié.",
+  photos:[
+    {url:"", wiki:"Ganvié", cap:"Ganvié Stilt Village"},
+    {url:"", wiki:"Ouidah", cap:"The Door of No Return"},
+    {url:"", wiki:"Royal Palaces of Abomey", cap:"Palaces of Abomey"}
+  ]},
+{ iso:583, fc:"fm", name:"Micronesia", flag:"🇫🇲", capital:"Palikir", region:"Oceania", lat:6.91, lon:158.18,
+  pop:"113k", area:"702 km²", lang:"English", currency:"US Dollar (USD)",
+  culture:"A massive nation of 607 islands spread across an unimaginably huge area of the Pacific Ocean.",
+  trad:"Chewing betel nut, carving intricate 'love sticks', deep reliance on traditional ocean navigation.",
+  fact:"The Federated States of Micronesia uses the US Dollar and its military defense is officially provided by the USA.",
+  dyk:"Nan Madol is an incredible, ancient ruined city built entirely on artificial islands directly on a coral reef.",
+  travel:"🛶 Navigate through the eerie, massive basalt log ruins of the ancient floating city of Nan Madol.",
+  photos:[
+    {url:"", wiki:"Nan Madol", cap:"Nan Madol Ruins"},
+    {url:"", wiki:"Chuuk Lagoon", cap:"WWII Wrecks in Chuuk Lagoon"},
+    {url:"", wiki:"Pohnpei", cap:"Pohnpei Island"}
+  ]},
+{ iso:584, fc:"mh", name:"Marshall Islands", flag:"🇲🇭", capital:"Majuro", region:"Oceania", lat:7.13, lon:171.18,
+  pop:"42k", area:"181 km²", lang:"Marshallese, English", currency:"US Dollar (USD)",
+  culture:"A remote, deeply low-lying Pacific nation facing extreme existential threats from rising sea levels.",
+  trad:"Navigating the vast ocean using incredibly complex 'stick charts' to read wave swells.",
+  fact:"The USA famously conducted 67 massive nuclear tests in the Marshall Islands between 1946 and 1958.",
+  dyk:"Bikini Atoll, part of the Marshall Islands, literally inspired the name of the 'bikini' swimsuit.",
+  travel:"🤿 Scuba dive among the massive, highly radioactive sunken warships at Bikini Atoll.",
+  photos:[
+    {url:"", wiki:"Bikini Atoll", cap:"Bikini Atoll"},
+    {url:"", wiki:"Majuro", cap:"Majuro Atoll"},
+    {url:"", wiki:"Kwajalein Atoll", cap:"Kwajalein Atoll"}
+  ]},
+{ iso:585, fc:"pw", name:"Palau", flag:"🇵🇼", capital:"Ngerulmud", region:"Oceania", lat:7.51, lon:134.58,
+  pop:"18k", area:"459 km²", lang:"Palauan, English", currency:"US Dollar (USD)",
+  culture:"An archipelago possessing some of the most pristine, heavily protected marine environments on the planet.",
+  trad:"The ancient, deeply complex matriarchal society, carving intricate 'storyboards' from wood.",
+  fact:"Palau was the absolute first country on Earth to create a massive sanctuary specifically to protect sharks.",
+  dyk:"Jellyfish Lake in Palau contains millions of harmless, completely stingless jellyfish that you can swim with.",
+  travel:"🪼 Swim completely surrounded by millions of pulsing, stingless golden jellyfish in an isolated marine lake.",
+  photos:[
+    {url:"", wiki:"Rock Islands (Palau)", cap:"The Rock Islands"},
+    {url:"", wiki:"Jellyfish Lake", cap:"Jellyfish Lake"},
+    {url:"", wiki:"Koror", cap:"Koror"}
+  ]},
+{ iso:520, fc:"nr", name:"Nauru", flag:"🇳🇷", capital:"Yaren", region:"Oceania", lat:-0.52, lon:166.93,
+  pop:"12k", area:"21 km²", lang:"Nauruan, English", currency:"Australian Dollar (AUD)",
+  culture:"The world's smallest island nation, completely devastated economically and physically by excessive phosphate mining.",
+  trad:"Catching noddy birds using giant nets at night, heavily playing Australian Rules Football.",
+  fact:"It is the absolute third-smallest country in the world by land area, after Vatican City and Monaco.",
+  dyk:"Nauru is the only republic in the entire world that officially does not have a designated capital city.",
+  travel:"🚲 Cycle the entire circumference of the entire country on a single, short paved ring road.",
+  photos:[
+    {url:"", wiki:"Nauru", cap:"Phosphate Pinnacles"},
+    {url:"", wiki:"Yaren", cap:"Yaren District"},
+    {url:"", wiki:"Anibare Bay", cap:"Anibare Bay"}
+  ]},
+{ iso:798, fc:"tv", name:"Tuvalu", flag:"🇹🇻", capital:"Funafuti", region:"Oceania", lat:-8.52, lon:179.19,
+  pop:"11k", area:"26 km²", lang:"Tuvaluan, English", currency:"Australian Dollar (AUD)",
+  culture:"An extremely remote, deeply traditional Polynesian nation highly vulnerable to complete submersion due to climate change.",
+  trad:"Playing massive games of Kilikiti (traditional cricket), intense Fatele dancing and singing.",
+  fact:"It is the fourth-smallest sovereign country in the world by land area.",
+  dyk:"Tuvalu actually makes roughly 10% of its entire national GDP just by leasing out its '.tv' internet domain name.",
+  travel:"✈️ Play sports directly on the international airport's runway, which is openly used as a park when planes aren't landing.",
+  photos:[
+    {url:"", wiki:"Funafuti", cap:"Funafuti Atoll"},
+    {url:"", wiki:"Tuvalu", cap:"Tuvalu Coastline"},
+    {url:"", wiki:"Nanumea", cap:"Nanumea Atoll"}
+  ]},
+{ iso:296, fc:"ki", name:"Kiribati", flag:"🇰🇮", capital:"Tarawa", region:"Oceania", lat:1.33, lon:172.98,
+  pop:"131k", area:"811 km²", lang:"English, Gilbertese", currency:"Australian Dollar (AUD)",
+  culture:"An immensely vast ocean nation comprised of 33 coral atolls spanning literally millions of square kilometers.",
+  trad:"Fierce traditional dancing using sharp frigatebird feathers, intense communal Maneaba meeting houses.",
+  fact:"Kiribati is the only country in the entire world completely situated in all four hemispheres of the globe.",
+  dyk:"The massive Kiritimati (Christmas Island) is the absolute largest coral atoll in the world by land area.",
+  travel:"🎣 Deep-sea fish in the incredibly vast, protected, and untouched Phoenix Islands Protected Area.",
+  photos:[
+    {url:"", wiki:"Tarawa", cap:"Tarawa Atoll"},
+    {url:"", wiki:"Kiritimati", cap:"Christmas Island"},
+    {url:"", wiki:"Phoenix Islands Protected Area", cap:"Phoenix Islands"}
+  ]},
+{ iso:674, fc:"sm", name:"San Marino", flag:"🇸🇲", capital:"San Marino", region:"Europe", lat:43.94, lon:12.44,
+  pop:"33k", area:"61 km²", lang:"Italian", currency:"Euro (€)",
+  culture:"A highly elevated, deeply proud, heavily fortified mountainous microstate entirely surrounded by central Italy.",
+  trad:"Holding immense medieval crossbow competitions, proudly avoiding integration into Italy.",
+  fact:"San Marino proudly claims to be the absolute oldest surviving sovereign state and constitutional republic in the world.",
+  dyk:"The country famously has more motor vehicles registered than it actually has human residents.",
+  travel:"🏰 Walk between the Three Towers, massive ancient fortresses sitting on the absolute peaks of Mount Titano.",
+  photos:[
+    {url:"", wiki:"Monte Titano", cap:"Mount Titano"},
+    {url:"", wiki:"Guaita", cap:"Guaita Tower"},
+    {url:"", wiki:"City of San Marino", cap:"City of San Marino"}
+  ]},
+{ iso:336, fc:"va", name:"Vatican City", flag:"🇻🇦", capital:"Vatican City", region:"Europe", lat:41.90, lon:12.45,
+  pop:"800", area:"0.49 km²", lang:"Italian, Latin", currency:"Euro (€)",
+  culture:"The absolute spiritual, administrative, and historical epicenter of the global Roman Catholic Church.",
+  trad:"The Pope's weekly address to thousands in St. Peter's Square, speaking official Latin.",
+  fact:"It is physically the absolute smallest fully independent nation-state in the entire world.",
+  dyk:"Vatican City contains its own post office, incredibly short railway station, radio station, and even an ATM that provides instructions in Latin.",
+  travel:"⛪ Stare up in absolute, awe-struck silence at the breathtaking ceiling of the Sistine Chapel.",
+  photos:[
+    {url:"", wiki:"St. Peter's Basilica", cap:"St. Peter's Basilica"},
+    {url:"", wiki:"Sistine Chapel", cap:"Sistine Chapel Ceiling"},
+    {url:"", wiki:"St. Peter's Square", cap:"St. Peter's Square"}
   ]}
 ];
 
@@ -1108,6 +3129,7 @@ const regionColor = {
 let discovered = new Set();
 document.getElementById('totN').textContent = DB.length;
 document.getElementById('discN').textContent = 0;
+document.getElementById('statsFill').style.width = "0%";
 
 // ══════════════════════════════════════
 // MAP
@@ -1271,7 +3293,13 @@ function showToast(msg){
 // ══════════════════════════════════════
 const cmodal=document.getElementById('cmodal');
 function openCountry(c){
-  if(!discovered.has(c.name)){ discovered.add(c.name); document.getElementById('discN').textContent=discovered.size; showToast("Discovered "+c.name+"!"); }
+  if(!discovered.has(c.name)){ 
+    discovered.add(c.name); 
+    document.getElementById('discN').textContent=discovered.size; 
+    let pct = Math.min(100, Math.round((discovered.size / DB.length) * 100));
+    document.getElementById('statsFill').style.width = pct + "%";
+    showToast("Discovered "+c.name+"!"); 
+  }
   zoomTo(c.lat,c.lon);
   document.getElementById('cmName').textContent=c.name;
   document.getElementById('cmSub').textContent=c.region+" · "+c.lang;
